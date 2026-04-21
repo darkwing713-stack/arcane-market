@@ -739,7 +739,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 </div>
 <!-- TWITCH CHAT OVERLAY -->
 <style>
-#twitch-overlay{position:fixed;bottom:1rem;right:1rem;width:280px;z-index:4000;pointer-events:none;}
+#twitch-overlay{position:fixed;bottom:1rem;right:1rem;width:280px;z-index:8000;pointer-events:none;}
 #twitch-overlay.active{pointer-events:all;}
 #twitch-box{background:rgba(14,14,19,.96);border:1px solid #9147ff;border-radius:8px;overflow:hidden;box-shadow:0 4px 24px rgba(145,71,255,.3);}
 #twitch-header{background:#9147ff;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
@@ -798,41 +798,71 @@ const SYNC_THROTTLE_MS=1500;
 let syncTimer=null;
 
 function fbInit(){
-  try{
-    fbApp=firebase.app();
-  }catch(e){
-    fbApp=firebase.initializeApp(firebaseConfig);
-  }
+  try{fbApp=firebase.app();}catch(e){fbApp=firebase.initializeApp(firebaseConfig);}
   fbDb=firebase.database(fbApp);
   fbRef=fbDb.ref('arcanemarket/state');
 
-  // Connection status
-  const connRef=firebase.database(fbApp).ref('.info/connected');
-  connRef.on('value',snap=>{
+  // Connection status indicator
+  firebase.database(fbApp).ref('.info/connected').on('value',snap=>{
     const online=snap.val()===true;
     setSyncStatus(online?'live':'reconnecting',online);
   });
 
-  // Listen for remote changes
-  fbRef.on('value',snap=>{
-    if(ignoreNextRemoteUpdate){ignoreNextRemoteUpdate=false;return;}
+  // ONE-TIME read on connect to decide: load existing or generate fresh
+  setSyncStatus('connecting',false);
+  fbRef.once('value',snap=>{
     const data=snap.val();
-    if(!data)return;
-    try{
-      const remote=JSON.parse(data.state);
-      const remoteDay=remote.day||0;
-      const localDay=S.day||0;
-      // Only apply if remote is different from current (avoid echo loops)
-      if(data.ts!==lastPushTs){
+    if(data&&data.state){
+      // Database has state — load it, skip all local generation
+      try{
+        const remote=JSON.parse(data.state);
         Object.assign(S,remote);
         afterStateLoad();
+        lastPushTs=data.ts||0;
         setSyncStatus('synced',true);
+        logEntry('STATE LOADED FROM CLOUD','win');
+      }catch(err){
+        console.warn('Failed to parse remote state, generating fresh',err);
+        generateFreshState();
       }
-    }catch(err){console.warn('Sync parse error',err);}
+    }else{
+      // Empty database — this is the first ever load, generate and push
+      generateFreshState();
+      logEntry('FRESH STATE GENERATED & PUSHED','win');
+    }
+
+    // After the initial load, subscribe to ongoing changes from the other client
+    fbRef.on('value',snap=>{
+      if(ignoreNextRemoteUpdate){ignoreNextRemoteUpdate=false;return;}
+      const data=snap.val();
+      if(!data||!data.state)return;
+      if(data.ts===lastPushTs)return;// our own echo, ignore
+      try{
+        Object.assign(S,JSON.parse(data.state));
+        afterStateLoad();
+        setSyncStatus('live',true);
+      }catch(err){console.warn('Sync parse error',err);}
+    });
   });
 
   syncEnabled=true;
-  setSyncStatus('connecting',false);
+}
+
+// Generate all procedural content from scratch and push to Firebase
+function generateFreshState(){
+  genProcMarkets();
+  initFragMkt();
+  ['C','U','R'].forEach(r=>{
+    const pf=mkPetFrag(r);
+    pf.marketPrice=rnd(RC[r].baseMin,RC[r].baseMax);
+    pf.priceHistory=[{day:1,price:pf.marketPrice}];
+    S.marketFrags.push(pf);
+  });
+  genShop();
+  initSponsors();
+  rotateBanner();
+  afterStateLoad();
+  fbPush();
 }
 
 let lastPushTs=0;
@@ -875,28 +905,29 @@ function setSyncStatus(status,online){
 function afterStateLoad(){
   document.getElementById('wdisp').textContent=S.wallet.toLocaleString();
   document.getElementById('daybdg').textContent='DAY '+S.day;
+  document.getElementById('dayinfo').textContent=`DAY ${S.day}`;
   // Restore avatar name input
   const nameInp=document.getElementById('avatar-name-inp');
   if(nameInp&&S.avatarName)nameInp.value=S.avatarName;
   const chEl=document.getElementById('twitch-channel-name');
   if(chEl&&S.avatarName)chEl.textContent=S.avatarName.replace(/\s+/g,'')+'TV';
+  // Full re-render
   equipTitle(S.equippedTitle);
   renderSlots();
   drawWizard();
   renderCharSheet();
-  const active=document.querySelector('.pnl.active')?.id?.replace('pnl-','');
-  if(active==='markets')renderMarkets();
-  else if(active==='costs')renderCosts();
-  else if(active==='shop')renderShop();
-  else if(active==='sponsor')renderSponsors();
-  else if(active==='frags')renderFragMkt();
-  else if(active==='inventory')renderInventory();
-  else if(active==='titles')renderTitles();
-  else if(active==='gacha'&&S.currentBanner)renderBanner();
+  renderMarkets();
+  renderCosts();
+  // Render whichever panel is active (for secondary panels)
+  const activeId=document.querySelector('.pnl.active')?.id?.replace('pnl-','');
+  if(activeId==='shop')renderShop();
+  else if(activeId==='sponsor')renderSponsors();
+  else if(activeId==='frags')renderFragMkt();
+  else if(activeId==='inventory')renderInventory();
+  else if(activeId==='titles')renderTitles();
+  else if(activeId==='gacha'&&S.currentBanner)renderBanner();
+  logEntry('ARCANEMARKET ONLINE','win');
 }
-
-// Wrap upWallet so every gem change syncs
-const _upWalletOrig=upWallet;
 
 // ══ ALL 5e SPELLS BY LEVEL ══════════════════════════════════
 const ALL_SPELLS={0:["Acid Splash","Blade Ward","Booming Blade","Chill Touch","Control Flames","Create Bonfire","Dancing Lights","Druidcraft","Eldritch Blast","Encode Thoughts","Fire Bolt","Friends","Frostbite","Green-Flame Blade","Guidance","Gust","Hand of Radiance","Infestation","Light","Lightning Lure","Mage Hand","Magic Stone","Mending","Message","Mind Sliver","Minor Illusion","Mold Earth","Poison Spray","Prestidigitation","Primal Savagery","Produce Flame","Ray of Frost","Resistance","Sacred Flame","Shape Water","Shillelagh","Shocking Grasp","Spare the Dying","Sword Burst","Thaumaturgy","Thunderclap","Toll the Dead","True Strike","Vicious Mockery","Word of Radiance"],1:["Absorb Elements","Alarm","Animal Friendship","Armor of Agathys","Arms of Hadar","Bane","Beast Bond","Bless","Burning Hands","Catapult","Cause Fear","Ceremony","Chaos Bolt","Charm Person","Chromatic Orb","Color Spray","Command","Compelled Duel","Comprehend Languages","Create or Destroy Water","Cure Wounds","Detect Evil and Good","Detect Magic","Detect Poison and Disease","Disguise Self","Dissonant Whispers","Divine Favor","Earth Tremor","Ensnaring Strike","Entangle","Expeditious Retreat","Faerie Fire","False Life","Feather Fall","Find Familiar","Fog Cloud","Goodberry","Grease","Guiding Bolt","Hail of Thorns","Healing Word","Hellish Rebuke","Heroism","Hex","Hunter's Mark","Ice Knife","Identify","Inflict Wounds","Jump","Longstrider","Mage Armor","Magic Missile","Protection from Evil and Good","Purify Food and Drink","Ray of Sickness","Sanctuary","Searing Smite","Shield","Shield of Faith","Silent Image","Sleep","Snare","Speak with Animals","Tasha's Hideous Laughter","Tenser's Floating Disk","Thunderous Smite","Thunderwave","Unseen Servant","Witch Bolt","Wrathful Smite","Zephyr Strike"],2:["Aganazzar's Scorcher","Aid","Alter Self","Animal Messenger","Arcane Lock","Augury","Barkskin","Beast Sense","Blindness/Deafness","Blur","Branding Smite","Calm Emotions","Cloud of Daggers","Continual Flame","Cordon of Arrows","Crown of Madness","Darkness","Darkvision","Detect Thoughts","Dragon's Breath","Dust Devil","Earthbind","Enhance Ability","Enlarge/Reduce","Enthrall","Find Steed","Find Traps","Flame Blade","Flaming Sphere","Flock of Familiars","Fortune's Favor","Gentle Repose","Gust of Wind","Heat Metal","Hold Person","Invisibility","Knock","Lesser Restoration","Levitate","Locate Animals or Plants","Locate Object","Magic Mouth","Magic Weapon","Maximilian's Earthen Grasp","Melf's Acid Arrow","Mirror Image","Misty Step","Moonbeam","Nystul's Magic Aura","Pass without Trace","Phantasmal Force","Prayer of Healing","Protection from Poison","Pyrotechnics","Ray of Enfeeblement","Rope Trick","Scorching Ray","See Invisibility","Shadow Blade","Shatter","Silence","Skywrite","Snilloc's Snowball Swarm","Spider Climb","Spike Growth","Spiritual Weapon","Suggestion","Summon Beast","Tasha's Mind Whip","Vortex Warp","Warding Bond","Web","Wither and Bloom","Zone of Truth"],3:["Animate Dead","Aura of Vitality","Beacon of Hope","Bestow Curse","Blink","Call Lightning","Catnap","Clairvoyance","Conjure Animals","Conjure Barrage","Counterspell","Create Food and Water","Crusader's Mantle","Daylight","Dispel Magic","Elemental Weapon","Enemies Abound","Erupting Earth","Fear","Feign Death","Fireball","Flame Arrows","Fly","Gaseous Form","Glyph of Warding","Haste","Hunger of Hadar","Hypnotic Pattern","Intellect Fortress","Leomund's Tiny Hut","Life Transference","Lightning Arrow","Lightning Bolt","Magic Circle","Major Image","Mass Healing Word","Meld into Stone","Melf's Minute Meteors","Nondetection","Plant Growth","Protection from Energy","Remove Curse","Revivify","Sending","Sleet Storm","Slow","Speak with Dead","Speak with Plants","Spirit Guardians","Spirit Shroud","Stinking Cloud","Summon Fey","Summon Lesser Demons","Summon Shadowspawn","Summon Undead","Thunder Step","Tidal Wave","Tiny Servant","Tongues","Vampiric Touch","Wall of Sand","Wall of Water","Water Breathing","Water Walk","Wind Wall"],4:["Aura of Life","Aura of Purity","Banishment","Blight","Charm Monster","Compulsion","Confusion","Conjure Minor Elementals","Conjure Woodland Beings","Control Water","Death Ward","Dimension Door","Divination","Dominate Beast","Elemental Bane","Evard's Black Tentacles","Fabricate","Fire Shield","Freedom of Movement","Giant Insect","Grasping Vine","Gravity Sinkhole","Greater Invisibility","Guardian of Faith","Guardian of Nature","Hallucinatory Terrain","Ice Storm","Leomund's Secret Chest","Locate Creature","Mordenkainen's Faithful Hound","Mordenkainen's Private Sanctum","Otiluke's Resilient Sphere","Phantasmal Killer","Polymorph","Raulothim's Psychic Lance","Shadow of Moil","Sickening Radiance","Spirit of Death","Staggering Smite","Stone Shape","Stoneskin","Storm Sphere","Summon Aberration","Summon Construct","Summon Elemental","Summon Greater Demon","Watery Sphere","Vitriolic Sphere","Wall of Fire"],5:["Animate Objects","Antilife Shell","Arcane Hand","Awaken","Banishing Smite","Circle of Power","Cloudkill","Commune","Commune with Nature","Cone of Cold","Conjure Elemental","Conjure Volley","Contact Other Plane","Contagion","Control Winds","Creation","Danse Macabre","Dawn","Destructive Wave","Dispel Evil and Good","Dominate Person","Dream","Enervation","Far Step","Flame Strike","Geas","Greater Restoration","Hold Monster","Holy Weapon","Immolation","Infernal Calling","Insect Plague","Legend Lore","Maelstrom","Mass Cure Wounds","Mislead","Modify Memory","Negative Energy Flood","Passwall","Planar Binding","Raise Dead","Rary's Telepathic Bond","Reincarnate","Scrying","Seeming","Skill Empowerment","Steel Wind Strike","Summon Celestial","Summon Draconic Spirit","Swift Quiver","Synaptic Static","Telekinesis","Teleportation Circle","Transmute Rock","Tree Stride","Wall of Force","Wall of Light","Wall of Stone","Wrath of Nature"],6:["Arcane Gate","Blade Barrier","Bones of the Earth","Chain Lightning","Circle of Death","Conjure Fey","Contingency","Create Undead","Disintegrate","Drawmij's Instant Summons","Eyebite","Find the Path","Flesh to Stone","Forbiddance","Globe of Invulnerability","Guards and Wards","Harm","Heal","Heroes' Feast","Investiture of Flame","Investiture of Ice","Investiture of Stone","Investiture of Wind","Mass Suggestion","Mental Prison","Move Earth","Otto's Irresistible Dance","Planar Ally","Primordial Ward","Programmed Illusion","Scatter","Soul Cage","Sunbeam","Tenser's Transformation","Transport via Plants","True Seeing","Wall of Ice","Wall of Thorns","Wind Walk","Word of Recall"],7:["Conjure Celestial","Crown of Stars","Delayed Blast Fireball","Divine Word","Draconic Transformation","Dream of the Blue Veil","Etherealness","Finger of Death","Fire Storm","Forcecage","Mirage Arcane","Mordenkainen's Magnificent Mansion","Mordenkainen's Sword","Plane Shift","Power Word Pain","Prismatic Spray","Project Image","Regenerate","Resurrection","Reverse Gravity","Sequester","Simulacrum","Symbol","Teleport","Temple of the Gods","Whirlwind"],8:["Abi-Dalzim's Horrid Wilting","Antimagic Field","Antipathy/Sympathy","Clone","Control Weather","Dark Star","Demiplane","Dominate Monster","Earthquake","Feeblemind","Glibness","Holy Aura","Illusory Dragon","Incendiary Cloud","Maddening Darkness","Maze","Mighty Fortress","Mind Blank","Power Word Stun","Reality Break","Sunburst","Telepathy","Tsunami"],9:["Astral Projection","Blade of Disaster","Foresight","Gate","Imprisonment","Invulnerability","Mass Heal","Mass Polymorph","Meteor Swarm","Power Word Heal","Power Word Kill","Prismatic Wall","Psychic Scream","Ravenous Void","Shapechange","Time Ravage","Time Stop","True Polymorph","True Resurrection","Weird","Wish"]};
@@ -2159,16 +2190,22 @@ function toggleTwitchMinimize(){
 }
 
 function init(){
-  buildTicker();genProcMarkets();initFragMkt();genShop();initSponsors();rotateBanner();
-  // Populate shop level filter
-  const lf=document.getElementById('shopLvlFilter');for(let l=0;l<=9;l++){const o=document.createElement('option');o.value=l;o.textContent=`Level ${l}`;lf.appendChild(o);}
-  // Add a few pet frags to market
-  ['C','U','R'].forEach(r=>{const pf=mkPetFrag(r);pf.marketPrice=rnd(RC[r].baseMin,RC[r].baseMax);pf.priceHistory=[{day:1,price:pf.marketPrice}];S.marketFrags.push(pf);});
-  renderMarkets();renderCosts();renderSlots();drawWizard();equipTitle(0);renderCharSheet();
-  setInterval(tickTimers,1000);setInterval(()=>{const el=document.getElementById('avearn');if(el)el.textContent=`~${Math.floor(S.wallet*TITLES[S.equippedTitle].interest).toLocaleString()}g/day`;},5000);
-  logEntry('ARCANEMARKET ONLINE','win');
-  // Start Firebase live sync
-  try{fbInit();}catch(e){console.warn('Firebase init failed:',e);setSyncStatus('error',false);}
+  // Populate shop level filter dropdown (UI only, no data)
+  const lf=document.getElementById('shopLvlFilter');
+  for(let l=0;l<=9;l++){const o=document.createElement('option');o.value=l;o.textContent=`Level ${l}`;lf.appendChild(o);}
+  buildTicker();
+  // Start timers
+  setInterval(tickTimers,1000);
+  setInterval(()=>{const el=document.getElementById('avearn');if(el)el.textContent=`~${Math.floor(S.wallet*TITLES[S.equippedTitle].interest).toLocaleString()}g/day`;},5000);
+  // Firebase is the single source of truth for all state.
+  // It will call generateFreshState() if the DB is empty,
+  // or load the existing shared state if it exists.
+  try{fbInit();}catch(e){
+    console.warn('Firebase unavailable, running offline:',e);
+    setSyncStatus('offline',false);
+    // Offline fallback — generate locally so the app still works
+    generateFreshState();
+  }
 }
 document.getElementById('hpamt').addEventListener('input',updateHPTotal);
 init();
