@@ -301,6 +301,10 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div id="dayinfo">DAY 1 — Press ADVANCE DAY to roll for price changes &amp; collect interest.</div>
   <button class="db" onclick="advanceDay()">ADVANCE DAY</button>
   <button class="db warn" onclick="rollbackDay()">ROLLBACK</button>
+  <button class="db" onclick="exportState()" style="border-color:var(--cyan);color:var(--cyan);">EXPORT</button>
+  <button class="db" onclick="document.getElementById('import-file').click()" style="border-color:var(--cyan);color:var(--cyan);">IMPORT</button>
+  <button class="db warn" onclick="confirmReset()" style="border-color:var(--red);color:var(--red);">RESET ALL</button>
+  <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importState(event)">
 </div>
 
 <!-- MARKETS -->
@@ -372,6 +376,9 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div id="avwrap">
     <div id="avstage">
       <canvas id="wc" width="120" height="160"></canvas>
+      <div style="display:flex;align-items:center;gap:5px;margin-top:2px;width:100%;">
+        <input id="avatar-name-inp" type="text" maxlength="24" placeholder="Name your wizard..." value="The Unnamed One" oninput="updateAvatarName(this.value)" style="flex:1;background:#05000f;border:1px solid var(--border);border-radius:4px;color:var(--w);font-family:var(--fm);font-size:10px;padding:3px 7px;text-align:center;min-width:0;">
+      </div>
       <div class="tdisp" id="avtdisp" style="color:#aa88cc;">NOBODY</div>
       <div class="idisp" id="avidisp">DAILY INTEREST: 0.10%</div>
       <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-top:1px;" id="avearn">~0 gems/day</div>
@@ -730,6 +737,42 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div id="rhl" style="margin-top:.3rem;"></div>
   <button class="db" style="margin-top:.4rem;" onclick="closeDice()">CONFIRM</button>
 </div>
+<!-- TWITCH CHAT OVERLAY -->
+<style>
+#twitch-overlay{position:fixed;bottom:1rem;right:1rem;width:280px;z-index:4000;pointer-events:none;}
+#twitch-overlay.active{pointer-events:all;}
+#twitch-box{background:rgba(14,14,19,.96);border:1px solid #9147ff;border-radius:8px;overflow:hidden;box-shadow:0 4px 24px rgba(145,71,255,.3);}
+#twitch-header{background:#9147ff;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+#twitch-header-title{font-family:'Arial Black',sans-serif;font-size:10px;color:#fff;letter-spacing:.5px;display:flex;align-items:center;gap:5px;}
+.twitch-live-dot{width:7px;height:7px;border-radius:50%;background:#f00;box-shadow:0 0 5px #f00;animation:twitch-pulse .8s ease-in-out infinite;}
+@keyframes twitch-pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+#twitch-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;padding:0;line-height:1;}
+#twitch-close:hover{color:#fff;}
+#twitch-viewer-count{font-size:9px;color:rgba(255,255,255,.7);font-family:Arial,sans-serif;}
+#twitch-messages{height:220px;overflow-y:auto;padding:6px 8px;display:flex;flex-direction:column;gap:3px;scrollbar-width:thin;scrollbar-color:#9147ff transparent;}
+#twitch-messages::-webkit-scrollbar{width:3px;}
+#twitch-messages::-webkit-scrollbar-thumb{background:#9147ff;border-radius:2px;}
+.tc-msg{font-family:Arial,sans-serif;font-size:11px;line-height:1.4;word-break:break-word;opacity:0;animation:tc-fadein .25s ease forwards;}
+@keyframes tc-fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.tc-badge{font-size:9px;margin-right:2px;}
+.tc-name{font-weight:700;cursor:pointer;}
+.tc-text{color:#efeff1;}
+.tc-emote{font-size:14px;line-height:1;}
+</style>
+
+<div id="twitch-overlay">
+  <div id="twitch-box" style="display:none;">
+    <div id="twitch-header" onclick="toggleTwitchMinimize()">
+      <div id="twitch-header-title">
+        <div class="twitch-live-dot"></div>
+        <span id="twitch-channel-name">TheOracleWizard</span>
+        <span id="twitch-viewer-count" style="margin-left:4px;">0 viewers</span>
+      </div>
+      <button id="twitch-close" onclick="closeTwitchChat(event)" title="Close">✕</button>
+    </div>
+    <div id="twitch-messages"></div>
+  </div>
+</div>
 <div id="logw"><div class="logt">TRANSACTION LOG</div><div id="logl"></div></div>
 
 <script>
@@ -832,6 +875,11 @@ function setSyncStatus(status,online){
 function afterStateLoad(){
   document.getElementById('wdisp').textContent=S.wallet.toLocaleString();
   document.getElementById('daybdg').textContent='DAY '+S.day;
+  // Restore avatar name input
+  const nameInp=document.getElementById('avatar-name-inp');
+  if(nameInp&&S.avatarName)nameInp.value=S.avatarName;
+  const chEl=document.getElementById('twitch-channel-name');
+  if(chEl&&S.avatarName)chEl.textContent=S.avatarName.replace(/\s+/g,'')+'TV';
   equipTitle(S.equippedTitle);
   renderSlots();
   drawWizard();
@@ -975,7 +1023,7 @@ const FOF=['of the Abyss','of Compound Interest','of the Lost Oracle','of Eterna
 const rfn=()=>`${pk(FADJ)} ${pk(FNOUN)} ${pk(FOF)}`;
 
 // ══ STATE ═══════════════════════════════════════════════════
-let S={wallet:1000,day:1,fame:0,equippedTitle:0,ownedTitles:[0],equipped:{hat:null,hand:null,boots:null,acc1:null,acc2:null,pet:null},inventory:[],marketFrags:[],markets:[],shop:[],sponsors:[],pity:0,hardPity:0,rollHistory:[],currentBanner:null,dayHistory:[],mktFilter:'all',slotCosts:[10,15,20,30,40,55,70,90,120],hpCostPer:5,dailyCost:50,rbWinMult:4,rbLossMult:4,
+let S={wallet:1000,day:1,fame:0,equippedTitle:0,ownedTitles:[0],equipped:{hat:null,hand:null,boots:null,acc1:null,acc2:null,pet:null},inventory:[],marketFrags:[],markets:[],shop:[],sponsors:[],pity:0,hardPity:0,rollHistory:[],currentBanner:null,dayHistory:[],mktFilter:'all',slotCosts:[10,15,20,30,40,55,70,90,120],hpCostPer:5,dailyCost:50,rbWinMult:4,rbLossMult:4,avatarName:'The Unnamed One',
   charSheet:{
     str:10,dex:10,con:10,int:18,wis:12,cha:10,
     proficiencies:['Arcana','History','Investigation','Insight'],
@@ -1041,9 +1089,9 @@ function dmResolve(result){
     const baseWin=Math.floor(bet*mult);
     upWallet(baseWin,`MARKET RESOLVED ${result.toUpperCase()}: +${baseWin}g`,'win');
     toast(`RESOLVED ${result.toUpperCase()}! +${baseWin}g — Reinbet?`,result==='yes'?'var(--green)':'var(--red)');
+    spawnTwitchChat(true,baseWin,'market');
     setTimeout(()=>{
       triggerReinbet(baseWin,(final)=>{
-        // Final already includes or replaces base win; adjust wallet by the difference
         const delta=final-baseWin;
         if(delta!==0)upWallet(delta,`MARKET REINBET ${result.toUpperCase()}: ${delta>=0?'+':''}${delta}g`,'win');
         toast(`REINBET: ${final.toLocaleString()}g total`,'var(--gold)');
@@ -1053,6 +1101,7 @@ function dmResolve(result){
   }else{
     toast(`RESOLVED ${result.toUpperCase()}. No position.`,'var(--orange)');
     logEntry(`Market resolved ${result.toUpperCase()} — no position`,'');
+    if(m.bets[result==='yes'?'no':'yes']>0) spawnTwitchChat(false,0,'market');
     setTimeout(()=>renderMarkets(),1800);
   }
   refreshDMSelects();
@@ -1401,11 +1450,13 @@ function rouletteResult(land,type,singleNum,amt){
     document.getElementById('roul-result').style.color='var(--green)';
     document.getElementById('roul-result').textContent=`${land}! WON +${baseWin.toLocaleString()}g`;
     toast(`ROULETTE WIN! ${land} — +${baseWin.toLocaleString()}g`,'var(--green)');
+    spawnTwitchChat(true,baseWin,'roulette');
     setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`ROULETTE REINBET (${land}): ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('roul-result').textContent=`${land}! TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
   }else{
     document.getElementById('roul-result').style.color='var(--red)';
     document.getElementById('roul-result').textContent=`${land}. LOST.`;
     toast(`ROULETTE: ${land}. LOST.`,'var(--red)');
+    spawnTwitchChat(false,amt,'roulette');
   }
 }
 
@@ -1417,9 +1468,9 @@ function initSlots(){SLOT_SYMS.forEach((_,ri)=>{const inner=document.getElementB
 function spinSlots(){
   if(slotsSpinning)return;const lineAmt=parseInt(document.getElementById('slots-amt').value)||25;const lines=parseInt(document.getElementById('slots-lines').value)||1;const totalCost=lineAmt*lines;if(S.wallet<totalCost){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-totalCost,`SLOTS BET: -${totalCost}g`,'spend');slotsSpinning=true;document.getElementById('slots-btn').disabled=true;document.getElementById('slots-result').textContent='...';
   const results=[];[0,1,2].forEach((ri,idx)=>{const final=rnd(0,SLOT_SYMS.length-1);results.push(final);const inner=document.getElementById('ri'+ri);setTimeout(()=>{inner.style.transition='none';inner.style.transform=`translateY(${-rnd(300,600)}px)`;setTimeout(()=>{inner.style.transition='transform 0.5s cubic-bezier(.25,.46,.45,.94)';inner.innerHTML='';for(let i=0;i<3;i++){const s=document.createElement('div');s.className='reel-sym';s.textContent=SLOT_SYMS[i===1?final:rnd(0,SLOT_SYMS.length-1)];inner.appendChild(s);}inner.style.transform='translateY(0)';},50);},idx*200);});
-  setTimeout(()=>{slotsSpinning=false;document.getElementById('slots-btn').disabled=false;slotResult(results,lineAmt,lines);},1200);
+  setTimeout(()=>{slotsSpinning=false;document.getElementById('slots-btn').disabled=false;slotResult(results,lineAmt,lines,totalCost);},1200);
 }
-function slotResult(results,lineAmt,lines){
+function slotResult(results,lineAmt,lines,totalCost){
   const[r0,r1,r2]=results;const match=r0===r1&&r1===r2;const partialMatch=r0===r1||r1===r2||r0===r2;
   if(match){
     const mult=SLOT_MULTS[r0];const baseWin=lineAmt*mult*lines;
@@ -1427,16 +1478,19 @@ function slotResult(results,lineAmt,lines){
     document.getElementById('slots-result').style.color='var(--gold)';
     document.getElementById('slots-result').textContent=`TRIPLE x${mult}! WON +${baseWin.toLocaleString()}g`;
     toast(`SLOTS WIN! Triple x${mult} +${baseWin.toLocaleString()}g`,'var(--gold)');
+    spawnTwitchChat(true,baseWin,'slots');
     setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`SLOTS REINBET: ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('slots-result').textContent=`TRIPLE TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
   }else if(partialMatch&&lines>=3){
     const baseWin=Math.floor(lineAmt*.5);
     upWallet(baseWin,`SLOTS PARTIAL WIN: +${baseWin}g`,'win');
     document.getElementById('slots-result').style.color='var(--green)';
     document.getElementById('slots-result').textContent=`PARTIAL MATCH. WON +${baseWin}g`;
+    spawnTwitchChat(true,baseWin,'slots');
     setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`SLOTS PARTIAL REINBET: ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('slots-result').textContent=`PARTIAL TOTAL: ${final.toLocaleString()}g`;});},400);
   }else{
     document.getElementById('slots-result').style.color='var(--red)';
     document.getElementById('slots-result').textContent='NO MATCH.';
+    spawnTwitchChat(false,totalCost,'slots');
   }
 }
 
@@ -1462,10 +1516,12 @@ function bonesResult(vals,type,amt){
     document.getElementById('bones-result').style.color='var(--green)';
     document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. WON +${baseWin.toLocaleString()}g`;
     toast(`BONES WIN! ${total} — +${baseWin.toLocaleString()}g`,'var(--green)');
+    spawnTwitchChat(true,baseWin,'bones');
     setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`BONES REINBET (${total}): ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
   }else{
     document.getElementById('bones-result').style.color='var(--red)';
     document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. LOST.`;
+    spawnTwitchChat(false,amt,'bones');
   }
 }
 function initCasino(){initRoulette();initSlots();initBones();}
@@ -1817,6 +1873,289 @@ function wbRemove(key,idx){
 function wbReset(key){
   WB[key].length=0;WB[key].push(...WB_DEFAULTS[key]);wbRenderTags(key);
   toast(`Reset ${WB_LABELS[key]} to defaults`,'#ff4444');
+}
+
+// ══ EXPORT / IMPORT / RESET ═══════════════════════════════════
+function exportState(){
+  const toSave={...S,dayHistory:S.dayHistory.slice(-3),_exportedAt:new Date().toISOString(),_version:3};
+  const json=JSON.stringify(toSave,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const d=new Date();
+  a.download=`arcanemarket-day${S.day}-${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('STATE EXPORTED','var(--cyan)');
+  logEntry('STATE EXPORTED TO FILE','');
+}
+
+function importState(evt){
+  const file=evt.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const loaded=JSON.parse(e.target.result);
+      if(typeof loaded.wallet!=='number'){toast('INVALID SAVE FILE','var(--red)');return;}
+      Object.assign(S,loaded);
+      afterStateLoad();
+      fbPush();
+      toast(`LOADED: Day ${S.day}, ${S.wallet.toLocaleString()} gems`,'var(--cyan)');
+      logEntry(`STATE IMPORTED FROM FILE (Day ${S.day})`,'win');
+    }catch(err){
+      toast('FAILED TO LOAD FILE','var(--red)');
+      console.error('Import error:',err);
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be re-loaded if needed
+  evt.target.value='';
+}
+
+function getDefaultState(){
+  return{
+    wallet:1000,day:1,fame:0,
+    equippedTitle:0,ownedTitles:[0],
+    equipped:{hat:null,hand:null,boots:null,acc1:null,acc2:null,pet:null},
+    inventory:[],marketFrags:[],markets:[],shop:[],sponsors:[],
+    pity:0,hardPity:0,rollHistory:[],currentBanner:null,dayHistory:[],
+    mktFilter:'all',
+    slotCosts:[10,15,20,30,40,55,70,90,120],
+    hpCostPer:5,dailyCost:50,
+    rbWinMult:4,rbLossMult:4,
+    charSheet:{
+      str:10,dex:10,con:10,int:18,wis:12,cha:10,
+      proficiencies:['Arcana','History','Investigation','Insight'],
+      preparedSpells:[],
+      spellSlots:[0,0,0,0,0,0,0,0,0],
+      spellSlotsMax:[4,3,3,3,2,1,1,1,1],
+      notes:''
+    }
+  };
+}
+
+function confirmReset(){
+  // Use a custom modal-style confirm so it looks good
+  const existing=document.getElementById('reset-confirm-modal');
+  if(existing){existing.remove();return;}
+  const modal=document.createElement('div');
+  modal.id='reset-confirm-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:8000;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML=`
+    <div style="background:#100000;border:2px solid var(--red);border-radius:12px;padding:1.8rem 2rem;max-width:360px;width:92vw;text-align:center;box-shadow:0 0 40px rgba(255,51,102,.3);">
+      <div style="font-family:var(--fd);font-size:1.8rem;letter-spacing:4px;color:var(--red);text-shadow:0 0 15px var(--red);margin-bottom:.5rem;">RESET ALL</div>
+      <div style="font-size:10px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;line-height:1.7;margin-bottom:1.2rem;">This will wipe the entire app state — wallet, inventory, markets, titles, spellbook, everything — and return it to factory defaults.<br><br><span style="color:var(--red);">This cannot be undone.</span><br>Export first if you want to keep your progress.</div>
+      <div style="display:flex;gap:.6rem;justify-content:center;">
+        <button onclick="doReset()" style="font-family:var(--fd);font-size:1.1rem;letter-spacing:3px;background:#330000;border:2px solid var(--red);color:var(--red);padding:.5rem 1.4rem;border-radius:6px;cursor:pointer;box-shadow:0 0 12px rgba(255,51,102,.3);">WIPE IT</button>
+        <button onclick="document.getElementById('reset-confirm-modal').remove()" style="font-family:var(--fh);font-size:9px;letter-spacing:2px;background:transparent;border:1px solid #330033;color:#664466;padding:.5rem 1.2rem;border-radius:6px;cursor:pointer;">CANCEL</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function doReset(){
+  const modal=document.getElementById('reset-confirm-modal');
+  if(modal)modal.remove();
+  // Rebuild state from scratch
+  Object.assign(S,getDefaultState());
+  // Regenerate all procedural content
+  genProcMarkets();
+  initFragMkt();
+  ['C','U','R'].forEach(r=>{const pf=mkPetFrag(r);pf.marketPrice=rnd(RC[r].baseMin,RC[r].baseMax);pf.priceHistory=[{day:1,price:pf.marketPrice}];S.marketFrags.push(pf);});
+  genShop();
+  initSponsors();
+  rotateBanner();
+  // Re-render everything
+  afterStateLoad();
+  // Reset world builder arrays to defaults too
+  Object.keys(WB).forEach(k=>wbReset(k));
+  fbPush();
+  toast('APP RESET TO DEFAULT STATE','var(--red)');
+  logEntry('FULL RESET PERFORMED','loss');
+  sw('markets');
+}
+
+// ══ AVATAR NAME ══════════════════════════════════════════════
+function updateAvatarName(val){
+  S.avatarName=val||'The Unnamed One';
+  const ch=document.getElementById('twitch-channel-name');
+  if(ch)ch.textContent=val.replace(/\s+/g,'')+'TV';
+  fbPush();
+}
+
+// ══ TWITCH CHAT SYSTEM ════════════════════════════════════════
+let twitchCloseTimer=null;
+let twitchMinimized=false;
+
+// Chatter archetypes — each has a name generator, color, badge, and message pools
+const TC_ARCHETYPES=[
+  {
+    type:'hype',color:'#ff4de6',badge:'⭐',weight:3,
+    namePool:['BigBrainBettor','ArcaneHypeGod','ManaGemVibes','PogChampion','OracleSeeker','WizardWatcher','GoldRushGoblin','PredictKing','ManaFlood','BetMaxGod'],
+    winMsgs:['LETS GOOOO PogChamp','HE ACTUALLY DID IT omg','THE ORACLE PROVIDES ResidentSleeper wait no LETS GO','bro is BUILT DIFFERENT','called it called it called it','W W W W W W','no way that actually hit','PogChamp PogChamp PogChamp PogChamp','THE MARKET FEARS HIM','clip it clip it clip it','this man cannot lose??','OMNIPOTENT GAMING'],
+    loseMsgs:['noooo :(','we go again we go again','that hurts to watch','the variance bro the variance','unlucky honestly','RIGGED btw','next one hits for sure','OMEGALUL just kidding you got this','he\'ll be fine he\'ll be fine','rip the gems tho'],
+  },
+  {
+    type:'smug',color:'#a0a0a0',badge:'',weight:2,
+    namePool:['ActuallyIKnew','SmugDiviner','PredictedThis','AlwaysKnew99','ClearlyObvious','MarketSage','DefinitelyExpected','NoPrizeBrained','ObviouslyCorrect','ICalledIt'],
+    winMsgs:['i said this would happen 3 days ago','as predicted','elementary market theory','literally called this in my notes','the signs were all there','some of us were paying attention','should\'ve bet more honestly','not surprised','the data never lies','this was the only outcome'],
+    loseMsgs:['well statistically this was the likely outcome actually','the market corrects for hubris','variance as predicted','this is what happens when you ignore the fundamentals','should\'ve hedged','i would have taken the other side tbh','predictable in hindsight','interesting result','noted'],
+  },
+  {
+    type:'doomer',color:'#ff6b35',badge:'💀',weight:2,
+    namePool:['DoomScrollDan','RuinedAgain','WorstTimeline','ChaosGremlin','DisgracedBettor','BrokeAndBroken','GamblingHobgoblin','FinancialRuin','MiseryIndex','VoidStarer'],
+    winMsgs:['this won\'t last','enjoy it while it lasts','one good bet changes nothing','the house always wins eventually','statistically the loss is coming','don\'t get comfortable','this is bait for the next loss','temporary','luck runs out'],
+    loseMsgs:['called it','of course','naturally','this is fine :) everything is fine','go touch grass bro','delete the app','gg no re','the void beckons','as expected','hopeless honestly','just stop. please. for your own sake.','go die in a ditch lmaooo','the economy was not cooked'],
+  },
+  {
+    type:'parasocial',color:'#00d4aa',badge:'💚',weight:2,
+    namePool:['TrueFan4Ever','LoyalViewer99','AlwaysHere4U','WizardSimp','CopiumKing','TouchGrass2024','BestStreamEver','NeverLeaving','Subscriber1','PositiveVibesOnly'],
+    winMsgs:['so proud of you!!','YOU DESERVE THIS','we love you!!','this is what dedication looks like','you worked so hard for this','i\'ve been here since the beginning and THIS is why','family ❤️','legendary performance','you\'re an inspiration honestly'],
+    loseMsgs:['better luck next time!!! ❤️','we still love you!!','it\'s okay!! there\'s always tomorrow','you\'re still amazing no matter what','the real win was the friends we made','sending hugs through the screen','I believe in you always','you\'re still my favorite streamer','don\'t give up!! ❤️❤️❤️'],
+  },
+  {
+    type:'chaos',color:'#ff3366',badge:'🎰',weight:2,
+    namePool:['ChaosGoblin','AnarchyArcher','GremlinMode','UnhingedViewer','RollTheDice','MayhemMage','DisasterBi','CatastropheKing','NothingMatters','YOLOsopher'],
+    winMsgs:['AHAHAHA','gamble more gamble more gamble more','PUT IT ALL ON RED NEXT','ALL IN ALL IN','this man is unstoppable reinbet it reinbet it','double down DOUBLE DOWN','more more more MORE','the prophecy fulfills itself','chaos always wins'],
+    loseMsgs:['HAHAHAHAHA','go again go again','nothing matters anyway lol','lose it all let\'s goooo','the void calls','beautiful disaster','put the last gems on roulette','fully committed to the bit i respect it','L + ratio + touch grass + get reinbetted'],
+  },
+  {
+    type:'financial_advisor',color:'#ffd700',badge:'📈',weight:1,
+    namePool:['RetiredAtSix','MarketWizard69','DiversifyBro','IndexFundEnjoyer','CompoundInterest','RothIRAGang','CryptoSkeptic','ActualFinance','RebalanceNow','LiquidAssets'],
+    winMsgs:['this is why you diversify your prediction portfolio','compound interest working as intended','strong risk-adjusted return','beat the market once again','alpha generation in action','the efficient market hypothesis is wrong and he proves it daily','sharpe ratio off the charts'],
+    loseMsgs:['this is why we don\'t put more than 2% in any single position','rebalance the portfolio','expected value was always negative here','sunk cost fallacy in real time','have you considered index funds','the market is irrational longer than you can stay solvent','diversification would have mitigated this'],
+  },
+  {
+    type:'lurker',color:'#888888',badge:'',weight:1,
+    namePool:['SilentObserver','ViewerNumber47','JustWatching99','BackgroundNPC','QuietMage','PassiveWatcher','InvisibleFan','LurkerLord','GhostViewer','AnonBettor'],
+    winMsgs:['nice','ok','pog','good','W','👍','based','gz'],
+    loseMsgs:['f','rip','oof','L','💀','ok','moment of silence','F in chat'],
+  },
+];
+
+// Fantasy emotes that get sprinkled in
+const TC_EMOTES=['PogChamp','OMEGALUL','ResidentSleeper','Pog','LUL','KEKW','PauseChamp','monkaS','monkaW','COPIUM','Sadge','PepeHands','pepeLaugh','LULW','FeelsBadMan','FeelsBadMan','pepeD','catJAM','HYPERS','POGGERS','5Head','EZ','NotLikeThis','widepeepoHappy','peepoGamble'];
+const TC_FANTASY_EMOTES=['🔮','💎','⚡','🎰','👁','💀','🌙','⭐','🏆','💸','🎲','🧙','🪄','📈','📉'];
+
+// Build viewer list based on fame
+function getTwitchViewers(){
+  const fameLvl=S.fame||0;
+  const base=3+Math.floor(fameLvl/10)*4;
+  const count=base+rnd(0,Math.floor(fameLvl/5)+2);
+  // Pick random archetypes weighted
+  const pool=[];
+  TC_ARCHETYPES.forEach(a=>{for(let i=0;i<a.weight;i++)pool.push(a);});
+  const viewers=[];
+  for(let i=0;i<count;i++){
+    const arch=pk(pool);
+    viewers.push({name:pk(arch.namePool)+(Math.random()<.3?rnd(1,9999):''),arch});
+  }
+  return viewers;
+}
+
+function tcMakeEmoteString(arch){
+  // Randomly sprinkle emotes into messages
+  const emotes=[];
+  if(Math.random()<.4)emotes.push(pk(TC_EMOTES));
+  if(Math.random()<.25)emotes.push(pk(TC_FANTASY_EMOTES));
+  return emotes.join(' ');
+}
+
+function spawnTwitchChat(won,amount,context){
+  const box=document.getElementById('twitch-box');
+  const overlay=document.getElementById('twitch-overlay');
+  const msgs=document.getElementById('twitch-messages');
+  if(!box||!msgs)return;
+
+  // Clear any existing close timer
+  clearTimeout(twitchCloseTimer);
+
+  // Show the box
+  box.style.display='block';
+  overlay.classList.add('active');
+  twitchMinimized=false;
+  msgs.innerHTML='';
+
+  // Update channel name from avatar name
+  const rawName=(S.avatarName||'TheWizard').replace(/\s+/g,'');
+  const chEl=document.getElementById('twitch-channel-name');
+  if(chEl)chEl.textContent=rawName+'TV';
+
+  // Pick viewers based on fame
+  const viewers=getTwitchViewers();
+  const viewerCount=viewers.length+rnd(Math.floor(S.fame*3),Math.floor(S.fame*8)+50);
+  const vcEl=document.getElementById('twitch-viewer-count');
+  if(vcEl)vcEl.textContent=viewerCount.toLocaleString()+' viewers';
+
+  // Shuffle and pick a subset to actually chat
+  const chatters=[...viewers].sort(()=>Math.random()-.5).slice(0,Math.min(viewers.length,rnd(4,10)));
+
+  // Calculate timing — more fame = faster messages
+  const baseDelay=won?300:500;
+  const fameMult=Math.max(.3,1-(S.fame/150));
+
+  let cumulativeDelay=0;
+  chatters.forEach((viewer,i)=>{
+    // Stagger messages
+    const gap=Math.floor((rnd(200,700)*fameMult)+(i===0?0:baseDelay*fameMult));
+    cumulativeDelay+=gap;
+
+    setTimeout(()=>{
+      const arch=viewer.arch;
+      const pool=won?arch.winMsgs:arch.loseMsgs;
+      let text=pk(pool);
+      // Replace [name] placeholder with avatar name
+      text=text.replace(/\[name\]/g,S.avatarName||'wizard');
+      const emotes=tcMakeEmoteString(arch);
+      const fullText=emotes?`${text} ${emotes}`:text;
+
+      const msgEl=document.createElement('div');
+      msgEl.className='tc-msg';
+
+      const badge=arch.badge?`<span class="tc-badge">${arch.badge}</span>`:'';
+      msgEl.innerHTML=`${badge}<span class="tc-name" style="color:${arch.color};">${viewer.name}</span><span style="color:#888;font-size:10px;">: </span><span class="tc-text">${fullText}</span>`;
+      msgs.appendChild(msgEl);
+      msgs.scrollTop=msgs.scrollHeight;
+    },cumulativeDelay);
+  });
+
+  // Add a few pure emote-only messages for hype/doom
+  const emoteOnlyCount=won?rnd(1,3):rnd(0,2);
+  for(let e=0;e<emoteOnlyCount;e++){
+    const extraDelay=cumulativeDelay+rnd(100,400)*(e+1);
+    setTimeout(()=>{
+      const fakeName=pk(TC_ARCHETYPES).namePool[0]+rnd(100,999);
+      const fakeColor=`hsl(${rnd(0,360)},70%,65%)`;
+      const emoteStr=Array.from({length:rnd(2,5)},()=>won?pk([...TC_EMOTES,...TC_FANTASY_EMOTES]):pk(['💀','OMEGALUL','PepeHands','FeelsBadMan','NotLikeThis','KEKW','LUL'])).join(' ');
+      const msgEl=document.createElement('div');
+      msgEl.className='tc-msg';
+      msgEl.innerHTML=`<span class="tc-name" style="color:${fakeColor};">${fakeName}</span><span style="color:#888;font-size:10px;">: </span><span class="tc-text tc-emote">${emoteStr}</span>`;
+      msgs.appendChild(msgEl);
+      msgs.scrollTop=msgs.scrollHeight;
+    },extraDelay);
+  }
+
+  // Auto-close after 5 seconds (from when last message lands)
+  const totalDuration=cumulativeDelay+2500;
+  twitchCloseTimer=setTimeout(()=>closeTwitchChat(),totalDuration);
+}
+
+function closeTwitchChat(evt){
+  if(evt)evt.stopPropagation();
+  clearTimeout(twitchCloseTimer);
+  const box=document.getElementById('twitch-box');
+  const overlay=document.getElementById('twitch-overlay');
+  if(box)box.style.display='none';
+  if(overlay)overlay.classList.remove('active');
+}
+
+function toggleTwitchMinimize(){
+  const msgs=document.getElementById('twitch-messages');
+  if(!msgs)return;
+  twitchMinimized=!twitchMinimized;
+  msgs.style.display=twitchMinimized?'none':'flex';
+  if(!twitchMinimized)msgs.scrollTop=msgs.scrollHeight;
 }
 
 function init(){
