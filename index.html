@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ArcaneMarket</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0a0010;--card:#150028;--purple:#c800ff;--cyan:#00f5ff;--gold:#ffd700;--green:#00ff88;--red:#ff3366;--orange:#ff6600;--dim:#aa88cc;--border:#6600cc;--w:#fff;--fd:'Bebas Neue',sans-serif;--fm:'Share Tech Mono',monospace;--fh:'Orbitron',sans-serif;}
+body{background:var(--bg);min-height:100vh;color:var(--w);font-family:var(--fm);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9000;}
+/* HEADER */
+#hdr{background:#080015;border-bottom:2px solid var(--purple);padding:.55rem 1.2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 4px 30px rgba(200,0,255,.35);}
+.logo{font-family:var(--fd);font-size:1.9rem;letter-spacing:3px;color:var(--purple);text-shadow:0 0 20px var(--purple);}
+.logo span{color:var(--cyan);text-shadow:0 0 20px var(--cyan);}
+.hdr-r{display:flex;align-items:center;gap:.6rem;}
+.day-bdg{background:#0a0020;border:1px solid var(--cyan);border-radius:5px;padding:.25rem .65rem;font-family:var(--fh);font-size:.6rem;color:var(--cyan);letter-spacing:1px;}
+.wal{display:flex;align-items:center;gap:.35rem;background:#1a0035;border:1px solid var(--purple);border-radius:7px;padding:.3rem .8rem;}
+.gem{width:14px;height:14px;background:radial-gradient(circle at 35% 35%,#e060ff,#8800ff);border-radius:50% 20% 50% 20%;transform:rotate(45deg);box-shadow:0 0 7px #c800ff;flex-shrink:0;}
+.wamt{font-family:var(--fh);font-size:.9rem;font-weight:700;color:var(--purple);text-shadow:0 0 8px var(--purple);}
+/* TICKER */
+#tkw{background:#05000f;border-bottom:1px solid var(--green);overflow:hidden;padding:3px 0;}
+#tk{display:flex;gap:3rem;animation:tks 55s linear infinite;width:max-content;}
+.ti{font-size:9px;color:var(--green);letter-spacing:1px;white-space:nowrap;}
+.ti.dn{color:var(--red);}
+@keyframes tks{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+/* NAV */
+#nav{display:flex;background:#05000f;border-bottom:1px solid #2a0050;padding:0 .8rem;overflow-x:auto;scrollbar-width:none;}
+#nav::-webkit-scrollbar{display:none;}
+.nt{font-family:var(--fh);font-size:9px;letter-spacing:1px;padding:.5rem .9rem;cursor:pointer;border:none;background:transparent;color:var(--dim);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;text-transform:uppercase;}
+.nt:hover{color:var(--cyan);}.nt.active{color:var(--cyan);border-bottom-color:var(--cyan);text-shadow:0 0 8px var(--cyan);}
+.nt.dmt{color:#cc3333;}.nt.dmt.active{color:#ff4444;border-bottom-color:#ff4444;text-shadow:0 0 8px #ff4444;}
+/* DAY BAR */
+#daybar{display:flex;gap:.4rem;align-items:center;background:#05000f;border-bottom:1px solid #1a0030;padding:.45rem 1.1rem;}
+#dayinfo{font-size:8px;color:var(--dim);font-family:var(--fh);flex:1;letter-spacing:.5px;}
+.db{background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:8px;letter-spacing:1px;padding:4px 11px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.db:hover{background:#2a0055;box-shadow:0 0 8px rgba(200,0,255,.4);}
+.db.warn{border-color:var(--orange);color:var(--orange);}
+.db.warn:hover{background:#2a1000;box-shadow:0 0 8px rgba(255,102,0,.4);}
+/* PANELS */
+.pnl{display:none;padding:.9rem 1.1rem 4rem;}
+.pnl.active{display:block;}
+.sh{font-family:var(--fd);font-size:1.25rem;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 12px var(--cyan);margin-bottom:.65rem;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.75rem;}
+/* GRID HELPERS */
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.65rem;}
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.6rem;}
+.g4{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
+/* MARKET */
+.mkt-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem;position:relative;}
+.mkt-card.dm-sp{border-color:rgba(255,215,0,.55);animation:gp 3s ease-in-out infinite;}
+@keyframes gp{0%,100%{box-shadow:0 0 8px rgba(255,215,0,.12);}50%{box-shadow:0 0 22px rgba(255,215,0,.3),inset 0 0 12px rgba(255,215,0,.04);}}
+.mkt-q{font-size:11px;margin-bottom:.45rem;line-height:1.4;padding-right:1.1rem;}
+.mkt-meta{display:flex;justify-content:space-between;margin-bottom:.5rem;}
+.mkt-type{font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;}
+.mkt-tmr{font-size:7px;color:var(--orange);font-family:var(--fh);}
+.pb{height:15px;background:#1a0030;border-radius:4px;overflow:hidden;border:1px solid #330055;margin-bottom:3px;}
+.pbf{height:100%;display:flex;align-items:center;padding-left:4px;font-size:8px;font-family:var(--fh);font-weight:700;transition:width .4s ease;}
+.pby{background:linear-gradient(90deg,#006633,#00ff88);color:#003311;}
+.pbl{display:flex;justify-content:space-between;font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.5rem;}
+.bet-row{display:flex;gap:4px;align-items:center;}
+.bi{width:56px;background:#05000f;border:1px solid var(--border);border-radius:3px;color:var(--w);font-family:var(--fm);font-size:10px;padding:3px 5px;}
+.bi:focus{outline:none;border-color:var(--cyan);}
+.bty,.btn{font-family:var(--fh);font-size:8px;font-weight:700;letter-spacing:1px;padding:4px 8px;border-radius:3px;border:none;cursor:pointer;transition:all .15s;}
+.bty{background:#004422;color:var(--green);border:1px solid var(--green);}
+.bty:hover{background:#006633;box-shadow:0 0 8px rgba(0,255,136,.4);}
+.btn{background:#330011;color:var(--red);border:1px solid var(--red);}
+.btn:hover{background:#550022;box-shadow:0 0 8px rgba(255,51,102,.4);}
+.dmcr{position:absolute;top:6px;right:6px;font-size:12px;color:var(--gold);text-shadow:0 0 8px var(--gold);}
+.rb-badge{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);border-radius:10px;font-family:var(--fd);font-size:1.6rem;letter-spacing:4px;z-index:10;}
+.rb-badge.yes{color:var(--green);text-shadow:0 0 20px var(--green);}
+.rb-badge.no{color:var(--red);text-shadow:0 0 20px var(--red);}
+.frow{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.6rem;align-items:center;}
+.ftog{background:#05000f;border:1px solid var(--border);color:var(--dim);font-family:var(--fh);font-size:8px;padding:3px 9px;border-radius:3px;cursor:pointer;letter-spacing:1px;}
+.ftog.active{border-color:var(--cyan);color:var(--cyan);}
+/* REINBET */
+/* reinbet toggle removed */
+.rb-lbl{font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;}
+/* COSTS */
+.dc{background:var(--card);border:1px solid #440044;border-radius:10px;padding:.8rem;}
+.dtl{font-family:var(--fh);font-size:8px;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:.45rem;}
+.dbig{font-family:var(--fd);font-size:1.9rem;color:var(--w);line-height:1;}
+.dsub{font-size:8px;color:var(--dim);margin-top:2px;}
+.paybtn{margin-top:.6rem;background:#220022;border:1px solid var(--red);color:var(--red);font-family:var(--fh);font-size:8px;letter-spacing:1px;padding:4px 9px;border-radius:4px;cursor:pointer;width:100%;transition:all .15s;}
+.paybtn:hover{background:#440022;box-shadow:0 0 8px rgba(255,51,102,.4);}
+.sr{background:#05000f;border:1px solid #2a0050;border-radius:4px;padding:3px 5px;display:flex;justify-content:space-between;align-items:center;}
+.ctr{display:flex;align-items:center;gap:3px;margin-top:4px;}
+.ctr input{width:36px;text-align:center;background:#05000f;border:1px solid var(--border);color:var(--w);font-family:var(--fm);font-size:10px;border-radius:3px;padding:2px;}
+.cb{background:#1a0035;border:1px solid var(--border);color:var(--w);font-size:10px;width:19px;height:19px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+/* SHOP */
+.sc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.75rem;position:relative;transition:all .2s;}
+.sc:hover{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,245,255,.15);}
+.sc.glitch{border-color:var(--green)!important;animation:gb .5s steps(2) infinite;}
+@keyframes gb{0%{border-color:var(--green);}33%{border-color:var(--cyan);}66%{border-color:var(--purple);}100%{border-color:var(--green);}}
+.gl{position:absolute;top:-6px;right:7px;background:var(--green);color:#001a00;font-family:var(--fh);font-size:6px;font-weight:700;padding:2px 4px;border-radius:3px;letter-spacing:1px;animation:gt .3s steps(2) infinite;}
+.soldout-lbl{position:absolute;top:-6px;right:7px;background:var(--red);color:#fff;font-family:var(--fh);font-size:6px;font-weight:700;padding:2px 4px;border-radius:3px;letter-spacing:1px;}
+.sc.soldout{opacity:.55;border-color:#440022!important;}
+.sc.soldout .bb{opacity:.4;cursor:not-allowed;pointer-events:none;}
+@keyframes gt{0%{transform:translateX(0);}50%{transform:translateX(1px) skewX(2deg);}100%{transform:translateX(-1px) skewX(-2deg);}}
+.snm{font-size:10px;color:var(--w);margin-bottom:2px;}
+.slv{font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;margin-bottom:6px;}
+.spr{font-family:var(--fd);font-size:1.6rem;line-height:1;color:var(--purple);text-shadow:0 0 10px var(--purple);}
+.spr.neg{color:var(--green);text-shadow:0 0 10px var(--green);}
+.bb{margin-top:.55rem;width:100%;background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:8px;letter-spacing:1px;padding:4px 7px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.bb:hover{background:#2a0055;box-shadow:0 0 8px rgba(200,0,255,.4);}
+/* Shop filter */
+.shop-filters{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;align-items:center;}
+.shop-search{background:#05000f;border:1px solid var(--border);border-radius:4px;color:var(--w);font-family:var(--fm);font-size:10px;padding:4px 8px;width:180px;}
+.shop-search:focus{outline:none;border-color:var(--cyan);}
+/* SPONSORS */
+.spc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.75rem;}
+.spprod{font-size:11px;font-weight:bold;margin-bottom:2px;}
+.sptag{font-size:8px;color:var(--dim);margin-bottom:6px;font-style:italic;}
+.dbar{height:6px;border-radius:3px;overflow:hidden;background:#1a0030;margin-bottom:6px;}
+.dbf{height:100%;border-radius:3px;}
+.sppay{font-family:var(--fd);font-size:1.3rem;color:var(--gold);text-shadow:0 0 8px var(--gold);margin-bottom:4px;}
+.shbtn{width:100%;background:#1a1000;border:1px solid var(--gold);color:var(--gold);font-family:var(--fh);font-size:8px;letter-spacing:1px;padding:4px 7px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.shbtn:hover{background:#2a1a00;box-shadow:0 0 8px rgba(255,215,0,.4);}
+.shbdg{display:inline-block;background:#1a1000;border:1px solid var(--gold);color:var(--gold);font-family:var(--fh);font-size:7px;padding:2px 6px;border-radius:3px;letter-spacing:1px;margin-top:4px;}
+/* AVATAR */
+#avwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:.9rem;}
+#avstage{background:#05000a;border:2px solid var(--border);border-radius:10px;padding:.8rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+#wc{image-rendering:pixelated;border:1px solid #2a0050;border-radius:4px;}
+.tdisp{font-family:var(--fd);font-size:.9rem;letter-spacing:2px;text-align:center;line-height:1.2;min-height:2.1rem;}
+.idisp{font-size:7px;color:var(--gold);font-family:var(--fh);letter-spacing:1px;text-align:center;}
+#slotg{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;}
+.slotc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.5rem;cursor:pointer;transition:all .2s;position:relative;}
+.slotc:hover{border-color:var(--cyan);box-shadow:0 0 10px rgba(0,245,255,.18);}
+.slbl{font-family:var(--fh);font-size:6px;letter-spacing:1px;color:var(--dim);margin-bottom:.2rem;text-transform:uppercase;}
+.si{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#05000f;border-radius:4px;position:relative;overflow:hidden;}
+.se{font-size:7px;color:#440066;font-family:var(--fh);}
+.snm2{font-size:7px;color:var(--dim);margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rbl{position:absolute;bottom:2px;right:2px;font-family:var(--fh);font-size:7px;font-weight:900;padding:1px 3px;border-radius:2px;animation:rba .4s steps(1) infinite;}
+@keyframes rba{0%{opacity:1;}50%{opacity:0;}}
+/* TITLES */
+#tlist{display:flex;flex-direction:column;gap:.3rem;max-height:360px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.trow{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.45rem .7rem;display:flex;align-items:center;justify-content:space-between;gap:.45rem;cursor:pointer;transition:all .2s;}
+.trow:hover{border-color:var(--gold);}.trow.owned{border-color:var(--green);opacity:.7;cursor:default;}.trow.equipped{border-color:var(--gold);box-shadow:0 0 10px rgba(255,215,0,.22);}
+.trnm{font-family:var(--fd);font-size:.85rem;letter-spacing:2px;flex:1;}
+.trint{font-size:7px;color:var(--gold);font-family:var(--fh);white-space:nowrap;}
+/* FRAG MARKET */
+.fc{background:var(--card);border-radius:8px;padding:.55rem;transition:all .2s;cursor:pointer;border:1px solid #2a0050;position:relative;}
+.fc:hover{box-shadow:0 0 12px rgba(0,245,255,.15);transform:translateY(-1px);}
+.fa{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#05000f;border-radius:4px;position:relative;overflow:hidden;margin-bottom:.3rem;}
+.fa canvas{image-rendering:pixelated;}
+.fnm{font-size:7px;margin-bottom:2px;line-height:1.3;}
+.fpr{font-family:var(--fd);font-size:.95rem;margin-bottom:1px;}
+.fsl{font-size:6px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;}
+.fbtns{display:flex;gap:3px;margin-top:.3rem;}
+.fbuy,.fsel{flex:1;font-family:var(--fh);font-size:7px;letter-spacing:.5px;padding:3px 3px;border-radius:3px;cursor:pointer;border:none;transition:all .15s;text-align:center;}
+.fbuy{background:#1a0035;border:1px solid var(--purple);color:var(--purple);}
+.fbuy:hover{background:#2a0055;}
+.fsel{background:#0a1a00;border:1px solid var(--green);color:var(--green);}
+.fsel:hover{background:#143000;}
+.chart-btn{position:absolute;top:4px;right:4px;background:#0a0018;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--fh);font-size:6px;padding:2px 5px;border-radius:2px;cursor:pointer;z-index:5;opacity:.8;}
+.chart-btn:hover{opacity:1;box-shadow:0 0 6px rgba(0,245,255,.4);}
+/* GACHA */
+#banner{width:100%;height:105px;border-radius:10px;margin-bottom:.45rem;position:relative;overflow:hidden;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.15rem;}
+.bttl{font-family:var(--fd);font-size:1.25rem;letter-spacing:3px;text-align:center;z-index:2;position:relative;padding:0 .9rem;line-height:1.1;}
+.bsub{font-size:7px;font-family:var(--fh);letter-spacing:2px;color:rgba(255,255,255,.7);z-index:2;position:relative;}
+.bbuff{font-size:6px;font-family:var(--fh);letter-spacing:1px;z-index:2;position:relative;padding:2px 7px;border-radius:3px;margin-top:1px;}
+.bbg{position:absolute;inset:0;z-index:1;}
+.gbtns{display:flex;gap:.55rem;margin-bottom:.65rem;}
+.gbtn{flex:1;padding:.5rem;border-radius:7px;border:2px solid;font-family:var(--fh);font-size:9px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-align:center;}
+.gbtn1{background:#1a0035;border-color:var(--purple);color:var(--purple);}
+.gbtn1:hover{background:#2a0055;box-shadow:0 0 12px rgba(200,0,255,.4);}
+.gbtn10{background:#1a1000;border-color:var(--gold);color:var(--gold);}
+.gbtn10:hover{background:#2a1a00;box-shadow:0 0 12px rgba(255,215,0,.4);}
+#pstage{min-height:140px;background:#05000a;border:1px solid var(--border);border-radius:10px;margin-bottom:.65rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.35rem;padding:.6rem;position:relative;overflow:hidden;}
+.pidle{font-family:var(--fh);font-size:9px;color:var(--dim);letter-spacing:2px;}
+.pc{width:66px;background:var(--card);border:2px solid var(--border);border-radius:7px;padding:.3rem;text-align:center;position:relative;overflow:hidden;opacity:0;transform:scale(.5) rotate(10deg);}
+.pc.rev{opacity:1;transform:scale(1) rotate(0deg);transition:all .35s cubic-bezier(.34,1.56,.64,1);}
+.pc canvas{image-rendering:pixelated;display:block;margin:0 auto;}
+.pcnm{font-size:6px;color:var(--dim);margin-top:2px;line-height:1.2;}
+.prar{font-family:var(--fh);font-size:7px;font-weight:900;animation:rba .4s steps(1) infinite;}
+#pityw{margin-bottom:.65rem;}
+.pityl{display:flex;justify-content:space-between;font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:3px;}
+.pbar{height:5px;background:#1a0030;border-radius:3px;overflow:hidden;}
+.pbarf{height:100%;background:linear-gradient(90deg,#660066,var(--purple));border-radius:3px;transition:width .5s;}
+/* INVENTORY */
+#invg{display:grid;grid-template-columns:repeat(auto-fill,minmax(106px,1fr));gap:.45rem;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.42rem;cursor:pointer;transition:all .2s;position:relative;}
+.ic:hover{border-color:var(--gold);box-shadow:0 0 8px rgba(255,215,0,.18);}
+.ic.eqon{border-color:var(--green);}
+.eql{font-size:6px;color:var(--green);font-family:var(--fh);margin-top:2px;}
+.isel{width:100%;margin-top:3px;background:#0a1a00;border:1px solid var(--green);color:var(--green);font-family:var(--fh);font-size:7px;padding:3px;border-radius:3px;cursor:pointer;transition:all .15s;}
+.isel:hover{background:#143000;box-shadow:0 0 5px rgba(0,255,136,.3);}
+
+/* ═══ CASINO ═══ */
+#casino-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;}
+.casino-game{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;flex-direction:column;align-items:center;gap:.6rem;}
+.casino-title{font-family:var(--fd);font-size:1.4rem;letter-spacing:3px;color:var(--gold);text-shadow:0 0 12px var(--gold);}
+.casino-sub{font-size:8px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;}
+/* ROULETTE */
+#roulette-canvas{image-rendering:auto;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 20px rgba(255,215,0,.3);cursor:pointer;}
+.roul-bets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;}
+.roul-bet-btn{font-family:var(--fh);font-size:8px;padding:4px 10px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .15s;}
+.roul-bet-btn:hover{box-shadow:0 0 8px rgba(255,255,255,.2);}
+/* SLOTS */
+#slots-display{display:flex;gap:.5rem;justify-content:center;align-items:center;}
+.reel{width:72px;height:80px;background:#05000f;border:2px solid var(--border);border-radius:8px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+.reel-inner{display:flex;flex-direction:column;align-items:center;transition:transform .5s cubic-bezier(.25,.46,.45,.94);}
+.reel-sym{font-size:2rem;line-height:72px;height:72px;text-align:center;width:72px;}
+.slots-spin-btn{font-family:var(--fd);font-size:1.2rem;letter-spacing:2px;background:#220044;border:2px solid var(--purple);color:var(--purple);padding:.4rem 1.5rem;border-radius:8px;cursor:pointer;transition:all .2s;}
+.slots-spin-btn:hover{background:#330066;box-shadow:0 0 15px rgba(200,0,255,.5);}
+.slots-spin-btn:disabled{opacity:.4;cursor:not-allowed;}
+/* DICE BONES */
+#bones-canvas{image-rendering:auto;cursor:pointer;}
+.bones-bets{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;}
+.bones-bet-btn{font-family:var(--fh);font-size:8px;padding:4px 10px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .15s;}
+/* Common casino input */
+.casino-inp-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:center;}
+.casi{background:#05000f;border:1px solid var(--border);border-radius:4px;color:var(--w);font-family:var(--fm);font-size:11px;padding:4px 8px;width:80px;}
+.casi:focus{outline:none;border-color:var(--cyan);}
+.casino-result{font-family:var(--fh);font-size:.9rem;letter-spacing:2px;min-height:1.4rem;text-align:center;}
+/* DM */
+.dmsec{background:#100000;border:1px solid #441111;border-radius:9px;padding:.8rem;margin-bottom:.75rem;}
+.dmttl{font-family:var(--fh);font-size:9px;letter-spacing:2px;color:#ff4444;text-transform:uppercase;margin-bottom:.65rem;border-bottom:1px solid #330000;padding-bottom:.3rem;}
+.dmrow{display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:.4rem;}
+.dml{font-size:8px;color:var(--dim);font-family:var(--fh);margin-bottom:2px;display:block;letter-spacing:1px;}
+.dmi{background:#050000;border:1px solid #441111;border-radius:4px;color:var(--w);font-family:var(--fm);font-size:10px;padding:3px 6px;}
+.dmi:focus{outline:none;border-color:#ff4444;}
+.dmbtn{background:#220000;border:1px solid #ff4444;color:#ff4444;font-family:var(--fh);font-size:8px;letter-spacing:1px;padding:4px 11px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.dmbtn:hover{background:#440000;box-shadow:0 0 8px rgba(255,68,68,.4);}
+.fame-bar{height:8px;background:#1a0a00;border-radius:5px;overflow:hidden;margin-bottom:.45rem;}
+.fame-fill{height:100%;background:linear-gradient(90deg,#cc8800,#ffd700);border-radius:5px;transition:width .3s;}
+.dm3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.wb-card{background:#080010;border:1px solid #330055;border-radius:7px;padding:.6rem;}
+.wb-card-title{font-family:var(--fh);font-size:7px;letter-spacing:2px;color:#ff4444;text-transform:uppercase;margin-bottom:.45rem;}
+.wb-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.4rem;min-height:22px;}
+.wb-tag{display:inline-flex;align-items:center;gap:3px;background:#1a0030;border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:8px;color:var(--dim);font-family:var(--fm);}
+.wb-tag-x{background:none;border:none;color:#660044;cursor:pointer;font-size:10px;line-height:1;padding:0;transition:color .15s;}
+.wb-tag-x:hover{color:var(--red);}
+.wb-add-row{display:flex;gap:4px;}
+.wb-inp{flex:1;background:#050000;border:1px solid #441111;border-radius:3px;color:var(--w);font-family:var(--fm);font-size:9px;padding:3px 6px;min-width:0;}
+.wb-inp:focus{outline:none;border-color:#ff4444;}
+.wb-add-btn{background:#220000;border:1px solid #ff4444;color:#ff4444;font-family:var(--fh);font-size:7px;letter-spacing:1px;padding:3px 8px;border-radius:3px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.wb-add-btn:hover{background:#440000;}
+.wb-reset-btn{background:transparent;border:1px solid #220033;color:#442244;font-family:var(--fh);font-size:6px;letter-spacing:1px;padding:2px 6px;border-radius:3px;cursor:pointer;margin-top:.35rem;display:block;transition:all .15s;}
+.wb-reset-btn:hover{border-color:#550055;color:#775577;}
+/* CHART MODAL */
+#chart-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:6000;display:none;align-items:center;justify-content:center;}
+#chart-modal.show{display:flex;}
+.chart-box{background:#100020;border:2px solid var(--cyan);border-radius:12px;padding:1.2rem;width:min(500px,94vw);box-shadow:0 0 30px rgba(0,245,255,.2);}
+.chart-box-title{font-family:var(--fd);font-size:1.2rem;letter-spacing:3px;color:var(--cyan);margin-bottom:.7rem;text-shadow:0 0 10px var(--cyan);}
+#chart-canvas{width:100%;height:200px;display:block;}
+.chart-close{margin-top:.7rem;background:#05000f;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--fh);font-size:9px;padding:5px 14px;border-radius:4px;cursor:pointer;width:100%;}
+/* DICE OVERLAY */
+#dice-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:5000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:.65rem;}
+#dice-ov.show{display:flex;}
+.d100{font-family:var(--fd);font-size:5rem;color:var(--w);text-shadow:0 0 30px var(--purple);line-height:1;}
+.d100r{font-family:var(--fh);font-size:.95rem;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 12px var(--cyan);}
+.d100s{font-size:8px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;text-align:center;max-width:290px;line-height:1.7;}
+#rhl{max-height:80px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;background:#05000f;border:1px solid #2a0050;border-radius:5px;padding:.3rem .5rem;width:270px;}
+.rhe{font-size:7px;color:var(--dim);font-family:var(--fh);padding:2px 0;border-bottom:1px solid #110022;}
+.rhe.pos{color:var(--green);}.rhe.neg{color:var(--red);}
+/* TOAST & LOG */
+#toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#1a0035;border:1px solid var(--purple);color:var(--w);font-family:var(--fh);font-size:10px;letter-spacing:1px;padding:6px 16px;border-radius:6px;z-index:10000;opacity:0;transition:opacity .3s;box-shadow:0 0 18px rgba(200,0,255,.4);pointer-events:none;text-align:center;max-width:92%;}
+#logw{position:fixed;bottom:0;right:0;width:260px;max-height:160px;overflow-y:auto;background:rgba(5,0,15,.93);border-top:1px solid var(--border);border-left:1px solid var(--border);border-radius:8px 0 0 0;padding:.3rem .5rem;z-index:300;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.logt{font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:2px;margin-bottom:2px;}
+.loge{font-size:8px;color:var(--dim);padding:2px 0;border-bottom:1px solid #110022;}
+.loge.win{color:var(--green);}.loge.loss{color:var(--red);}.loge.spend{color:var(--orange);}.loge.glitch{color:var(--cyan);}
+.pu{color:var(--green)!important;text-shadow:0 0 5px var(--green);}
+.pd{color:var(--red)!important;text-shadow:0 0 5px var(--red);}
+.pn{color:var(--dim)!important;}
+</style>
+<!-- Firebase compat SDKs (no build tools needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div id="hdr">
+  <div class="logo">Arc<span>ane</span>Market</div>
+  <div class="hdr-r">
+    <div id="sync-pill" style="display:flex;align-items:center;gap:5px;background:#0a0020;border:1px solid #330055;border-radius:5px;padding:.25rem .6rem;font-family:var(--fh);font-size:7px;letter-spacing:1px;color:var(--dim);">
+      <div id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#444;flex-shrink:0;transition:background .4s;"></div>
+      <span id="sync-label">OFFLINE</span>
+    </div>
+    <div class="day-bdg" id="daybdg">DAY 1</div>
+    <div class="wal"><div class="gem"></div><div class="wamt" id="wdisp">1,000</div></div>
+  </div>
+</div>
+<div id="tkw"><div id="tk"></div></div>
+<div id="nav">
+  <button class="nt active" onclick="sw('markets')">MARKETS</button>
+  <button class="nt" onclick="sw('costs')">COSTS</button>
+  <button class="nt" onclick="sw('shop')">SCROLL SHOP</button>
+  <button class="nt" onclick="sw('sponsor')">SPONSORSHIPS</button>
+  <button class="nt" onclick="sw('avatar')">AVATAR</button>
+  <button class="nt" onclick="sw('titles')">TITLE SHOP</button>
+  <button class="nt" onclick="sw('frags')">SOUL FRAGMENTS</button>
+  <button class="nt" onclick="sw('gacha')">GACHA</button>
+  <button class="nt" onclick="sw('inventory')">INVENTORY</button>
+  <button class="nt" onclick="sw('casino')">CASINO</button>
+  <button class="nt" onclick="sw('spellbook')">SPELLBOOK</button>
+  <button class="nt dmt" onclick="sw('dm')">DM PANEL</button>
+</div>
+<div id="daybar">
+  <div id="dayinfo">DAY 1 — Press ADVANCE DAY to roll for price changes &amp; collect interest.</div>
+  <button class="db" onclick="advanceDay()">ADVANCE DAY</button>
+  <button class="db warn" onclick="rollbackDay()">ROLLBACK</button>
+</div>
+
+<!-- MARKETS -->
+<div class="pnl active" id="pnl-markets">
+  <div class="sh">PREDICTION MARKETS</div>
+  <div class="frow">
+    <button class="ftog active" onclick="filterMkts('all',this)">ALL</button>
+    <button class="ftog" onclick="filterMkts('open',this)">OPEN</button>
+    <button class="ftog" onclick="filterMkts('timed',this)">TIMED</button>
+    <button class="ftog" onclick="filterMkts('dm',this)">DM SPECIAL</button>
+    <div style="flex:1"></div>
+    <span style="font-size:8px;color:var(--dim);font-family:var(--fh);">FAME: <span id="famedisp" style="color:var(--gold)">UNKNOWN</span></span>
+  </div>
+  <div class="g2" id="mktgrid" style="margin-bottom:.5rem;"></div>
+</div>
+
+<!-- COSTS -->
+<div class="pnl" id="pnl-costs">
+  <div class="sh">COST DRAINS</div>
+  <div style="font-size:9px;color:var(--dim);margin-bottom:.65rem;font-style:italic;">"The market giveth and the market taketh away."</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.65rem;">
+    <div class="dc">
+      <div class="dtl">LONG REST — SPELL SLOTS</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:7px;" id="scd"></div>
+      <div style="font-size:8px;color:var(--dim);font-family:var(--fh);margin-bottom:3px;">BUY BACK SLOTS:</div>
+      <div id="sbr"></div>
+      <button class="paybtn" id="restbtn" onclick="payRest()">PAY FULL REST COST</button>
+    </div>
+    <div class="dc">
+      <div class="dtl">HEAL HP</div>
+      <div style="font-size:8px;color:var(--dim);margin-bottom:4px;">Cost: <span id="hpcp" style="color:var(--red)">5</span> gems/HP</div>
+      <div class="ctr"><button class="cb" onclick="adjHP(-1)">-</button><input type="number" id="hpamt" value="1" min="1" style="width:46px;"><button class="cb" onclick="adjHP(1)">+</button><span style="font-size:8px;color:var(--dim);margin-left:3px;">HP</span></div>
+      <div style="font-size:9px;color:var(--purple);font-family:var(--fh);margin:5px 0;" id="hptot">Total: 5 gems</div>
+      <button class="paybtn" onclick="payHP()">HEAL &amp; PAY</button>
+    </div>
+    <div class="dc">
+      <div class="dtl">DAILY SURVIVAL TAX</div>
+      <div class="dbig" id="dailydisp">50</div>
+      <div class="dsub">gems owed each day you breathe</div>
+      <button class="paybtn" onclick="payDaily()">PAY DAILY TAX</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div class="pnl" id="pnl-shop">
+  <div class="sh">SCROLL SHOP</div>
+  <div class="shop-filters">
+    <input class="shop-search" type="text" id="shopSearch" placeholder="Search scrolls..." oninput="renderShop()">
+    <select class="dmi" id="shopLvlFilter" onchange="renderShop()" style="background:#05000f;color:var(--w);">
+      <option value="all">All Levels</option>
+    </select>
+    <span style="font-size:8px;color:var(--dim);font-family:var(--fh);" id="shopCount"></span>
+  </div>
+  <div class="g3" id="shopgrid"></div>
+</div>
+
+<!-- SPONSOR -->
+<div class="pnl" id="pnl-sponsor">
+  <div class="sh">SPONSORSHIPS</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.6rem;font-style:italic;">"This episode of The Divination Hour is brought to you by..."</div>
+  <div class="g2" id="spgrid"></div>
+  <button class="dmbtn" style="margin-top:.6rem;" onclick="addRandSponsor()">+ GENERATE RANDOM SPONSOR</button>
+</div>
+
+<!-- AVATAR -->
+<div class="pnl" id="pnl-avatar">
+  <div class="sh">MY AVATAR</div>
+  <div id="avwrap">
+    <div id="avstage">
+      <canvas id="wc" width="120" height="160"></canvas>
+      <div class="tdisp" id="avtdisp" style="color:#aa88cc;">NOBODY</div>
+      <div class="idisp" id="avidisp">DAILY INTEREST: 0.10%</div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-top:1px;" id="avearn">~0 gems/day</div>
+    </div>
+    <div>
+      <div style="font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:.4rem;">EQUIPPED SOUL FRAGMENTS</div>
+      <div id="slotg">
+        <div class="slotc" onclick="openSlot('hat')" id="slot-hat"><div class="slbl">HAT</div><div class="si"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+        <div class="slotc" onclick="openSlot('hand')" id="slot-hand"><div class="slbl">HAND</div><div class="si"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+        <div class="slotc" onclick="openSlot('boots')" id="slot-boots"><div class="slbl">BOOTS</div><div class="si"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+        <div class="slotc" onclick="openSlot('acc1')" id="slot-acc1"><div class="slbl">ACC I</div><div class="si"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+        <div class="slotc" onclick="openSlot('acc2')" id="slot-acc2" style="grid-column:span 2;"><div class="slbl">ACC II</div><div class="si" style="aspect-ratio:2/1;"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+        <div class="slotc" onclick="openSlot('pet')" id="slot-pet" style="grid-column:span 2;"><div class="slbl">PET FAMILIAR</div><div class="si" style="aspect-ratio:2/1;"><span class="se">EMPTY</span></div><div class="snm2">—</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- CHARACTER SHEET -->
+  <div style="margin-top:1rem;">
+    <div class="sh" style="font-size:1rem;margin-bottom:.5rem;">CHARACTER SUMMARY</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr);gap:.7rem;">
+      <!-- ABILITY SCORES -->
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">ABILITY SCORES</div>
+        <div id="ability-scores-display"></div>
+      </div>
+      <!-- PROFICIENCIES -->
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">PROFICIENCIES</div>
+        <div id="prof-display" style="font-size:9px;color:var(--dim);line-height:1.6;"></div>
+        <button onclick="sw('spellbook')" style="margin-top:.5rem;background:#0a1a00;border:1px solid var(--green);color:var(--green);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;width:100%;">OPEN SPELLBOOK</button>
+      </div>
+      <!-- PREPARED SPELLS -->
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">PREPARED SPELLS</div>
+        <div id="prepared-display" style="font-size:8px;color:var(--dim);line-height:1.6;max-height:120px;overflow-y:auto;scrollbar-width:thin;"></div>
+      </div>
+    </div>
+  </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TITLES -->
+<div class="pnl" id="pnl-titles">
+  <div class="sh">TITLE SHOP</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Titles grant daily mana gem interest. Purchase then click to equip.</div>
+  <div id="tlist"></div>
+</div>
+
+<!-- FRAGMENTS -->
+<div class="pnl" id="pnl-frags">
+  <div class="sh">SOUL FRAGMENT MARKET</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.35rem;">Buy or sell. Prices drift daily. Click 📈 for price history chart.</div>
+  <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.55rem;font-size:7px;font-family:var(--fh);">
+    <span style="color:#aaa">C: ~50–300</span><span style="color:#44ff88">U: ~250–700</span><span style="color:#4488ff">R: ~600–1.8k</span><span style="color:#ff44cc">S: ~1.5–4.5k</span><span style="color:#ffd700">SSR: ~4–12k</span>
+  </div>
+  <div class="g4" id="fragmktg"></div>
+</div>
+
+<!-- GACHA -->
+<div class="pnl" id="pnl-gacha">
+  <div id="banner"></div>
+  <div id="bannerrates" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem;font-size:7px;font-family:var(--fh);"></div>
+  <div id="pityw">
+    <div class="pityl"><span>SOFT PITY (SSR)</span><span id="pitynum">0 / 90</span></div>
+    <div class="pbar"><div class="pbarf" id="pityfill" style="width:0%"></div></div>
+    <div class="pityl" style="margin-top:4px;"><span style="color:var(--gold);">HARD PITY (BANNER ITEM)</span><span id="hardpitynum" style="color:var(--gold);">0 / 180</span></div>
+    <div class="pbar" style="margin-top:2px;"><div class="pbarf" id="hardpityfill" style="width:0%;background:linear-gradient(90deg,#aa6600,#ffd700);"></div></div>
+  </div>
+  <div class="gbtns"><button class="gbtn gbtn1" onclick="doPull(1)">SINGLE PULL — 50 GEMS</button><button class="gbtn gbtn10" onclick="doPull(10)">10-PULL — 450 GEMS</button></div>
+  <div id="pstage"><span class="pidle">AWAITING FATE...</span></div>
+  <div id="psumm" style="font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;margin-top:.3rem;min-height:.85rem;"></div>
+</div>
+
+<!-- INVENTORY -->
+<div class="pnl" id="pnl-inventory">
+  <div class="sh">SOUL FRAGMENT INVENTORY</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Click to equip. Sell button converts to mana gems at 85% market rate.</div>
+  <div id="invg"></div>
+</div>
+
+<!-- CASINO -->
+<div class="pnl" id="pnl-casino">
+  <div class="sh">THE ARCANE CASINO</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.8rem;">All games support the <span style="color:var(--gold)">REINBET ENGINE</span> — toggle on any game, and if you win you'll be offered a d100 roll: land 0× to 4× your winnings. Decline to keep your guaranteed win.</div>
+  <div id="casino-wrap">
+
+    <!-- ROULETTE -->
+    <div class="casino-game">
+      <div class="casino-title">ARCANE ROULETTE</div>
+      <div class="casino-sub">The Wheel of Fate. 0–36 plus the VOID (00).</div>
+      <canvas id="roulette-canvas" width="200" height="200"></canvas>
+      <div class="casino-inp-row">
+        <input class="casi" type="number" id="roul-amt" value="50" min="1" placeholder="gems">
+        <select class="dmi" id="roul-type" style="background:#05000f;color:var(--w);font-family:var(--fh);font-size:8px;">
+          <option value="red">RED (×2)</option>
+          <option value="black">BLACK (×2)</option>
+          <option value="odd">ODD (×2)</option>
+          <option value="even">EVEN (×2)</option>
+          <option value="low">LOW 1-18 (×2)</option>
+          <option value="high">HIGH 19-36 (×2)</option>
+          <option value="dozen1">1st DOZEN (×3)</option>
+          <option value="dozen2">2nd DOZEN (×3)</option>
+          <option value="dozen3">3rd DOZEN (×3)</option>
+          <option value="single">SINGLE# (×36)</option>
+        </select>
+        <input class="casi" type="number" id="roul-num" value="7" min="0" max="36" placeholder="# if single" style="width:55px;display:none;">
+      </div>
+      <button class="slots-spin-btn" onclick="spinRoulette()" id="roul-btn">SPIN THE WHEEL</button>
+      <div class="casino-result" id="roul-result"></div>
+    </div>
+
+    <!-- SLOT MACHINE -->
+    <div class="casino-game">
+      <div class="casino-title">ARCANE SLOTS</div>
+      <div class="casino-sub">Seven arcane symbols. Match three to win.</div>
+      <div id="slots-display">
+        <div class="reel" id="reel0"><div class="reel-inner" id="ri0"></div></div>
+        <div class="reel" id="reel1"><div class="reel-inner" id="ri1"></div></div>
+        <div class="reel" id="reel2"><div class="reel-inner" id="ri2"></div></div>
+      </div>
+      <div class="casino-inp-row">
+        <input class="casi" type="number" id="slots-amt" value="25" min="1" placeholder="gems">
+        <select class="dmi" id="slots-lines" style="background:#05000f;color:var(--w);font-family:var(--fh);font-size:8px;">
+          <option value="1">1 LINE (×1 cost)</option>
+          <option value="3">3 LINES (×3 cost)</option>
+        </select>
+      </div>
+      <button class="slots-spin-btn" onclick="spinSlots()" id="slots-btn">PULL</button>
+      <div class="casino-result" id="slots-result"></div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);text-align:center;">🔮=200× 💀=150× 👁=100× ⚡=50× 🌙=20× ⭐=10× 🎰=5×</div>
+    </div>
+
+    <!-- ARCANE DICE / READ THE BONES -->
+    <div class="casino-game">
+      <div class="casino-title">READ THE BONES</div>
+      <div class="casino-sub">Two d6. Bet on total, high/low, or doubles.</div>
+      <canvas id="bones-canvas" width="160" height="80"></canvas>
+      <div class="casino-inp-row">
+        <input class="casi" type="number" id="bones-amt" value="30" min="1" placeholder="gems">
+        <select class="dmi" id="bones-type" style="background:#05000f;color:var(--w);font-family:var(--fh);font-size:8px;">
+          <option value="high">HIGH 8-12 (×2)</option>
+          <option value="low">LOW 2-6 (×2)</option>
+          <option value="doubles">DOUBLES (×5)</option>
+          <option value="exact7">EXACT 7 (×5)</option>
+          <option value="exact2">SNAKE EYES 2 (×30)</option>
+          <option value="exact12">BOXCARS 12 (×30)</option>
+        </select>
+      </div>
+      <button class="slots-spin-btn" onclick="rollBones()" id="bones-btn">CAST THE BONES</button>
+      <div class="casino-result" id="bones-result"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DM PANEL -->
+<div class="pnl" id="pnl-dm">
+  <div style="font-family:var(--fh);font-size:.95rem;color:#ff4444;letter-spacing:3px;margin-bottom:.75rem;text-shadow:0 0 10px #ff4444;">DM CONTROL PANEL</div>
+
+  <div class="dmsec">
+    <div class="dmttl">PARTY FAME</div>
+    <div style="display:flex;justify-content:space-between;font-size:8px;font-family:var(--fh);margin-bottom:3px;"><span style="color:var(--dim)">FAME LEVEL</span><span id="fameval" style="color:var(--gold)">0 — NOBODY</span></div>
+    <div class="fame-bar"><div class="fame-fill" id="famebf" style="width:0%"></div></div>
+    <input type="range" min="0" max="100" value="0" id="fameslider" oninput="setFame(this.value)" style="width:100%;margin-top:.35rem;">
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">WALLET CONTROL</div>
+    <div class="dmrow">
+      <div><label class="dml">SET GEMS TO</label><input type="number" class="dmi" id="setwl" placeholder="amount" style="width:100px;"></div>
+      <button class="dmbtn" onclick="dmSet()">SET</button>
+      <div><label class="dml">ADJUST BY ±</label><input type="number" class="dmi" id="adjwl" placeholder="+/- amount" style="width:100px;"></div>
+      <button class="dmbtn" onclick="dmAdj()">ADJUST</button>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">ADD MARKET</div>
+    <div class="dmrow">
+      <div><label class="dml">QUESTION</label><input type="text" class="dmi" id="dmq" placeholder="Will the dragon notice us?" style="width:230px;"></div>
+      <div><label class="dml">YES PROB %</label><input type="number" class="dmi" id="dmprob" value="50" min="1" max="99" style="width:60px;"></div>
+    </div>
+    <div class="dmrow">
+      <div><label class="dml">TYPE</label><select class="dmi" id="dmtype" onchange="toggleTimer()"><option value="open">MANUAL RESOLVE</option><option value="timed">TIMED</option></select></div>
+      <div id="dmtimerwrap" style="display:none;"><label class="dml">MINUTES</label><input type="number" class="dmi" id="dmtimer" value="10" min="1" style="width:70px;"></div>
+      <div><label class="dml">DM SPECIAL?</label><select class="dmi" id="dmspecial"><option value="no">NO</option><option value="yes">YES (GOLD)</option></select></div>
+      <button class="dmbtn" onclick="dmAddMarket()">ADD</button>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">RESOLVE MARKET</div>
+    <div class="dmrow">
+      <div><label class="dml">MARKET</label><select class="dmi" id="resolvesel" style="width:210px;"></select></div>
+      <button class="dmbtn" onclick="dmResolve('yes')" style="color:var(--green);border-color:var(--green);">RESOLVE YES</button>
+      <button class="dmbtn" onclick="dmResolve('no')" style="color:var(--red);border-color:var(--red);">RESOLVE NO</button>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">COST SETTINGS</div>
+    <div class="dm3" style="margin-bottom:7px;">
+      <div><label class="dml">HP HEAL/HP</label><input type="number" class="dmi" id="dmhp" value="5" style="width:100%;" oninput="dmCosts()"></div>
+      <div><label class="dml">DAILY TAX</label><input type="number" class="dmi" id="dmdaily" value="50" style="width:100%;" oninput="dmCosts()"></div>
+    </div>
+    <div class="dml" style="margin-bottom:4px;">SPELL SLOT COSTS BY LEVEL</div>
+    <div class="dm3" id="dmslotinps"></div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">SCROLL SHOP — PRICE RANGES PER LEVEL</div>
+    <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:6px;letter-spacing:1px;">Adjust base price range for scrolls of each spell level. Shop randomizes within range each day.</div>
+    <div class="dm3" id="dmshopranges"></div>
+    <div class="dmrow" style="margin-top:8px;">
+      <div><label class="dml">OVERRIDE SPECIFIC SCROLL</label><select class="dmi" id="dmshopsel" style="width:180px;"></select></div>
+      <div><label class="dml">NEW PRICE</label><input type="number" class="dmi" id="dmshopprice" style="width:80px;"></div>
+      <button class="dmbtn" onclick="dmOverrideShop()">OVERRIDE</button>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">REINBET SETTINGS</div>
+    <div class="dm3">
+      <div><label class="dml">WIN MULTIPLIER (×)</label><input type="number" class="dmi" id="dmrbwin" value="4" min="2" style="width:100%;" oninput="S.rbWinMult=parseFloat(this.value)||4;"></div>
+      <div><label class="dml">LOSS DIVISOR (÷)</label><input type="number" class="dmi" id="dmrbloss" value="4" min="2" style="width:100%;" oninput="S.rbLossMult=parseFloat(this.value)||4;"></div>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">ADD CUSTOM SPONSOR</div>
+    <div class="dmrow">
+      <div><label class="dml">PRODUCT NAME</label><input type="text" class="dmi" id="dmspnm" placeholder="Potion of Questionable Vitality" style="width:200px;"></div>
+      <div><label class="dml">TAGLINE</label><input type="text" class="dmi" id="dmsptag" placeholder="Probably fine" style="width:150px;"></div>
+    </div>
+    <div class="dmrow">
+      <div><label class="dml">DANGER (1-10)</label><input type="number" class="dmi" id="dmspdan" value="5" min="1" max="10" style="width:70px;"></div>
+      <div><label class="dml">PAYOUT</label><input type="number" class="dmi" id="dmsppay" value="200" style="width:90px;"></div>
+      <button class="dmbtn" onclick="dmAddSponsor()">ADD</button>
+    </div>
+  </div>
+
+  <div class="dmsec">
+    <div class="dmttl">WORLD BUILDER — PROPER NOUNS</div>
+    <div style="font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;margin-bottom:.7rem;">Edit the names used in procedural market generation. Changes take effect on the next day advance or market refresh.</div>
+    <div id="wb-lists-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.6rem;"></div>
+  </div>
+</div>
+
+<!-- SPELLBOOK -->
+<div class="pnl" id="pnl-spellbook">
+  <div class="sh">ARCANE SPELLBOOK</div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:1rem;">
+    <div>
+      <div class="card" style="margin-bottom:.7rem;">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">ABILITY SCORES</div>
+        <div class="dm3" style="gap:5px;" id="sb-ability-inputs"></div>
+      </div>
+      <div class="card" style="margin-bottom:.7rem;">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">PROFICIENCIES</div>
+        <div id="sb-prof-list" style="font-size:8px;color:var(--dim);margin-bottom:.4rem;line-height:1.7;"></div>
+        <div style="display:flex;gap:.3rem;">
+          <input type="text" id="sb-prof-inp" class="dmi" placeholder="Add proficiency..." style="flex:1;background:#05000f;border-color:var(--border);">
+          <button onclick="addProficiency()" class="db">ADD</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">SPELL SLOTS REMAINING</div>
+        <div id="sb-slots-display"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:.7rem;">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">PREPARED SPELLS</div>
+        <div style="display:flex;gap:.3rem;margin-bottom:.4rem;flex-wrap:wrap;">
+          <input type="text" id="sb-spell-inp" class="dmi" placeholder="Spell name..." style="flex:1;background:#05000f;border-color:var(--border);" list="all-spells-datalist">
+          <select class="dmi" id="sb-spell-lvl" style="background:#05000f;color:var(--w);">
+            <option value="0">Cantrip</option>
+            <option value="1">Lv1</option><option value="2">Lv2</option><option value="3">Lv3</option>
+            <option value="4">Lv4</option><option value="5">Lv5</option><option value="6">Lv6</option>
+            <option value="7">Lv7</option><option value="8">Lv8</option><option value="9">Lv9</option>
+          </select>
+          <button onclick="addPreparedSpell()" class="db">PREPARE</button>
+        </div>
+        <datalist id="all-spells-datalist"></datalist>
+        <div id="sb-prepared-list" style="max-height:300px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;"></div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:8px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">NOTES</div>
+        <textarea id="sb-notes" style="width:100%;height:80px;background:#05000f;border:1px solid var(--border);color:var(--w);font-family:var(--fm);font-size:9px;padding:5px;border-radius:4px;resize:vertical;" placeholder="Character notes, class features, etc..." oninput="S.charSheet.notes=this.value"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REINBET MODAL -->
+<style>
+@keyframes rb-pulse{0%,100%{box-shadow:0 0 30px rgba(255,215,0,.4),0 0 60px rgba(255,215,0,.2),inset 0 0 30px rgba(255,215,0,.05);}50%{box-shadow:0 0 60px rgba(255,215,0,.8),0 0 120px rgba(255,215,0,.4),inset 0 0 50px rgba(255,215,0,.1);}}
+@keyframes rb-title-pulse{0%,100%{text-shadow:0 0 20px var(--gold),0 0 40px var(--gold);}50%{text-shadow:0 0 40px #fff,0 0 80px var(--gold),0 0 120px var(--gold);}}
+@keyframes rb-gem-spin{0%{transform:rotate(0deg) scale(1);}50%{transform:rotate(180deg) scale(1.3);}100%{transform:rotate(360deg) scale(1);}}
+@keyframes rb-taunt{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.7;transform:scale(.97);}}
+#reinbet-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:7000;display:none;align-items:center;justify-content:center;}
+.rb-box{background:linear-gradient(160deg,#1a0e00,#2a1500,#1a0a00);border:2px solid var(--gold);border-radius:16px;padding:2rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:.9rem;max-width:400px;width:92vw;animation:rb-pulse 2s ease-in-out infinite;position:relative;overflow:hidden;}
+.rb-box::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,215,0,.02) 8px,rgba(255,215,0,.02) 9px);pointer-events:none;}
+.rb-title{font-family:var(--fd);font-size:2.5rem;letter-spacing:6px;color:var(--gold);animation:rb-title-pulse 1.5s ease-in-out infinite;text-align:center;}
+.rb-subtitle{font-family:var(--fh);font-size:8px;letter-spacing:3px;color:#cc9900;text-transform:uppercase;text-align:center;}
+.rb-gems-row{display:flex;gap:.5rem;align-items:center;}
+.rb-gem-ico{width:18px;height:18px;background:radial-gradient(circle at 35% 35%,#ffe066,#cc8800);border-radius:50% 20% 50% 20%;transform:rotate(45deg);box-shadow:0 0 10px var(--gold);animation:rb-gem-spin 3s linear infinite;}
+.rb-base-win{font-family:var(--fh);font-size:1rem;color:var(--gold);letter-spacing:2px;text-align:center;}
+.rb-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:.2rem 0;}
+.rb-taunt{font-family:var(--fh);font-size:9px;color:#ffdd66;letter-spacing:1px;text-align:center;animation:rb-taunt 2s ease-in-out infinite;font-style:italic;}
+.rb-d100{font-family:var(--fd);font-size:6rem;color:var(--white);text-shadow:0 0 30px var(--gold),0 0 60px rgba(255,215,0,.5);line-height:1;min-width:120px;text-align:center;transition:color .3s;}
+.rb-mult{font-family:var(--fh);font-size:1.3rem;letter-spacing:4px;min-height:2rem;text-align:center;transition:all .3s;}
+.rb-final{font-family:var(--fd);font-size:2rem;letter-spacing:3px;min-height:2.5rem;text-align:center;transition:all .3s;}
+.rb-odds{font-size:7px;color:#886600;font-family:var(--fh);letter-spacing:1px;text-align:center;line-height:1.8;}
+.rb-confirm{font-family:var(--fd);font-size:1.4rem;letter-spacing:4px;background:linear-gradient(135deg,#cc8800,#ffd700,#cc8800);color:#1a0800;border:none;padding:.6rem 2rem;border-radius:8px;cursor:pointer;transition:all .2s;box-shadow:0 0 20px rgba(255,215,0,.5);animation:rb-pulse 1s ease-in-out infinite;}
+.rb-confirm:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(255,215,0,.8);}
+.rb-decline{font-family:var(--fh);font-size:8px;letter-spacing:2px;background:transparent;border:1px solid #442200;color:#664400;padding:.4rem 1.2rem;border-radius:5px;cursor:pointer;transition:all .2s;margin-top:-.3rem;}
+.rb-decline:hover{border-color:#884400;color:#aa6600;}
+</style>
+<div id="reinbet-modal">
+  <div class="rb-box">
+    <div class="rb-title">REINBET</div>
+    <div class="rb-subtitle">The Oracle dares you to press your luck</div>
+    <div class="rb-gems-row">
+      <div class="rb-gem-ico"></div><div class="rb-gem-ico" style="animation-delay:.4s"></div><div class="rb-gem-ico" style="animation-delay:.8s"></div>
+    </div>
+    <div class="rb-base-win" id="rb-base-info">You won: 0 gems</div>
+    <div class="rb-divider"></div>
+    <div class="rb-taunt" id="rb-taunt-text">Roll the d100. It could be so much more...</div>
+    <div class="rb-d100" id="rb-d100-face">??</div>
+    <div class="rb-mult" id="rb-mult-display"></div>
+    <div class="rb-final" id="rb-final-display"></div>
+    <div class="rb-odds">1–10: ×0 &nbsp;|&nbsp; 11–30: ×1 &nbsp;|&nbsp; 31–60: ×2 &nbsp;|&nbsp; 61–85: ×3 &nbsp;|&nbsp; 86–100: ×4</div>
+    <button class="rb-confirm" id="rb-confirm-btn" style="display:none;" onclick="confirmReinbet()">COLLECT WINNINGS</button>
+    <button class="rb-confirm" id="rb-roll-btn" onclick="rollReinbet()" style="background:linear-gradient(135deg,#880000,#cc0044,#880000);box-shadow:0 0 20px rgba(200,0,100,.5);">ROLL THE D100</button>
+    <button class="rb-decline" onclick="closeReinbet()">decline — <span id="rb-decline-note">keep guaranteed win</span></button>
+  </div>
+</div>
+<div id="chart-modal">
+  <div class="chart-box">
+    <div class="chart-box-title" id="chart-title">PRICE HISTORY</div>
+    <canvas id="chart-canvas"></canvas>
+    <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-top:.3rem;text-align:center;" id="chart-sub"></div>
+    <button class="chart-close" onclick="closeChart()">CLOSE</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="dice-ov">
+  <div style="font-family:var(--fh);font-size:9px;color:var(--dim);letter-spacing:3px;" id="dphase">ROLLING D100...</div>
+  <div class="d100" id="dface">??</div>
+  <div class="d100r" id="dresult"></div>
+  <div class="d100s" id="dsub"></div>
+  <div id="rhl" style="margin-top:.3rem;"></div>
+  <button class="db" style="margin-top:.4rem;" onclick="closeDice()">CONFIRM</button>
+</div>
+<div id="logw"><div class="logt">TRANSACTION LOG</div><div id="logl"></div></div>
+
+<script>
+// ══ FIREBASE CONFIG & LIVE SYNC ══════════════════════════════
+const firebaseConfig={
+  apiKey:"AIzaSyA87gNkfqzRp2I2d6aLv79YFPim8zWUn2E",
+  authDomain:"arcane-market-54a0e.firebaseapp.com",
+  databaseURL:"https://arcane-market-54a0e-default-rtdb.firebaseio.com",
+  projectId:"arcane-market-54a0e",
+  storageBucket:"arcane-market-54a0e.firebasestorage.app",
+  messagingSenderId:"518287770926",
+  appId:"1:518287770926:web:614b1041c970ebb97a26bf"
+};
+
+let fbApp,fbDb,fbRef;
+let syncEnabled=false;
+let remotePushPending=false;
+let ignoreNextRemoteUpdate=false;
+
+// Keys that are too large/volatile to sync (canvas state etc)
+// We sync the full S object minus non-serializable bits
+const SYNC_THROTTLE_MS=1500;
+let syncTimer=null;
+
+function fbInit(){
+  try{
+    fbApp=firebase.app();
+  }catch(e){
+    fbApp=firebase.initializeApp(firebaseConfig);
+  }
+  fbDb=firebase.database(fbApp);
+  fbRef=fbDb.ref('arcanemarket/state');
+
+  // Connection status
+  const connRef=firebase.database(fbApp).ref('.info/connected');
+  connRef.on('value',snap=>{
+    const online=snap.val()===true;
+    setSyncStatus(online?'live':'reconnecting',online);
+  });
+
+  // Listen for remote changes
+  fbRef.on('value',snap=>{
+    if(ignoreNextRemoteUpdate){ignoreNextRemoteUpdate=false;return;}
+    const data=snap.val();
+    if(!data)return;
+    try{
+      const remote=JSON.parse(data.state);
+      const remoteDay=remote.day||0;
+      const localDay=S.day||0;
+      // Only apply if remote is different from current (avoid echo loops)
+      if(data.ts!==lastPushTs){
+        Object.assign(S,remote);
+        afterStateLoad();
+        setSyncStatus('synced',true);
+      }
+    }catch(err){console.warn('Sync parse error',err);}
+  });
+
+  syncEnabled=true;
+  setSyncStatus('connecting',false);
+}
+
+let lastPushTs=0;
+function fbPush(){
+  if(!syncEnabled||!fbRef)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{
+    try{
+      // Strip non-serializable — dayHistory is large, keep last 3
+      const toSave={...S,dayHistory:S.dayHistory.slice(-3)};
+      const ts=Date.now();
+      lastPushTs=ts;
+      ignoreNextRemoteUpdate=true;
+      fbRef.set({state:JSON.stringify(toSave),ts});
+      setSyncStatus('synced',true);
+    }catch(err){console.warn('Sync push error',err);}
+  },SYNC_THROTTLE_MS);
+}
+
+function setSyncStatus(status,online){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  if(!dot||!lbl)return;
+  const map={
+    live:{color:'#00ff88',text:'LIVE'},
+    synced:{color:'#00ff88',text:'SYNCED'},
+    connecting:{color:'#ff8800',text:'CONNECTING'},
+    reconnecting:{color:'#ff8800',text:'RECONNECTING'},
+    offline:{color:'#444444',text:'OFFLINE'},
+    error:{color:'#ff3366',text:'SYNC ERROR'}
+  };
+  const cfg=map[status]||map.offline;
+  dot.style.background=cfg.color;
+  dot.style.boxShadow=online?`0 0 6px ${cfg.color}`:'none';
+  lbl.textContent=cfg.text;
+  lbl.style.color=online?cfg.color:'#444444';
+}
+
+// Called any time we need to re-render after loading remote state
+function afterStateLoad(){
+  document.getElementById('wdisp').textContent=S.wallet.toLocaleString();
+  document.getElementById('daybdg').textContent='DAY '+S.day;
+  equipTitle(S.equippedTitle);
+  renderSlots();
+  drawWizard();
+  renderCharSheet();
+  const active=document.querySelector('.pnl.active')?.id?.replace('pnl-','');
+  if(active==='markets')renderMarkets();
+  else if(active==='costs')renderCosts();
+  else if(active==='shop')renderShop();
+  else if(active==='sponsor')renderSponsors();
+  else if(active==='frags')renderFragMkt();
+  else if(active==='inventory')renderInventory();
+  else if(active==='titles')renderTitles();
+  else if(active==='gacha'&&S.currentBanner)renderBanner();
+}
+
+// Wrap upWallet so every gem change syncs
+const _upWalletOrig=upWallet;
+
+// ══ ALL 5e SPELLS BY LEVEL ══════════════════════════════════
+const ALL_SPELLS={0:["Acid Splash","Blade Ward","Booming Blade","Chill Touch","Control Flames","Create Bonfire","Dancing Lights","Druidcraft","Eldritch Blast","Encode Thoughts","Fire Bolt","Friends","Frostbite","Green-Flame Blade","Guidance","Gust","Hand of Radiance","Infestation","Light","Lightning Lure","Mage Hand","Magic Stone","Mending","Message","Mind Sliver","Minor Illusion","Mold Earth","Poison Spray","Prestidigitation","Primal Savagery","Produce Flame","Ray of Frost","Resistance","Sacred Flame","Shape Water","Shillelagh","Shocking Grasp","Spare the Dying","Sword Burst","Thaumaturgy","Thunderclap","Toll the Dead","True Strike","Vicious Mockery","Word of Radiance"],1:["Absorb Elements","Alarm","Animal Friendship","Armor of Agathys","Arms of Hadar","Bane","Beast Bond","Bless","Burning Hands","Catapult","Cause Fear","Ceremony","Chaos Bolt","Charm Person","Chromatic Orb","Color Spray","Command","Compelled Duel","Comprehend Languages","Create or Destroy Water","Cure Wounds","Detect Evil and Good","Detect Magic","Detect Poison and Disease","Disguise Self","Dissonant Whispers","Divine Favor","Earth Tremor","Ensnaring Strike","Entangle","Expeditious Retreat","Faerie Fire","False Life","Feather Fall","Find Familiar","Fog Cloud","Goodberry","Grease","Guiding Bolt","Hail of Thorns","Healing Word","Hellish Rebuke","Heroism","Hex","Hunter's Mark","Ice Knife","Identify","Inflict Wounds","Jump","Longstrider","Mage Armor","Magic Missile","Protection from Evil and Good","Purify Food and Drink","Ray of Sickness","Sanctuary","Searing Smite","Shield","Shield of Faith","Silent Image","Sleep","Snare","Speak with Animals","Tasha's Hideous Laughter","Tenser's Floating Disk","Thunderous Smite","Thunderwave","Unseen Servant","Witch Bolt","Wrathful Smite","Zephyr Strike"],2:["Aganazzar's Scorcher","Aid","Alter Self","Animal Messenger","Arcane Lock","Augury","Barkskin","Beast Sense","Blindness/Deafness","Blur","Branding Smite","Calm Emotions","Cloud of Daggers","Continual Flame","Cordon of Arrows","Crown of Madness","Darkness","Darkvision","Detect Thoughts","Dragon's Breath","Dust Devil","Earthbind","Enhance Ability","Enlarge/Reduce","Enthrall","Find Steed","Find Traps","Flame Blade","Flaming Sphere","Flock of Familiars","Fortune's Favor","Gentle Repose","Gust of Wind","Heat Metal","Hold Person","Invisibility","Knock","Lesser Restoration","Levitate","Locate Animals or Plants","Locate Object","Magic Mouth","Magic Weapon","Maximilian's Earthen Grasp","Melf's Acid Arrow","Mirror Image","Misty Step","Moonbeam","Nystul's Magic Aura","Pass without Trace","Phantasmal Force","Prayer of Healing","Protection from Poison","Pyrotechnics","Ray of Enfeeblement","Rope Trick","Scorching Ray","See Invisibility","Shadow Blade","Shatter","Silence","Skywrite","Snilloc's Snowball Swarm","Spider Climb","Spike Growth","Spiritual Weapon","Suggestion","Summon Beast","Tasha's Mind Whip","Vortex Warp","Warding Bond","Web","Wither and Bloom","Zone of Truth"],3:["Animate Dead","Aura of Vitality","Beacon of Hope","Bestow Curse","Blink","Call Lightning","Catnap","Clairvoyance","Conjure Animals","Conjure Barrage","Counterspell","Create Food and Water","Crusader's Mantle","Daylight","Dispel Magic","Elemental Weapon","Enemies Abound","Erupting Earth","Fear","Feign Death","Fireball","Flame Arrows","Fly","Gaseous Form","Glyph of Warding","Haste","Hunger of Hadar","Hypnotic Pattern","Intellect Fortress","Leomund's Tiny Hut","Life Transference","Lightning Arrow","Lightning Bolt","Magic Circle","Major Image","Mass Healing Word","Meld into Stone","Melf's Minute Meteors","Nondetection","Plant Growth","Protection from Energy","Remove Curse","Revivify","Sending","Sleet Storm","Slow","Speak with Dead","Speak with Plants","Spirit Guardians","Spirit Shroud","Stinking Cloud","Summon Fey","Summon Lesser Demons","Summon Shadowspawn","Summon Undead","Thunder Step","Tidal Wave","Tiny Servant","Tongues","Vampiric Touch","Wall of Sand","Wall of Water","Water Breathing","Water Walk","Wind Wall"],4:["Aura of Life","Aura of Purity","Banishment","Blight","Charm Monster","Compulsion","Confusion","Conjure Minor Elementals","Conjure Woodland Beings","Control Water","Death Ward","Dimension Door","Divination","Dominate Beast","Elemental Bane","Evard's Black Tentacles","Fabricate","Fire Shield","Freedom of Movement","Giant Insect","Grasping Vine","Gravity Sinkhole","Greater Invisibility","Guardian of Faith","Guardian of Nature","Hallucinatory Terrain","Ice Storm","Leomund's Secret Chest","Locate Creature","Mordenkainen's Faithful Hound","Mordenkainen's Private Sanctum","Otiluke's Resilient Sphere","Phantasmal Killer","Polymorph","Raulothim's Psychic Lance","Shadow of Moil","Sickening Radiance","Spirit of Death","Staggering Smite","Stone Shape","Stoneskin","Storm Sphere","Summon Aberration","Summon Construct","Summon Elemental","Summon Greater Demon","Watery Sphere","Vitriolic Sphere","Wall of Fire"],5:["Animate Objects","Antilife Shell","Arcane Hand","Awaken","Banishing Smite","Circle of Power","Cloudkill","Commune","Commune with Nature","Cone of Cold","Conjure Elemental","Conjure Volley","Contact Other Plane","Contagion","Control Winds","Creation","Danse Macabre","Dawn","Destructive Wave","Dispel Evil and Good","Dominate Person","Dream","Enervation","Far Step","Flame Strike","Geas","Greater Restoration","Hold Monster","Holy Weapon","Immolation","Infernal Calling","Insect Plague","Legend Lore","Maelstrom","Mass Cure Wounds","Mislead","Modify Memory","Negative Energy Flood","Passwall","Planar Binding","Raise Dead","Rary's Telepathic Bond","Reincarnate","Scrying","Seeming","Skill Empowerment","Steel Wind Strike","Summon Celestial","Summon Draconic Spirit","Swift Quiver","Synaptic Static","Telekinesis","Teleportation Circle","Transmute Rock","Tree Stride","Wall of Force","Wall of Light","Wall of Stone","Wrath of Nature"],6:["Arcane Gate","Blade Barrier","Bones of the Earth","Chain Lightning","Circle of Death","Conjure Fey","Contingency","Create Undead","Disintegrate","Drawmij's Instant Summons","Eyebite","Find the Path","Flesh to Stone","Forbiddance","Globe of Invulnerability","Guards and Wards","Harm","Heal","Heroes' Feast","Investiture of Flame","Investiture of Ice","Investiture of Stone","Investiture of Wind","Mass Suggestion","Mental Prison","Move Earth","Otto's Irresistible Dance","Planar Ally","Primordial Ward","Programmed Illusion","Scatter","Soul Cage","Sunbeam","Tenser's Transformation","Transport via Plants","True Seeing","Wall of Ice","Wall of Thorns","Wind Walk","Word of Recall"],7:["Conjure Celestial","Crown of Stars","Delayed Blast Fireball","Divine Word","Draconic Transformation","Dream of the Blue Veil","Etherealness","Finger of Death","Fire Storm","Forcecage","Mirage Arcane","Mordenkainen's Magnificent Mansion","Mordenkainen's Sword","Plane Shift","Power Word Pain","Prismatic Spray","Project Image","Regenerate","Resurrection","Reverse Gravity","Sequester","Simulacrum","Symbol","Teleport","Temple of the Gods","Whirlwind"],8:["Abi-Dalzim's Horrid Wilting","Antimagic Field","Antipathy/Sympathy","Clone","Control Weather","Dark Star","Demiplane","Dominate Monster","Earthquake","Feeblemind","Glibness","Holy Aura","Illusory Dragon","Incendiary Cloud","Maddening Darkness","Maze","Mighty Fortress","Mind Blank","Power Word Stun","Reality Break","Sunburst","Telepathy","Tsunami"],9:["Astral Projection","Blade of Disaster","Foresight","Gate","Imprisonment","Invulnerability","Mass Heal","Mass Polymorph","Meteor Swarm","Power Word Heal","Power Word Kill","Prismatic Wall","Psychic Scream","Ravenous Void","Shapechange","Time Ravage","Time Stop","True Polymorph","True Resurrection","Weird","Wish"]};
+
+// ══ PRICE RANGES PER SPELL LEVEL ════════════════════════════
+// [min, max] in mana gems — DM editable
+let SHOP_RANGES={0:[5,20],1:[15,50],2:[40,100],3:[80,200],4:[150,350],5:[280,600],6:[500,1100],7:[900,2000],8:[1600,3500],9:[3000,8000]};
+
+// ══ RARITY ══════════════════════════════════════════════════
+const RC={C:{label:'C',color:'#aaaaaa',bg:'#1a1a1a',tier:1,baseMin:50,baseMax:300},U:{label:'U',color:'#44ff88',bg:'#002211',tier:2,baseMin:250,baseMax:700},R:{label:'R',color:'#4488ff',bg:'#001133',tier:3,baseMin:600,baseMax:1800},S:{label:'S',color:'#ff44cc',bg:'#220033',tier:4,baseMin:1500,baseMax:4500},SSR:{label:'SSR',color:'#ffd700',bg:'#221100',tier:5,baseMin:4000,baseMax:12000}};
+const RK=['C','U','R','S','SSR'];
+const BASE_RATES={C:60,U:25,R:10,S:4,SSR:1};
+const SLOTS_EQ=['hat','hand','boots','acc1','acc2','pet'];
+const SL={hat:'HAT',hand:'HAND',boots:'BOOTS',acc1:'ACC I',acc2:'ACC II',pet:'PET'};
+
+// Pet sprite types (index 0-4 = Raven, Spider, Pseudodragon, Living Tome, Mephit)
+const PET_TYPES=['raven','spider','pseudodragon','tome','mephit'];
+const PET_NAMES=['Raven Familiar','Shadow Spider','Pseudodragon','Living Tome','Mephit'];
+
+const TITLES=[{name:'NOBODY',interest:.001,cost:0,color:'#888',glow:'#888'},{name:'APPRENTICE SPECULATOR',interest:.003,cost:150,color:'#aaa',glow:'#aaa'},{name:'LICENSED ORACLE',interest:.006,cost:400,color:'#44aaff',glow:'#44aaff'},{name:'GRAND DIVINER OF RETURNS',interest:.012,cost:1200,color:'#aa44ff',glow:'#aa44ff'},{name:'ARCHMAGE OF INSIDER KNOWLEDGE',interest:.02,cost:3000,color:'#ff44aa',glow:'#ff44aa'},{name:'SOVEREIGN OF THE PREDICTION REALM',interest:.035,cost:8000,color:'#ff8800',glow:'#ff8800'},{name:'INFERNAL LORD OF LIQUID MARKETS',interest:.055,cost:20000,color:'#ff3333',glow:'#ff3333'},{name:'COSMIC EMPEROR OF ETERNAL GAINS',interest:.08,cost:50000,color:'#ff00ff',glow:'#ff00ff'},{name:'ETERNAL GAMBLING EMPEROR OF THE RICH REALM',interest:.12,cost:150000,color:'#ffd700',glow:'#ffd700'}];
+
+// ══ PROCEDURAL MARKET GENERATOR ══════════════════════════════
+const MKT_TOWNS=['Ashford','Millhaven','Brackwater','Dunsley','Thistledown','Greyveil','Copperton','Mosswick','Ravenshollow','Saltmere','Irongate','Duskfield','Coldwater','Fernbridge','Stonebell','Quarryham','Mudhollow','Cinderwick','Tallow Cross','Vexmoor','Harrowfen','Grimsby','Pelwick','Aldenmere','Thornvale','Crowsport','Emberfall','Ashwick','Siltbury','Wraithend'];
+const MKT_NOBLES=['Lord Aldric','Lady Vessa','Baron Crothwyn','Duke Maren','Countess Elara','Earl Theddus','Margrave Ossa','Viscountess Hyrell','Lord Protector Dain','Governor Sable','High Alderman Fitch','Magistrate Crone','Warden Brek','Chancellor Osswyn','Prelate Miru'];
+const MKT_FACTIONS=['the Merchant Consortium','the Thieves\' Guild','the Church of the Allmother','the Iron Brotherhood','the Harbor Authority','the Wizards\' College','the Farmers\' Union','the City Watch','the Dockworkers\' Guild','the Moneylenders\' Association','the Alchemists\' Society','the Heralds\' Office','the Assassins\' Compact','the Artificers\' League'];
+const MKT_GOODS=['grain','salt','iron','timber','wool','silk','spices','coal','potatoes','turnips','fish','livestock','wine','ale','lamp oil','steel','copper','glass','leather','dyes'];
+const MKT_CROPS=['potato','wheat','barley','rye','turnip','carrot','cabbage','onion','apple','hop'];
+const MKT_DISASTERS=['drought','flood','blight','frost','a locust swarm','a plague of rats','unseasonable storms','bandit raids','trade embargo','arcane contamination'];
+const MKT_WEATHER=['mild and clear','unseasonably warm','bitterly cold','unusually wet','unseasonably dry','stormy','fog-plagued','afflicted by wild magic'];
+const MKT_ROUTES=['the Northern Road','the King\'s Highway','the River Mere','the Coastal Pass','the Mountain Trail','the Old Forest Road','the Pilgrim\'s Way','the Merchant\'s Circuit'];
+const MKT_SHIPS=['the Silver Keel','the Dawnstrider','the Iron Mare','the Pale Cormorant','the Salt Queen','the Weathered Brig','the Harbormaster\'s Prize','the Deeprunner'];
+const MKT_ELECTIONS=['Head Alderman','Port Warden','Chief Magistrate','Guild Master','Harbor Prefect','High Constable','City Treasurer','Grand Surveyor'];
+const MKT_EVENTS=['the Harvest Festival','the Midsummer Fair','the Traders\' Conclave','the Grand Tournament','the Annual Census','the Charter Renewal','the Trade Summit','the Founding Day Parade'];
+const MKT_TEMPLATES=[
+  [()=>`Will the ${pk(MKT_CROPS)} crop in ${pk(MKT_TOWNS)} exceed last season's yield?`,52],
+  [()=>`Will ${pk(MKT_TOWNS)} experience ${pk(MKT_DISASTERS)} before the next harvest?`,28],
+  [()=>`Will the price of ${pk(MKT_GOODS)} in ${pk(MKT_TOWNS)} rise by end of month?`,55],
+  [()=>`Will ${pk(MKT_TOWNS)} have a surplus of ${pk(MKT_GOODS)} this season?`,48],
+  [()=>`Will ${pk(MKT_TOWNS)} import more ${pk(MKT_GOODS)} than it exports this quarter?`,44],
+  [()=>`Will the ${pk(MKT_GOODS)} shortage in ${pk(MKT_TOWNS)} resolve within three months?`,38],
+  [()=>`Will famine be declared in the ${pk(MKT_TOWNS)} region this year?`,14],
+  [()=>`Will the ${pk(MKT_TOWNS)} granary hold enough stock to survive winter?`,61],
+  [()=>`Will ${pk(MKT_NOBLES)} retain their seat after the ${pk(MKT_EVENTS)}?`,58],
+  [()=>`Will the next ${pk(MKT_ELECTIONS)} of ${pk(MKT_TOWNS)} be contested?`,67],
+  [()=>`Will ${pk(MKT_NOBLES)} publicly endorse ${pk(MKT_FACTIONS)} before month's end?`,31],
+  [()=>`Will ${pk(MKT_FACTIONS)} expand their influence into ${pk(MKT_TOWNS)} this year?`,42],
+  [()=>`Will ${pk(MKT_NOBLES)} and ${pk(MKT_FACTIONS)} reach a trade agreement?`,49],
+  [()=>`Will ${pk(MKT_TOWNS)} secede from the regional charter?`,9],
+  [()=>`Will ${pk(MKT_FACTIONS)} and ${pk(MKT_FACTIONS)} go to open conflict this season?`,17],
+  [()=>`Will ${pk(MKT_NOBLES)} be removed from office by popular petition?`,22],
+  [()=>`Will the taxation rate in ${pk(MKT_TOWNS)} increase this fiscal year?`,58],
+  [()=>`Will ${pk(MKT_FACTIONS)} successfully lobby to repeal the recent tariff?`,35],
+  [()=>`Will the next shipment along ${pk(MKT_ROUTES)} arrive on schedule?`,64],
+  [()=>`Will ${pk(MKT_SHIPS)} return safely to ${pk(MKT_TOWNS)} harbor?`,71],
+  [()=>`Will the trade agreement between ${pk(MKT_TOWNS)} and ${pk(MKT_TOWNS)} be renewed?`,54],
+  [()=>`Will ${pk(MKT_FACTIONS)} monopolize the ${pk(MKT_GOODS)} trade in ${pk(MKT_TOWNS)}?`,29],
+  [()=>`Will the ${pk(MKT_GOODS)} tariff between ${pk(MKT_TOWNS)} and ${pk(MKT_TOWNS)} be lifted?`,40],
+  [()=>`Will ${pk(MKT_ROUTES)} remain passable through winter?`,68],
+  [()=>`Will the dockworkers of ${pk(MKT_TOWNS)} strike before month's end?`,24],
+  [()=>`Will the weather around ${pk(MKT_TOWNS)} be ${pk(MKT_WEATHER)} this season?`,50],
+  [()=>`Will the river through ${pk(MKT_TOWNS)} flood its banks before spring?`,33],
+  [()=>`Will ${pk(MKT_DISASTERS)} threatening ${pk(MKT_TOWNS)} be averted in time?`,44],
+  [()=>`Will the wells in ${pk(MKT_TOWNS)} dry up before the rains return?`,18],
+  [()=>`Will the ${pk(MKT_TOWNS)} region see its coldest winter in a decade?`,26],
+  [()=>`Will the ${pk(MKT_EVENTS)} in ${pk(MKT_TOWNS)} draw record attendance?`,59],
+  [()=>`Will ${pk(MKT_FACTIONS)} sponsor the ${pk(MKT_EVENTS)} in ${pk(MKT_TOWNS)}?`,47],
+  [()=>`Will ${pk(MKT_NOBLES)} attend the ${pk(MKT_EVENTS)} in ${pk(MKT_TOWNS)}?`,62],
+  [()=>`Will a new temple be constructed in ${pk(MKT_TOWNS)} before year's end?`,31],
+  [()=>`Will crime in ${pk(MKT_TOWNS)} rise after disbanding of the local watch?`,71],
+  [()=>`Will the ${pk(MKT_TOWNS)} Wizards' College report a containment breach this month?`,19],
+  [()=>`Will the strange lights seen over ${pk(MKT_TOWNS)} be officially explained?`,34],
+  [()=>`Will ${pk(MKT_NOBLES)} commission an investigation into the ${pk(MKT_TOWNS)} disappearances?`,41],
+  [()=>`Will the cursed well in ${pk(MKT_TOWNS)} be purified before market day?`,53],
+  [()=>`Will the prophecy of the Oracle of ${pk(MKT_TOWNS)} prove accurate this season?`,38],
+  [()=>`Will bandit activity on ${pk(MKT_ROUTES)} exceed last year's incidents?`,45],
+  [()=>`Will the ${pk(MKT_TOWNS)} militia repel the eastern raiders?`,60],
+  [()=>`Will the border dispute between ${pk(MKT_TOWNS)} and ${pk(MKT_TOWNS)} escalate?`,21],
+  [()=>`Will the bounty on the ${pk(MKT_TOWNS)} bandit leader be claimed this month?`,48],
+  [()=>`Will ${pk(MKT_NOBLES)} authorize new defensive walls around ${pk(MKT_TOWNS)}?`,37],
+];
+
+function genOneProcMarket(){
+  const[tmpl,baseProb]=pk(MKT_TEMPLATES);
+  const question=tmpl();
+  const prob=Math.max(5,Math.min(95,baseProb+rnd(-12,12)));
+  const timed=Math.random()<.35;
+  const timerMins=timed?rnd(4,18):null;
+  return{id:Date.now()+Math.random(),question,prob,type:timed?'timed':'open',dmSpecial:false,resolved:null,timerEnd:timed?Date.now()+timerMins*60*1000:null,vol:rnd(80,3000),bets:{},proc:true};
+}
+
+function genProcMarkets(){
+  const count=rnd(5,8);
+  for(let i=0;i<count;i++) S.markets.push(genOneProcMarket());
+}
+
+function refreshProcMarkets(){
+  // Remove resolved proc markets and expired timed proc markets
+  S.markets=S.markets.filter(m=>{
+    if(!m.proc)return true;
+    if(m.resolved)return false;
+    if(m.type==='timed'&&m.timerEnd&&Date.now()>m.timerEnd)return false;
+    return true;
+  });
+  // Top up to 5-8 proc markets
+  const live=S.markets.filter(m=>m.proc).length;
+  const need=Math.max(0,rnd(5,8)-live);
+  for(let i=0;i<need;i++) S.markets.push(genOneProcMarket());
+}
+
+
+const PROC_SP=[{name:"Alchemy Corp SURGE Elixir",tagline:"The energy potion that energizes!",danger:2,payout:80},{name:"Cloaks of Suspicious Origin™",tagline:"Don't ask where they came from.",danger:6,payout:250},{name:"Dragon Dental Insurance",tagline:"For smiles that breathe fire.",danger:1,payout:60},{name:"The Thieves' Guild Referral Program",tagline:"Refer a mark, earn a cut.",danger:8,payout:400},{name:"MindFlayer Therapy Services",tagline:"We get inside your head.",danger:9,payout:600},{name:"Ye Olde Certified Pre-Owned Horses",tagline:"Most of them walk fine.",danger:3,payout:100},{name:"Runes & Ruins Financial Planning",tagline:"Invest in your future. Or don't.",danger:5,payout:200},{name:"ShadowBroker VPN",tagline:"They can't track what doesn't exist.",danger:7,payout:350},{name:"Goblin 'Safety' Explosives",tagline:"Cheap. Effective. Mostly.",danger:10,payout:800},{name:"Potion of Existential Clarity",tagline:"See beyond the veil. Results vary.",danger:4,payout:150}];
+
+const TK_PHRASES=["INSIDE INFORMATION IS WRONG WHEN OTHER PEOPLE DO IT","PROBABILITY IS JUST VIBES WITH MATH","THE WIZARD DISCLAIMS ALL ARCANE LIABILITY","PAST PROPHESIES NOT INDICATIVE OF FUTURE RESULTS","MANA GEM VALUE MAY FLUCTUATE — OR GLITCH","ALL KNOWLEDGE HAS A PRICE","THE ORACLE IS NOT FINANCIAL ADVICE","MARKETS ARE EFFICIENT EXCEPT WHEN THEY AREN'T","THE DM RESERVES THE RIGHT TO RETCON EVERYTHING","SOUL FRAGMENT PRICES SUBJECT TO COSMIC DRIFT","SPONSORED CONTENT AHEAD — RESULTS MAY VARY","TODAY'S MARKET: BROUGHT TO YOU BY INSIDER TRADING","REINBET AT YOUR OWN PERIL","THE HOUSE ALWAYS WINS. EXCEPT SOMETIMES IT DOESN'T."];
+
+const BN_ADJ=['Divine','Cursed','Eternal','Forsaken','Radiant','Hollow','Abyssal','Twilight','Sovereign','Spectral','Gilded','Ancient','Infernal','Cosmic','Void','Blessed','Shattered','Undying','Blazing','Frozen'];
+const BN_NOUN=['Cap','Mantle','Gauntlets','Boots','Amulet','Orb','Staff','Crown','Veil','Shard','Cipher','Bindings','Talisman','Eye','Relic','Brand','Seal','Cowl','Cloak','Tome'];
+const BN_OF=['of the Greatest Twilight Mage of the Third Age','of the Forsaken Probability Engine','of Compound Suffering','of the Undying Market Sage','of the Inverse Yield Curve','of Eternal Fiscal Doom','of the Hollow Oracle','of the Screaming Ledger','of the Bankrupt Archmage','of the Last Exchange','of the Void Dividend','of the Accursed Portfolio','of the Spectral Arbitrage','of the Sovereign Loss','of the Blind Prophet','of Impending Gains','of the Infinite Rollover','of the Cursed Balance Sheet'];
+const BN_SUBS=['LIMITED BANNER — FEATURED RATE UP','COLLAB BANNER — EXCLUSIVE FRAGMENT','STANDARD BANNER — ALL RARITIES','FLASH BANNER — 24 HOURS ONLY','PITY ACCELERATOR BANNER','PRESTIGE BANNER — HIGH STAKES'];
+const BN_COLS=[['#1a0030','#4a0080','#ff00cc'],['#001a30','#003060','#00aaff'],['#200010','#600030','#ff3366'],['#101a00','#204000','#88ff00'],['#1a1a00','#404000','#cccc00'],['#200020','#500050','#ff00ff'],['#001a1a','#003333','#00ffcc'],['#200a00','#502000','#ff6600']];
+
+const FADJ=['Cursed','Divine','Spectral','Void','Blazing','Frozen','Arcane','Shadow','Gilded','Ancient','Hollow','Radiant','Feral','Twisted','Ethereal','Shattered','Sovereign','Infernal','Cosmic','Forsaken'];
+const FNOUN=['Cowl','Orb','Bindings','Talisman','Crown','Mantle','Amulet','Shard','Relic','Cipher','Eye','Veil','Brand','Seal','Token','Grimoire','Lens','Sigil','Spark','Knot'];
+const FOF=['of the Abyss','of Compound Interest','of the Lost Oracle','of Eternal Debt','of the Fallen Market','of Prophetic Ruin','of the Third Realm','of Impending Gains','of Hollow Prophecy','of the Undying Ledger','of the Screaming Void','of the Inverse Tide','of Fiscal Reckoning','of the Blind Exchange'];
+const rfn=()=>`${pk(FADJ)} ${pk(FNOUN)} ${pk(FOF)}`;
+
+// ══ STATE ═══════════════════════════════════════════════════
+let S={wallet:1000,day:1,fame:0,equippedTitle:0,ownedTitles:[0],equipped:{hat:null,hand:null,boots:null,acc1:null,acc2:null,pet:null},inventory:[],marketFrags:[],markets:[],shop:[],sponsors:[],pity:0,hardPity:0,rollHistory:[],currentBanner:null,dayHistory:[],mktFilter:'all',slotCosts:[10,15,20,30,40,55,70,90,120],hpCostPer:5,dailyCost:50,rbWinMult:4,rbLossMult:4,
+  charSheet:{
+    str:10,dex:10,con:10,int:18,wis:12,cha:10,
+    proficiencies:['Arcana','History','Investigation','Insight'],
+    preparedSpells:[],
+    spellSlots:[0,0,0,0,0,0,0,0,0],
+    spellSlotsMax:[4,3,3,3,2,1,1,1,1],
+    notes:''
+  }
+};
+
+// ══ UTILS ════════════════════════════════════════════════════
+const pk=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+
+function toast(m,c){const t=document.getElementById('toast');t.textContent=m;t.style.borderColor=c||'var(--purple)';t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2500);}
+function logEntry(m,cls){const l=document.getElementById('logl');const e=document.createElement('div');e.className='loge '+(cls||'');const n=new Date();e.textContent=`[${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}] ${m}`;l.prepend(e);while(l.children.length>50)l.removeChild(l.lastChild);}
+function upWallet(d,desc,cls){S.wallet=Math.max(0,S.wallet+d);document.getElementById('wdisp').textContent=S.wallet.toLocaleString();if(desc)logEntry(desc,cls);fbPush();}
+
+
+
+// ══ NAV ══════════════════════════════════════════════════════
+// ══ TICKER ═══════════════════════════════════════════════════
+function buildTicker(){const items=[...TK_PHRASES,...TK_PHRASES];document.getElementById('tk').innerHTML=items.map(p=>`<span class="ti${Math.random()>.8?' dn':''}">${p} &nbsp;&bull;&nbsp; </span>`).join('');}
+
+// ══ MARKETS ══════════════════════════════════════════════════
+
+function filterMkts(f,btn){S.mktFilter=f;document.querySelectorAll('.ftog').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMarkets();}
+
+function renderMarkets(){
+  const grid=document.getElementById('mktgrid');
+  let mkts=S.markets.filter(m=>!m.resolved);
+  if(S.mktFilter==='open')mkts=mkts.filter(m=>m.type==='open');
+  if(S.mktFilter==='timed')mkts=mkts.filter(m=>m.type==='timed');
+  if(S.mktFilter==='dm')mkts=mkts.filter(m=>m.dmSpecial);
+  grid.innerHTML=mkts.length?'':'<div style="color:var(--dim);font-size:10px;padding:1rem;font-family:var(--fh);">NO OPEN MARKETS</div>';
+  mkts.forEach(m=>{
+    const card=document.createElement('div');card.className='mkt-card'+(m.dmSpecial?' dm-sp':'');card.id='mkt-'+m.id;
+    let ts='';if(m.type==='timed'&&m.timerEnd){const rem=Math.max(0,Math.floor((m.timerEnd-Date.now())/1000));ts=`${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`;}
+    card.innerHTML=`${m.dmSpecial?'<div class="dmcr">&#9733;</div>':''}<div class="mkt-q">${m.question}</div><div class="mkt-meta"><div class="mkt-type">${m.type.toUpperCase()} &bull; VOL:${m.vol.toLocaleString()}</div>${m.type==='timed'?`<div class="mkt-tmr" id="tmr-${m.id}">${ts}</div>`:''}</div><div class="pb"><div class="pbf pby" style="width:${m.prob}%">${m.prob}%</div></div><div class="pbl"><span>YES</span><span>${100-m.prob}% NO</span></div><div class="bet-row"><input class="bi" type="number" id="ba-${m.id}" value="10" min="1"><button class="bty" onclick="placeBet(${m.id},'yes')">BET YES</button><button class="btn" onclick="placeBet(${m.id},'no')">BET NO</button></div>`;
+    grid.appendChild(card);
+  });
+}
+
+
+
+function placeBet(id,side){
+  const m=S.markets.find(x=>x.id===id);if(!m||m.resolved)return;
+  const amt=parseInt(document.getElementById('ba-'+id)?.value)||10;
+  if(amt<=0||S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}
+  upWallet(-amt,`BET ${side.toUpperCase()} "${m.question.substring(0,28)}..." -${amt}g`,'spend');
+  m.bets[side]=(m.bets[side]||0)+amt;m.vol+=amt;m.prob=Math.max(5,Math.min(95,m.prob+(side==='yes'?rnd(1,4):-rnd(1,4))));
+  toast(`BET: ${amt} gems on ${side.toUpperCase()}`,'var(--cyan)');renderMarkets();
+}
+
+function dmResolve(result){
+  const id=parseFloat(document.getElementById('resolvesel').value);
+  const m=S.markets.find(x=>x.id===id);if(!m)return;m.resolved=result;
+  const bet=m.bets[result]||0;
+  const card=document.getElementById('mkt-'+id);
+  if(card){const b=document.createElement('div');b.className='rb-badge '+result;b.textContent=result==='yes'?'RESOLVED: YES':'RESOLVED: NO';card.appendChild(b);}
+  if(bet>0){
+    const mult=result==='yes'?(100/m.prob):(100/(100-m.prob));
+    const baseWin=Math.floor(bet*mult);
+    upWallet(baseWin,`MARKET RESOLVED ${result.toUpperCase()}: +${baseWin}g`,'win');
+    toast(`RESOLVED ${result.toUpperCase()}! +${baseWin}g — Reinbet?`,result==='yes'?'var(--green)':'var(--red)');
+    setTimeout(()=>{
+      triggerReinbet(baseWin,(final)=>{
+        // Final already includes or replaces base win; adjust wallet by the difference
+        const delta=final-baseWin;
+        if(delta!==0)upWallet(delta,`MARKET REINBET ${result.toUpperCase()}: ${delta>=0?'+':''}${delta}g`,'win');
+        toast(`REINBET: ${final.toLocaleString()}g total`,'var(--gold)');
+        renderMarkets();
+      });
+    },600);
+  }else{
+    toast(`RESOLVED ${result.toUpperCase()}. No position.`,'var(--orange)');
+    logEntry(`Market resolved ${result.toUpperCase()} — no position`,'');
+    setTimeout(()=>renderMarkets(),1800);
+  }
+  refreshDMSelects();
+}
+
+function tickTimers(){
+  let anyExpired=false;
+  S.markets.forEach(m=>{
+    if(m.type==='timed'&&m.timerEnd&&!m.resolved){
+      const rem=Math.max(0,Math.floor((m.timerEnd-Date.now())/1000));
+      const el=document.getElementById('tmr-'+m.id);
+      if(el){
+        el.textContent=`${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`;
+        if(rem===0)el.style.color='var(--red)';
+      }
+      // Auto-expire proc markets when timer hits zero
+      if(rem===0&&m.proc){
+        m.resolved='expired';
+        anyExpired=true;
+      }
+    }
+  });
+  if(anyExpired){
+    refreshProcMarkets();
+    if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();
+  }
+}
+
+// ══ COSTS ════════════════════════════════════════════════════
+function renderCosts(){
+  document.getElementById('hpcp').textContent=S.hpCostPer;document.getElementById('dailydisp').textContent=S.dailyCost;updateHPTotal();
+  const c=document.getElementById('scd');c.innerHTML='';for(let l=1;l<=9;l++){const d=document.createElement('div');d.className='sr';d.innerHTML=`<span style="font-size:7px;color:var(--dim);font-family:var(--fh);">LVL ${l}</span><span style="font-size:8px;color:var(--purple);font-family:var(--fh);">${S.slotCosts[l-1]}g</span>`;c.appendChild(d);}
+  const b=document.getElementById('sbr');b.innerHTML='';for(let l=1;l<=9;l++){const row=document.createElement('div');row.className='ctr';row.style.marginBottom='3px';row.innerHTML=`<span style="font-size:7px;color:var(--dim);font-family:var(--fh);width:34px;">LVL ${l}</span><button class="cb" onclick="adjSlot(${l},-1)">-</button><input type="number" id="sq-${l}" value="0" min="0" oninput="updateRestTotal()"><button class="cb" onclick="adjSlot(${l},1)">+</button><span style="font-size:7px;color:var(--purple);font-family:var(--fh);margin-left:3px;" id="ss-${l}">0g</span>`;b.appendChild(row);}
+}
+function adjSlot(l,d){const i=document.getElementById('sq-'+l);i.value=Math.max(0,(parseInt(i.value)||0)+d);updateRestTotal();}
+function updateRestTotal(){let t=0;for(let l=1;l<=9;l++){const q=parseInt(document.getElementById('sq-'+l)?.value)||0;const s=q*S.slotCosts[l-1];t+=s;const e=document.getElementById('ss-'+l);if(e)e.textContent=s+'g';}document.getElementById('restbtn').textContent=`PAY REST: ${t} GEMS`;}
+function payRest(){let t=0;for(let l=1;l<=9;l++){t+=(parseInt(document.getElementById('sq-'+l)?.value)||0)*S.slotCosts[l-1];}if(t<=0){toast('NO SLOTS SELECTED','var(--orange)');return;}if(S.wallet<t){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-t,`LONG REST: -${t}g`,'loss');toast(`REST PAID: -${t}g`,'var(--purple)');}
+function adjHP(d){const i=document.getElementById('hpamt');i.value=Math.max(1,(parseInt(i.value)||1)+d);updateHPTotal();}
+function updateHPTotal(){const a=parseInt(document.getElementById('hpamt')?.value)||1;const el=document.getElementById('hptot');if(el)el.textContent=`Total: ${a*S.hpCostPer} gems`;}
+function payHP(){const a=parseInt(document.getElementById('hpamt').value)||1;const c=a*S.hpCostPer;if(S.wallet<c){toast('CANT AFFORD HEALING','var(--red)');return;}upWallet(-c,`HEALED ${a}HP: -${c}g`,'loss');toast(`HEALED ${a}HP: -${c}g`,'var(--green)');}
+function payDaily(){if(S.wallet<S.dailyCost){toast('YOU CANNOT AFFORD TO LIVE','var(--red)');return;}upWallet(-S.dailyCost,`DAILY TAX: -${S.dailyCost}g`,'loss');toast(`SURVIVED: -${S.dailyCost}g`,'var(--orange)');}
+
+// ══ SCROLL SHOP (full 5e) ════════════════════════════════════
+// Max spell level available by title tier (0-indexed)
+const TITLE_MAX_SPELL_LEVEL=[3,3,4,5,6,7,8,8,9];
+
+function genShop(){
+  S.shop=[];
+  const maxLevel=TITLE_MAX_SPELL_LEVEL[Math.min(S.equippedTitle,8)];
+  // Weighted by level, capped to title
+  const weights=[1,3,4,4,3,3,2,2,1,1];
+  let pool=[];
+  for(let lv=0;lv<=Math.min(maxLevel,9);lv++){
+    const spells=ALL_SPELLS[lv]||[];
+    const picks=Math.ceil(weights[lv]*1.5);
+    const shuffled=[...spells].sort(()=>Math.random()-.5);
+    pool.push(...shuffled.slice(0,picks).map(nm=>({name:nm,level:lv})));
+  }
+  pool=pool.sort(()=>Math.random()-.5).slice(0,12);
+  S.shop=pool.map(s=>{
+    const[mn,mx]=SHOP_RANGES[s.level]||[10,100];
+    const base=rnd(mn,mx);
+    const glitch=Math.random()<.05;
+    // Glitch scrolls: stock 1-5; normal: 1-4
+    const stock=glitch?rnd(1,5):rnd(1,4);
+    return{...s,price:glitch?-rnd(5,Math.floor(base*.3)):base,glitch,baseMin:mn,baseMax:mx,stock,maxStock:stock};
+  });
+}
+
+function renderShop(){
+  const search=(document.getElementById('shopSearch')?.value||'').toLowerCase();
+  const lvlF=document.getElementById('shopLvlFilter')?.value||'all';
+  let items=S.shop.filter(s=>{const nm=('Scroll of '+s.name).toLowerCase();if(search&&!nm.includes(search))return false;if(lvlF!=='all'&&s.level!==parseInt(lvlF))return false;return true;});
+  document.getElementById('shopCount').textContent=`${items.length} / ${S.shop.length} scrolls`;
+  const grid=document.getElementById('shopgrid');grid.innerHTML='';
+  items.forEach((s)=>{
+    const idx=S.shop.indexOf(s);const neg=s.price<0;const soldOut=s.stock<=0;
+    const card=document.createElement('div');card.className='sc'+(s.glitch&&!soldOut?' glitch':'')+(soldOut?' soldout':'');
+    const maxLevel=TITLE_MAX_SPELL_LEVEL[Math.min(S.equippedTitle,8)];
+    const locked=s.level>maxLevel;
+    card.innerHTML=`${soldOut?'<div class="soldout-lbl">SOLD OUT</div>':s.glitch?'<div class="gl">GLITCH</div>':''}
+      <div class="snm">Scroll of ${s.name}</div>
+      <div class="slv">LEVEL ${s.level} SPELL${locked?' — TITLE TOO LOW':''}</div>
+      <div class="spr ${neg&&!soldOut?'neg':''}">${soldOut?'—':neg?'+'+Math.abs(s.price)+'g':s.price+'g'}</div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-top:2px;">${soldOut?'OUT OF STOCK':'STOCK: '+s.stock}</div>
+      <button class="bb" onclick="buyScroll(${idx})" ${soldOut||locked?'disabled style="opacity:.4;cursor:not-allowed;"':''}>${soldOut?'SOLD OUT':locked?'TITLE TOO LOW':neg?'COLLECT GLITCH':'BUY SCROLL'}</button>`;
+    grid.appendChild(card);
+  });
+}
+
+function buyScroll(idx){
+  const s=S.shop[idx];if(!s||s.stock<=0)return;
+  const neg=s.price<0;
+  const maxLevel=TITLE_MAX_SPELL_LEVEL[Math.min(S.equippedTitle,8)];
+  if(s.level>maxLevel){toast('TITLE RANK TOO LOW FOR THIS SCROLL','var(--red)');return;}
+  if(!neg&&S.wallet<s.price){toast('INSUFFICIENT GEMS','var(--red)');return;}
+  upWallet(-s.price,`${neg?'GLITCH:':'BOUGHT'} Scroll of ${s.name}: ${neg?'+'+Math.abs(s.price):'-'+s.price}g`,neg?'glitch':'spend');
+  s.stock--;
+  if(neg)toast(`GLITCH: +${Math.abs(s.price)}g — ${s.stock} left`,'var(--green)');
+  else toast(`SCROLL: ${s.name} — ${s.stock} left`,'var(--cyan)');
+  renderShop();
+}
+
+// ══ SPONSORS ════════════════════════════════════════════════
+function initSponsors(){S.sponsors=[...PROC_SP].sort(()=>Math.random()-.5).slice(0,4).map(s=>({...s,shilled:false}));}
+function renderSponsors(){
+  const g=document.getElementById('spgrid');g.innerHTML='';
+  S.sponsors.forEach((s,i)=>{const dc=s.danger<=3?'var(--green)':s.danger<=6?'var(--orange)':'var(--red)';const card=document.createElement('div');card.className='spc';card.innerHTML=`<div class="spprod">${s.name}</div><div class="sptag">"${s.tagline}"</div><div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:3px;letter-spacing:1px;">DANGER: ${s.danger}/10</div><div class="dbar"><div class="dbf" style="width:${s.danger*10}%;background:${dc};"></div></div><div class="sppay">${s.payout} gems</div>${s.shilled?'<div class="shbdg">SHILLED</div>':`<button class="shbtn" onclick="shillSponsor(${i})">SHILL THIS PRODUCT</button>`}`;g.appendChild(card);});
+}
+function shillSponsor(i){const s=S.sponsors[i];if(s.shilled)return;s.shilled=true;upWallet(s.payout,`SPONSORED: "${s.name}" +${s.payout}g`,'win');toast(`SPONSORSHIP: +${s.payout}g!`,'var(--gold)');renderSponsors();fbPush();}
+function addRandSponsor(){const s={...pk(PROC_SP),shilled:false};s.name+=' (Vol. '+rnd(2,9)+')';S.sponsors.push(s);renderSponsors();toast('NEW SPONSOR AVAILABLE','var(--gold)');}
+
+// ══ AVATAR ════════════════════════════════════════════════════
+function drawPS1(ctx,rarity,type,x,y,sz){
+  const cfg=RC[rarity];const t=cfg.tier;const px=Math.max(2,Math.floor(sz/12));
+  function sq(gx,gy,gw,gh,col){ctx.fillStyle=col;ctx.fillRect(x+gx*px,y+gy*px,gw*px,gh*px);}
+  const cols=['#888','#44ff88','#4488ff','#ff44cc','#ffd700'];const col=cols[t-1];
+  ctx.save();
+  if(type==='hat'){sq(1,5,10,2,'#333');sq(3,1,6,5,col);if(t>=3)sq(4,0,4,1,'#fff');if(t>=4){sq(1,4,2,1,'#ff8800');sq(9,4,2,1,'#ff8800');}if(t===5){sq(4,0,4,1,'#ffffaa');sq(3,3,1,1,'#fff');sq(8,3,1,1,'#fff');}}
+  else if(type==='hand'){sq(4,2,4,10,col);sq(3,1,6,3,'#555');sq(4,0,4,2,'#aaf');if(t>=3){ctx.fillStyle='#00ffff';ctx.beginPath();ctx.arc(x+6*px,y+1*px,px,0,Math.PI*2);ctx.fill();}if(t>=4)sq(3,6,6,2,'#ff8800');if(t===5){sq(5,0,2,4,'#ffffaa');sq(3,5,6,1,'#ffd700');}}
+  else if(type==='boots'){sq(2,3,5,8,col);sq(7,3,4,8,col);sq(1,10,6,2,'#333');sq(7,10,5,2,'#333');if(t>=3){sq(2,3,5,1,'#aaf');sq(7,3,4,1,'#aaf');}if(t>=4){sq(1,7,1,3,'#ff8800');sq(10,7,1,3,'#ff8800');}if(t===5){sq(2,9,5,1,'#ffd700');sq(7,9,5,1,'#ffd700');}}
+  else{sq(4,2,4,4,col);sq(3,3,6,2,col);sq(5,1,2,1,'#fff');if(t>=3){sq(2,3,2,2,'#aaf');sq(8,3,2,2,'#aaf');}if(t>=4)sq(4,6,4,2,'#ff8800');if(t===5){sq(3,1,6,1,'#ffffaa');sq(1,3,2,2,'#ffffaa');sq(9,3,2,2,'#ffffaa');}}
+  ctx.restore();
+}
+function mkFC(frag,w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;const cfg=RC[frag.rarity];ctx.fillStyle=cfg.bg;ctx.fillRect(0,0,w,h);for(let y=0;y<h;y+=2){ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(0,y,w,1);}const sz=Math.min(w,h);const st=frag.slot==='acc1'||frag.slot==='acc2'?'acc':frag.slot;drawPS1(ctx,frag.rarity,st,(w-sz)/2,(h-sz)/2,sz);return c;}
+function drawWizard(){
+  const cv=document.getElementById('wc');if(!cv)return;const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;const w=cv.width,h=cv.height;
+  ctx.fillStyle='#05000a';ctx.fillRect(0,0,w,h);for(let y=0;y<h;y+=3){ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(0,y,w,1);}
+  const ti=S.equippedTitle,tc=TITLES[ti],gc=tc.glow;
+  if(ti>=4){const g=ctx.createRadialGradient(60,80,10,60,80,55);g.addColorStop(0,'rgba(255,0,255,0)');g.addColorStop(1,gc+'33');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);}
+  ctx.fillStyle='#2a006a';ctx.beginPath();ctx.moveTo(35,60);ctx.lineTo(20,150);ctx.lineTo(100,150);ctx.lineTo(85,60);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#18004a';ctx.beginPath();ctx.moveTo(60,60);ctx.lineTo(52,150);ctx.lineTo(68,150);ctx.closePath();ctx.fill();
+  const tc2=[null,'#888','#44ff88','#4488ff','#ff44cc','#ffd700'][Math.min(ti+1,5)];if(tc2){ctx.fillStyle=tc2;ctx.fillRect(33,58,4,92);ctx.fillRect(83,58,4,92);ctx.fillRect(20,148,82,4);}
+  ctx.fillStyle='#f4c98a';ctx.beginPath();ctx.arc(60,42,18,0,Math.PI*2);ctx.fill();ctx.fillStyle='#d4a96a';ctx.fillRect(48,38,8,12);
+  const ec=ti>=6?gc:'#00ffff';ctx.fillStyle=ec;ctx.fillRect(52,40,5,4);ctx.fillRect(63,40,5,4);if(ti>=4){ctx.fillStyle='rgba(255,255,255,.6)';ctx.fillRect(53,40,2,2);ctx.fillRect(64,40,2,2);}
+  ctx.fillStyle='#1a0040';ctx.beginPath();ctx.moveTo(30,28);ctx.lineTo(60,0);ctx.lineTo(90,28);ctx.closePath();ctx.fill();ctx.fillStyle='#120030';ctx.fillRect(24,26,72,6);
+  const hat=S.equipped.hat;if(hat){const hc=['#888','#44ff88','#4488ff','#ff44cc','#ffd700'][RC[hat.rarity].tier-1];ctx.fillStyle=hc;ctx.fillRect(24,24,72,4);if(RC[hat.rarity].tier>=3){ctx.fillStyle='#fff';ctx.fillRect(42,20,36,2);}if(RC[hat.rarity].tier>=5){ctx.fillStyle='#ffd700';ctx.fillRect(56,2,8,3);ctx.fillRect(36,26,8,3);ctx.fillRect(76,26,8,3);}}
+  ctx.fillStyle='#2a006a';ctx.fillRect(18,62,16,50);ctx.fillRect(86,62,16,50);
+  const hand=S.equipped.hand;if(hand){const hc=['#888','#44ff88','#4488ff','#ff44cc','#ffd700'][RC[hand.rarity].tier-1];ctx.fillStyle=hc;ctx.fillRect(98,50,4,80);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(100,48,6,0,Math.PI*2);ctx.fill();ctx.fillStyle=hc;ctx.beginPath();ctx.arc(100,48,4,0,Math.PI*2);ctx.fill();if(RC[hand.rarity].tier>=4){ctx.fillStyle='rgba(255,215,0,.4)';ctx.beginPath();ctx.arc(100,48,8,0,Math.PI*2);ctx.fill();}}
+  const boots=S.equipped.boots;ctx.fillStyle=boots?['#888','#44ff88','#4488ff','#ff44cc','#ffd700'][RC[boots.rarity].tier-1]:'#1a0040';ctx.fillRect(32,145,24,12);ctx.fillRect(64,145,24,12);if(boots&&RC[boots.rarity].tier>=4){ctx.fillStyle='#ffd700';ctx.fillRect(32,143,24,3);ctx.fillRect(64,143,24,3);}
+  [S.equipped.acc1,S.equipped.acc2].forEach((acc,ai)=>{if(!acc)return;const t2=RC[acc.rarity].tier;if(t2>=3){const c2=['','','#4488ff','#ff44cc','#ffd700'][t2];ctx.fillStyle=c2;const ox=ai===0?15:105;for(let i=0;i<t2;i++){ctx.beginPath();ctx.arc(ox+(i%2)*4,70+i*12,2+t2,0,Math.PI*2);ctx.fill();}}});
+  const vig=ctx.createRadialGradient(60,80,20,60,80,90);vig.addColorStop(0,'transparent');vig.addColorStop(1,'rgba(0,0,0,.45)');ctx.fillStyle=vig;ctx.fillRect(0,0,w,h);
+}
+
+// ══ TITLES ═══════════════════════════════════════════════════
+function renderTitles(){
+  const list=document.getElementById('tlist');list.innerHTML='';
+  TITLES.forEach((t,i)=>{const owned=S.ownedTitles.includes(i),eq=S.equippedTitle===i;const row=document.createElement('div');row.className='trow'+(owned?' owned':'')+(eq?' equipped':'');const g=i>=6?`text-shadow:0 0 8px ${t.glow},0 0 20px ${t.glow};`:'';const fl=i>=7?'animation:rba .5s steps(1) infinite;':'';row.innerHTML=`<div class="trnm" style="color:${t.color};${g}${fl}">${t.name}</div><div class="trint">${(t.interest*100).toFixed(2)}%/day</div>${owned?`<div style="background:#001a00;border:1px solid var(--green);color:var(--green);font-family:var(--fh);font-size:7px;padding:2px 5px;border-radius:3px;">${eq?'EQUIPPED':'OWNED'}</div>`:`<div style="font-size:8px;color:var(--purple);font-family:var(--fh);white-space:nowrap;">${t.cost.toLocaleString()}g</div><button style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;" onclick="buyTitle(${i},event)">BUY</button>`}`;if(owned&&!eq)row.addEventListener('click',()=>equipTitle(i));list.appendChild(row);});
+}
+function buyTitle(i,e){e.stopPropagation();const t=TITLES[i];if(S.ownedTitles.includes(i)){toast('ALREADY OWNED','var(--green)');return;}if(S.wallet<t.cost){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-t.cost,`TITLE: ${t.name} -${t.cost}g`,'spend');S.ownedTitles.push(i);equipTitle(i);toast(`TITLE: ${t.name}`,'var(--gold)');renderTitles();fbPush();}
+function equipTitle(i){S.equippedTitle=i;const t=TITLES[i];const d=document.getElementById('avtdisp');const g=i>=6?`text-shadow:0 0 12px ${t.glow},0 0 25px ${t.glow};`:'';const fl=i>=7?'animation:rba .4s steps(1) infinite;':'';d.style.cssText=`color:${t.color};${g}${fl}`;d.textContent=t.name;document.getElementById('avidisp').textContent=`DAILY INTEREST: ${(t.interest*100).toFixed(2)}%`;document.getElementById('avearn').textContent=`~${Math.floor(S.wallet*t.interest).toLocaleString()}g/day`;drawWizard();renderTitles();}
+
+// ══ FRAGMENT MARKET ══════════════════════════════════════════
+function mkFrag(rarity,slotHint,vm){const sl=slotHint||pk(SLOTS_EQ);const cfg=RC[rarity];const val=Math.round(rnd(cfg.baseMin,cfg.baseMax)*(vm||1));return{id:Date.now()+Math.random(),name:rfn(),rarity,slot:sl,value:val,equippedSlot:null};}
+function initFragMkt(){S.marketFrags=[];const dist=[...Array(5).fill('C'),...Array(3).fill('U'),...Array(2).fill('R'),'S','SSR'];for(let i=0;i<12;i++){const r=dist[i%dist.length];const f=mkFrag(r,pk(SLOTS_EQ),1);f.marketPrice=rnd(RC[r].baseMin,RC[r].baseMax);f.priceHistory=[{day:1,price:f.marketPrice}];S.marketFrags.push(f);}}
+
+function renderFragMkt(){
+  const grid=document.getElementById('fragmktg');grid.innerHTML='';
+  S.marketFrags.forEach((f,idx)=>{
+    const cfg=RC[f.rarity];const last=f.priceHistory.length>1?f.priceHistory[f.priceHistory.length-1]:null;const prev=f.priceHistory.length>1?f.priceHistory[f.priceHistory.length-2]:null;
+    const up=last&&prev?last.price>prev.price:null;const arrow=up===null?'':up?'▲ ':'▼ ';const pc=up===null?'pn':up?'pu':'pd';
+    const soldOut=!!f.soldOut;
+    const card=document.createElement('div');card.className='fc';card.style.borderColor=soldOut?'#440022':cfg.color+'44';if(soldOut)card.style.opacity='.5';
+    card.innerHTML=`<button class="chart-btn" onclick="openChart(${idx},event)" title="Price History">📈</button><div class="fa" id="fma-${idx}"><div class="rbl" style="color:${cfg.color};background:${cfg.bg};z-index:2;">${f.rarity}</div></div><div style="font-size:7px;font-family:var(--fh);font-weight:900;color:${cfg.color};">${f.rarity} — ${SL[f.slot]}</div><div class="fnm">${f.name.split(' ').slice(0,3).join(' ')}...</div><div class="fpr ${soldOut?'pd':pc}">${soldOut?'SOLD OUT':arrow+f.marketPrice.toLocaleString()}</div><div style="font-size:6px;color:var(--dim);font-family:var(--fh);">val: ${f.value.toLocaleString()}</div><div class="fbtns">${soldOut?'<div style="font-family:var(--fh);font-size:7px;color:var(--red);text-align:center;width:100%;padding:3px;">SOLD OUT</div>':`<button class="fbuy" onclick="buyFragMkt(${idx},event)">BUY</button>`}</div>`;
+    grid.appendChild(card);
+    const art=document.getElementById('fma-'+idx);if(art)art.insertBefore(mkFC(f,54,54),art.firstChild);
+  });
+}
+
+function buyFragMkt(idx,e){
+  if(e)e.stopPropagation();
+  const f=S.marketFrags[idx];
+  if(!f||f.soldOut){toast('SOLD OUT','var(--red)');return;}
+  if(S.wallet<f.marketPrice){toast('INSUFFICIENT GEMS','var(--red)');return;}
+  upWallet(-f.marketPrice,`BUY FRAG: ${f.name} -${f.marketPrice}g`,'spend');
+  S.inventory.push({...f,id:Date.now()+Math.random(),equippedSlot:null});
+  f.soldOut=true;
+  toast(`ACQUIRED: ${f.name}`,'var(--cyan)');
+  renderFragMkt();
+}
+
+function sellFrag(inventoryIdx){
+  const f=S.inventory[inventoryIdx];if(!f)return;
+  const mkt=S.marketFrags.find(m=>m.rarity===f.rarity);const sp=mkt?Math.round(mkt.marketPrice*.85):Math.round(f.value*.85);
+  if(f.equippedSlot){S.equipped[f.equippedSlot]=null;renderSlots();}
+  S.inventory.splice(inventoryIdx,1);upWallet(sp,`SOLD FRAG: ${f.name} +${sp}g`,'win');toast(`SOLD ${f.rarity}: +${sp}g`,'var(--green)');renderInventory();
+}
+
+// ══ CHART MODAL ══════════════════════════════════════════════
+function openChart(fragIdx,e){if(e)e.stopPropagation();const f=S.marketFrags[fragIdx];if(!f)return;const modal=document.getElementById('chart-modal');const canvas=document.getElementById('chart-canvas');modal.classList.add('show');document.getElementById('chart-title').textContent=f.name.toUpperCase();document.getElementById('chart-sub').textContent=`${f.rarity} — ${SL[f.slot]} — Current: ${f.marketPrice.toLocaleString()}g`;const hist=f.priceHistory;if(hist.length<2){const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='var(--dim)';ctx.font='12px var(--fh)';ctx.fillText('NOT ENOUGH DATA YET',40,100);return;}drawLineChart(canvas,hist,f.rarity);}
+function closeChart(){document.getElementById('chart-modal').classList.remove('show');}
+
+function drawLineChart(canvas,hist,rarity){
+  const W=canvas.clientWidth||460;const H=200;canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,W,H);
+  const prices=hist.map(h=>h.price);const minP=Math.min(...prices);const maxP=Math.max(...prices);const pad={l:50,r:15,t:15,b:30};const cW=W-pad.l-pad.r;const cH=H-pad.t-pad.b;const range=maxP-minP||1;
+  // Grid lines
+  ctx.strokeStyle='#2a0050';ctx.lineWidth=1;for(let i=0;i<=4;i++){const y=pad.t+cH*(i/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();}
+  // Y labels
+  ctx.fillStyle='#aa88cc';ctx.font='9px Share Tech Mono';ctx.textAlign='right';for(let i=0;i<=4;i++){const val=maxP-(range*(i/4));const y=pad.t+cH*(i/4);ctx.fillText(Math.round(val).toLocaleString(),pad.l-4,y+3);}
+  // X labels
+  ctx.textAlign='center';const step=Math.max(1,Math.floor(hist.length/5));hist.forEach((h,i)=>{if(i%step===0){const x=pad.l+cW*(i/(hist.length-1));ctx.fillStyle='#aa88cc';ctx.fillText(`D${h.day||i+1}`,x,H-pad.b+14);}});
+  // Line
+  const color=RC[rarity]?.color||'#00f5ff';ctx.strokeStyle=color;ctx.lineWidth=2;ctx.shadowColor=color;ctx.shadowBlur=6;ctx.beginPath();hist.forEach((h,i)=>{const x=pad.l+cW*(i/(hist.length-1));const y=pad.t+cH*(1-(h.price-minP)/range);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.shadowBlur=0;
+  // Fill under
+  ctx.beginPath();hist.forEach((h,i)=>{const x=pad.l+cW*(i/(hist.length-1));const y=pad.t+cH*(1-(h.price-minP)/range);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.lineTo(pad.l+cW,pad.t+cH);ctx.lineTo(pad.l,pad.t+cH);ctx.closePath();ctx.fillStyle=color+'22';ctx.fill();
+  // Dots
+  ctx.fillStyle=color;hist.forEach((h,i)=>{if(hist.length<=20||i%Math.ceil(hist.length/20)===0){const x=pad.l+cW*(i/(hist.length-1));const y=pad.t+cH*(1-(h.price-minP)/range);ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();}});
+}
+
+// ══ GACHA ════════════════════════════════════════════════════
+function genBanner(){const name=`${pk(BN_ADJ)} ${pk(BN_NOUN)} ${pk(BN_OF)}`;const sub=pk(BN_SUBS);const cols=pk(BN_COLS);const acc=pk(['#ffd700','#00ffcc','#ff44cc','#44ff88','#ff8800','#ffffff']);const slotTheme=pk([...SLOTS_EQ,null]);const br=pk(['R','S','SSR']);const boost=rnd(1,5);const rateBoosts={[br]:boost};if(Math.random()<.4){const r2=pk(['U','R','S'].filter(r=>r!==br));rateBoosts[r2]=1;}const eff={...BASE_RATES};let added=0;Object.entries(rateBoosts).forEach(([r,v])=>{eff[r]=(eff[r]||0)+v;added+=v;});eff.C=Math.max(1,eff.C-added);const total=Object.values(eff).reduce((a,b)=>a+b,0);const norm={};Object.entries(eff).forEach(([r,v])=>{norm[r]=+(v/total*100).toFixed(1);});return{name,sub,cols,acc,slotTheme,rateBoosts,effectiveRates:norm,vm:br==='SSR'?1.3:br==='S'?1.15:1.0,br};}
+function rotateBanner(){S.currentBanner=genBanner();}
+function renderBanner(){if(!S.currentBanner)rotateBanner();const b=S.currentBanner;const art=document.getElementById('banner');const[c1,c2,c3]=b.cols;art.innerHTML=`<div class="bbg" style="background:linear-gradient(135deg,${c1},${c2},${c3});"></div><div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,.03) 8px,rgba(255,255,255,.03) 9px);z-index:1;"></div><div class="bttl" style="color:${b.acc};">${b.name}</div><div class="bsub">${b.sub}</div>${b.slotTheme?`<div class="bbuff" style="background:rgba(0,0,0,.5);color:${b.acc};">SLOT FOCUS: ${SL[b.slotTheme]||'ALL'}</div>`:''}`;const row=document.getElementById('bannerrates');row.innerHTML='';RK.forEach(r=>{const rate=b.effectiveRates[r]||0;const boosted=rate>BASE_RATES[r];const sp=document.createElement('span');sp.style.cssText=`color:${RC[r].color};${boosted?'text-shadow:0 0 5px '+RC[r].color+';font-weight:bold;':'opacity:.6;'}`;sp.textContent=`${r}: ${rate.toFixed(1)}%${boosted?' ▲':''}`;row.appendChild(sp);});if(Object.keys(b.rateBoosts).length){const note=document.createElement('div');note.style.cssText='font-size:7px;color:var(--gold);font-family:var(--fh);width:100%;letter-spacing:1px;margin-top:1px;';note.textContent='FEATURED: '+Object.entries(b.rateBoosts).map(([r,v])=>`${r} +${v}% val×${b.vm.toFixed(2)}`).join(' | ');row.appendChild(note);}}
+function rollR(pity,banner){if(pity>=89)return'SSR';const rates=banner?banner.effectiveRates:BASE_RATES;const r=Math.random()*100;let cum=0;for(const k of RK){cum+=rates[k]||0;if(r<cum)return k;}return'C';}
+function doPull(count){
+  const cost=count===1?50:450;if(S.wallet<cost){toast('INSUFFICIENT GEMS','var(--red)');return;}
+  upWallet(-cost,`GACHA ${count}-pull: -${cost}g`,'spend');
+  const b=S.currentBanner;const stage=document.getElementById('pstage');stage.innerHTML='';const results=[];
+  for(let i=0;i<count;i++){
+    S.hardPity++;
+    // Hard pity at 180: award the banner's named item
+    if(S.hardPity>=180){
+      const bannerFrag={id:Date.now()+Math.random()+i,name:b.name,rarity:'SSR',slot:b.slotTheme||pk(SLOTS_EQ),value:rnd(RC.SSR.baseMin,RC.SSR.baseMax)*b.vm,equippedSlot:null,isBannerItem:true};
+      results.push(bannerFrag);S.inventory.push({...bannerFrag});S.hardPity=0;S.pity=0;
+    }else{
+      const r=rollR(S.pity,b);if(r==='SSR'){S.pity=0;}else S.pity++;
+      const sl=b.slotTheme&&Math.random()<.6?b.slotTheme:pk(SLOTS_EQ);
+      const f=mkFrag(r,sl,b.vm);results.push(f);S.inventory.push({...f,id:Date.now()+Math.random()+i,equippedSlot:null});
+    }
+  }
+  document.getElementById('pitynum').textContent=S.pity+' / 90';
+  document.getElementById('pityfill').style.width=(S.pity/90*100)+'%';
+  document.getElementById('hardpitynum').textContent=S.hardPity+' / 180';
+  document.getElementById('hardpityfill').style.width=(S.hardPity/180*100)+'%';
+  results.forEach((f,i)=>{
+    const cfg=RC[f.rarity];const card=document.createElement('div');card.className='pc';card.style.borderColor=f.isBannerItem?'#ffd700':cfg.color;card.style.boxShadow=`0 0 ${f.isBannerItem?'20px #ffd700':('10px '+cfg.color+'44')}`;
+    const c=mkFC(f,52,52);const nm=document.createElement('div');nm.className='pcnm';nm.textContent=f.name.split(' ').slice(0,3).join(' ');
+    const rar=document.createElement('div');rar.className='prar';rar.style.color=f.isBannerItem?'#ffd700':cfg.color;rar.textContent=f.isBannerItem?'★BANNER★':f.rarity;
+    const val=document.createElement('div');val.style.cssText=`font-size:6px;color:${f.isBannerItem?'#ffd700':cfg.color};font-family:var(--fh);margin-top:1px;`;val.textContent=f.value.toLocaleString()+'v';
+    card.appendChild(c);card.appendChild(nm);card.appendChild(rar);card.appendChild(val);stage.appendChild(card);
+    setTimeout(()=>card.classList.add('rev'),i*110+60);
+  });
+  const best=results.reduce((a,b2)=>{if(b2.isBannerItem)return b2;if(a.isBannerItem)return a;return RC[b2.rarity].tier>RC[a.rarity].tier?b2:a;});
+  const bc=best.isBannerItem?{color:'#ffd700',tier:6}:RC[best.rarity];
+  const cnts=RK.map(r=>({r,n:results.filter(f=>f.rarity===r&&!f.isBannerItem).length})).filter(x=>x.n>0).map(x=>`${x.n}×${x.r}`).join(' ');
+  const bannerCt=results.filter(f=>f.isBannerItem).length;
+  document.getElementById('psumm').textContent=`RESULTS: ${cnts}${bannerCt?` + ${bannerCt}×★BANNER★`:''}`;
+  if(best.isBannerItem)toast(`★ BANNER ITEM ACQUIRED: ${best.name}!`,'#ffd700');
+  else if(bc.tier>=4)toast(`${best.rarity}! ${best.name} — ${best.value.toLocaleString()}v`,bc.color);
+}
+
+// ══ INVENTORY ════════════════════════════════════════════════
+function renderInventory(){
+  const g=document.getElementById('invg');g.innerHTML='';if(!S.inventory.length){g.innerHTML='<div style="color:var(--dim);font-size:9px;font-family:var(--fh);padding:1rem;">NO SOUL FRAGMENTS YET</div>';return;}
+  S.inventory.forEach((f,i)=>{const cfg=RC[f.rarity];const card=document.createElement('div');card.className='ic'+(f.equippedSlot?' eqon':'');card.style.borderColor=cfg.color+'44';const c=mkFC(f,66,66);const nm=document.createElement('div');nm.style.cssText='font-size:7px;color:var(--dim);margin-top:2px;line-height:1.3;';nm.textContent=f.name.split(' ').slice(0,4).join(' ')+'...';const rar=document.createElement('div');rar.style.cssText=`font-family:var(--fh);font-size:7px;font-weight:900;color:${cfg.color};animation:rba .4s steps(1) infinite;`;rar.textContent=f.rarity;const val=document.createElement('div');val.style.cssText=`font-size:8px;color:${cfg.color};font-family:var(--fh);font-weight:bold;`;val.textContent=f.value.toLocaleString()+'g';const slt=document.createElement('div');slt.style.cssText='font-size:6px;color:var(--dim);font-family:var(--fh);';slt.textContent=SL[f.slot];const mkt=S.marketFrags.find(m=>m.rarity===f.rarity);const sp=mkt?Math.round(mkt.marketPrice*.85):Math.round(f.value*.85);const sb=document.createElement('button');sb.className='isel';sb.textContent=`SELL ${sp.toLocaleString()}g`;sb.onclick=e=>{e.stopPropagation();if(confirm(`Sell ${f.name} for ${sp.toLocaleString()}g?`))sellFrag(i);};card.appendChild(c);card.appendChild(nm);card.appendChild(rar);card.appendChild(val);card.appendChild(slt);if(f.equippedSlot){const el=document.createElement('div');el.className='eql';el.textContent='EQ: '+f.equippedSlot.toUpperCase();card.appendChild(el);}card.appendChild(sb);card.addEventListener('click',()=>equipFrag(i));g.appendChild(card);});
+}
+function equipFrag(i){const f=S.inventory[i];if(S.equipped[f.slot]){const old=S.equipped[f.slot];const oi=S.inventory.find(x=>x.id===old.id);if(oi)oi.equippedSlot=null;}S.equipped[f.slot]=f;f.equippedSlot=f.slot;toast(`EQUIPPED: ${f.name} → ${SL[f.slot]}`,'var(--cyan)');renderSlots();drawWizard();if(document.getElementById('pnl-inventory').classList.contains('active'))renderInventory();fbPush();}
+function openSlot(sl){const m=S.inventory.filter(f=>f.slot===sl);if(!m.length){toast('NO FRAGMENTS FOR THIS SLOT','var(--dim)');return;}sw('inventory');toast(`${SL[sl]} FRAGMENTS`,'var(--cyan)');}
+function renderSlots(){
+  SLOTS_EQ.forEach(sl=>{
+    const f=S.equipped[sl],card=document.getElementById('slot-'+sl);if(!card)return;
+    const inner=card.querySelector('.si'),nm=card.querySelector('.snm2');inner.innerHTML='';
+    if(f){
+      const cfg=RC[f.rarity];
+      const isPet=sl==='pet';
+      const sz=(sl==='acc2'||sl==='pet')?66:52;
+      const c=isPet&&f.petType?mkPetCanvas(f.petType,sz,sz):mkFC(f,sz,sz);
+      const rb=document.createElement('div');rb.className='rbl';rb.style.cssText=`color:${cfg.color};background:${cfg.bg};position:absolute;bottom:2px;right:2px;font-family:var(--fh);font-size:7px;font-weight:900;padding:1px 3px;border-radius:2px;animation:rba .4s steps(1) infinite;`;rb.textContent=f.rarity;
+      inner.appendChild(c);inner.appendChild(rb);nm.textContent=f.name.split(' ').slice(0,3).join(' ');nm.style.color=cfg.color;
+    }else{inner.innerHTML='<span class="se">EMPTY</span>';nm.textContent='—';nm.style.color='';}
+  });
+}
+
+// ══ DAY ADVANCE ══════════════════════════════════════════════
+function advanceDay(){
+  S.dayHistory.push(JSON.parse(JSON.stringify({wallet:S.wallet,inventory:S.inventory,marketFrags:S.marketFrags,day:S.day,pity:S.pity,hardPity:S.hardPity,equippedTitle:S.equippedTitle,ownedTitles:S.ownedTitles,equipped:S.equipped,rollHistory:S.rollHistory,markets:S.markets,shop:S.shop,sponsors:S.sponsors,fame:S.fame,slotCosts:S.slotCosts,hpCostPer:S.hpCostPer,dailyCost:S.dailyCost,rbWinMult:S.rbWinMult,rbLossMult:S.rbLossMult,charSheet:S.charSheet})));
+  if(S.dayHistory.length>10)S.dayHistory.shift();
+  const roll=rnd(1,100),up=Math.random()<.5,pct=roll/100,dir=up?1:-1;
+  S.rollHistory.push({day:S.day+1,roll,up,pct});
+  // Update fragment prices and restock sold-out ones
+  S.marketFrags.forEach((f,i)=>{
+    const cfg=RC[f.rarity];const raw=Math.round(f.marketPrice*(1+dir*pct));
+    f.marketPrice=Math.max(Math.floor(cfg.baseMin*.6),Math.min(Math.ceil(cfg.baseMax*3),raw));
+    f.priceHistory.push({day:S.day+1,price:f.marketPrice});
+    if(f.soldOut){
+      // Restock: replace with new fragment
+      const r=f.rarity;const nf=mkFrag(r,pk(SLOTS_EQ),1);
+      nf.marketPrice=f.marketPrice;nf.priceHistory=f.priceHistory;
+      S.marketFrags[i]=nf;
+    }
+  });
+  // Clear shilled sponsors
+  S.sponsors.forEach(s=>s.shilled=false);
+  // Refresh procedural markets: remove expired/resolved, add fresh ones
+  refreshProcMarkets();
+  const ti=TITLES[S.equippedTitle];const interest=Math.floor(S.wallet*ti.interest);upWallet(interest,`DAY ${S.day+1} INTEREST: +${interest}g`,'win');
+  S.day++;document.getElementById('daybdg').textContent='DAY '+S.day;
+  document.getElementById('dayinfo').textContent=`DAY ${S.day} — Interest +${interest.toLocaleString()}g | d100=${roll} | ${up?'HEADS ▲':'TAILS ▼'} ${(pct*100).toFixed(0)}% price shift`;
+  document.getElementById('avearn').textContent=`~${Math.floor(S.wallet*ti.interest).toLocaleString()}g/day`;
+  genShop();rotateBanner();
+  if(document.getElementById('pnl-gacha').classList.contains('active'))renderBanner();
+  if(document.getElementById('pnl-frags').classList.contains('active'))renderFragMkt();
+  if(document.getElementById('pnl-shop').classList.contains('active'))renderShop();
+  if(document.getElementById('pnl-sponsor').classList.contains('active'))renderSponsors();
+  if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();
+  showDiceOverlay(roll,up,pct,interest);
+  fbPush();
+}
+function showDiceOverlay(roll,up,pct,interest){const ov=document.getElementById('dice-ov');ov.classList.add('show');const face=document.getElementById('dface'),phase=document.getElementById('dphase'),result=document.getElementById('dresult'),sub=document.getElementById('dsub');let count=0;phase.textContent='ROLLING D100...';result.textContent='';sub.textContent='';face.style.color='';const iv=setInterval(()=>{face.textContent=rnd(1,100);count++;if(count===25){clearInterval(iv);face.textContent=roll;face.style.color=up?'var(--green)':'var(--red)';result.textContent=`COIN: ${up?'HEADS — PRICES UP':'TAILS — PRICES DOWN'}`;sub.textContent=`${up?'▲':'▼'} ${(pct*100).toFixed(0)}% ALL FRAGMENT PRICES\n+${interest.toLocaleString()} GEMS INTEREST\nNEW BANNER GENERATED`;const rh=document.getElementById('rhl');S.rollHistory.slice(-6).reverse().forEach(e=>{if(!document.querySelector('[data-rd="'+e.day+'"]')){const d=document.createElement('div');d.className='rhe '+(e.up?'pos':'neg');d.setAttribute('data-rd',e.day);d.textContent=`Day ${e.day}: d100=${e.roll} | ${e.up?'+':'−'}${(e.pct*100).toFixed(0)}%`;rh.prepend(d);}});}},50);}
+function closeDice(){document.getElementById('dice-ov').classList.remove('show');document.getElementById('dface').style.color='';}
+function rollbackDay(){if(!S.dayHistory.length){toast('NOTHING TO ROLL BACK','var(--red)');return;}const snap=S.dayHistory.pop();Object.assign(S,JSON.parse(JSON.stringify(snap)));document.getElementById('wdisp').textContent=S.wallet.toLocaleString();document.getElementById('daybdg').textContent='DAY '+S.day;document.getElementById('dayinfo').textContent=`ROLLED BACK TO DAY ${S.day}`;toast('DAY ROLLED BACK','var(--orange)');logEntry('DAY ROLLED BACK','spend');equipTitle(S.equippedTitle);renderSlots();drawWizard();if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();if(document.getElementById('pnl-frags').classList.contains('active'))renderFragMkt();if(document.getElementById('pnl-shop').classList.contains('active'))renderShop();fbPush();}
+
+// ══ CASINO ═══════════════════════════════════════════════════
+
+document.getElementById('roul-type').addEventListener('change',function(){document.getElementById('roul-num').style.display=this.value==='single'?'inline':'none';});
+
+// ROULETTE
+const ROUL_REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+let roulAngle=0,roulSpinning=false;
+function initRoulette(){const cv=document.getElementById('roulette-canvas');drawRoulette(cv,roulAngle);}
+function drawRoulette(cv,angle){
+  const ctx=cv.getContext('2d');const w=cv.width,h=cv.height,r=w/2-2;ctx.clearRect(0,0,w,h);
+  const nums=[0,...Array.from({length:36},(_,i)=>i+1),'00'];const seg=nums.length;const arc=(Math.PI*2)/seg;
+  nums.forEach((n,i)=>{const a=angle+i*arc;ctx.beginPath();ctx.moveTo(w/2,h/2);ctx.arc(w/2,h/2,r,a,a+arc);ctx.fillStyle=n===0||n==='00'?'#006600':ROUL_REDS.includes(n)?'#880011':'#111';ctx.fill();ctx.strokeStyle='#ffd70044';ctx.lineWidth=1;ctx.stroke();ctx.save();ctx.translate(w/2,h/2);ctx.rotate(a+arc/2);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 9px Share Tech Mono';ctx.fillText(String(n),r-4,3);ctx.restore();});
+  // Center
+  ctx.beginPath();ctx.arc(w/2,h/2,18,0,Math.PI*2);ctx.fillStyle='#1a0030';ctx.fill();ctx.strokeStyle='#ffd700';ctx.lineWidth=2;ctx.stroke();
+  // Arrow
+  ctx.fillStyle='#ffd700';ctx.beginPath();ctx.moveTo(w/2,6);ctx.lineTo(w/2-7,22);ctx.lineTo(w/2+7,22);ctx.closePath();ctx.fill();
+}
+function spinRoulette(){
+  if(roulSpinning)return;const amt=parseInt(document.getElementById('roul-amt').value)||50;const type=document.getElementById('roul-type').value;const singleNum=parseInt(document.getElementById('roul-num').value)||0;if(S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-amt,`ROULETTE BET: -${amt}g`,'spend');roulSpinning=true;document.getElementById('roul-btn').disabled=true;document.getElementById('roul-result').textContent='...';
+  const cv=document.getElementById('roulette-canvas');const totalRot=(Math.PI*2)*rnd(5,10)+Math.random()*Math.PI*2;const startAngle=roulAngle;let elapsed=0;const dur=3000;const tick=setInterval(()=>{elapsed+=50;const progress=elapsed/dur;const ease=1-Math.pow(1-progress,4);roulAngle=startAngle+totalRot*ease;drawRoulette(cv,roulAngle);if(elapsed>=dur){clearInterval(tick);roulSpinning=false;document.getElementById('roul-btn').disabled=false;// Determine landing number
+  const nums=[0,...Array.from({length:36},(_,i)=>i+1),'00'];const seg=nums.length;const arc=(Math.PI*2)/seg;const norm=((roulAngle%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);const land=nums[Math.floor(((Math.PI*2-norm)%(Math.PI*2))/arc)%seg];rouletteResult(land,type,singleNum,amt);}},50);
+}
+function rouletteResult(land,type,singleNum,amt){
+  const isRed=ROUL_REDS.includes(land);const isBlack=!isRed&&land!==0&&land!=='00';
+  const isOdd=typeof land==='number'&&land>0&&land%2!==0;const isEven=typeof land==='number'&&land>0&&land%2===0;const n=typeof land==='number'?land:null;
+  let won=false;let mult=2;
+  if(type==='red')won=isRed;else if(type==='black')won=isBlack;else if(type==='odd')won=isOdd;else if(type==='even')won=isEven;
+  else if(type==='low')won=n!==null&&n>=1&&n<=18;else if(type==='high')won=n!==null&&n>=19&&n<=36;
+  else if(type==='dozen1'){won=n!==null&&n>=1&&n<=12;mult=3;}else if(type==='dozen2'){won=n!==null&&n>=13&&n<=24;mult=3;}
+  else if(type==='dozen3'){won=n!==null&&n>=25&&n<=36;mult=3;}else if(type==='single'){won=String(land)===String(singleNum);mult=36;}
+  const baseWin=won?amt*mult:0;
+  if(won){
+    upWallet(baseWin,`ROULETTE WIN (${land}): +${baseWin}g`,'win');
+    document.getElementById('roul-result').style.color='var(--green)';
+    document.getElementById('roul-result').textContent=`${land}! WON +${baseWin.toLocaleString()}g`;
+    toast(`ROULETTE WIN! ${land} — +${baseWin.toLocaleString()}g`,'var(--green)');
+    setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`ROULETTE REINBET (${land}): ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('roul-result').textContent=`${land}! TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
+  }else{
+    document.getElementById('roul-result').style.color='var(--red)';
+    document.getElementById('roul-result').textContent=`${land}. LOST.`;
+    toast(`ROULETTE: ${land}. LOST.`,'var(--red)');
+  }
+}
+
+// SLOTS
+const SLOT_SYMS=['🔮','💀','👁','⚡','🌙','⭐','🎰'];
+const SLOT_MULTS={0:200,1:150,2:100,3:50,4:20,5:10,6:5};
+let slotsSpinning=false;
+function initSlots(){SLOT_SYMS.forEach((_,ri)=>{const inner=document.getElementById('ri'+ri);inner.innerHTML='';for(let i=0;i<5;i++){const s=document.createElement('div');s.className='reel-sym';s.textContent=SLOT_SYMS[rnd(0,SLOT_SYMS.length-1)];inner.appendChild(s);}});}
+function spinSlots(){
+  if(slotsSpinning)return;const lineAmt=parseInt(document.getElementById('slots-amt').value)||25;const lines=parseInt(document.getElementById('slots-lines').value)||1;const totalCost=lineAmt*lines;if(S.wallet<totalCost){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-totalCost,`SLOTS BET: -${totalCost}g`,'spend');slotsSpinning=true;document.getElementById('slots-btn').disabled=true;document.getElementById('slots-result').textContent='...';
+  const results=[];[0,1,2].forEach((ri,idx)=>{const final=rnd(0,SLOT_SYMS.length-1);results.push(final);const inner=document.getElementById('ri'+ri);setTimeout(()=>{inner.style.transition='none';inner.style.transform=`translateY(${-rnd(300,600)}px)`;setTimeout(()=>{inner.style.transition='transform 0.5s cubic-bezier(.25,.46,.45,.94)';inner.innerHTML='';for(let i=0;i<3;i++){const s=document.createElement('div');s.className='reel-sym';s.textContent=SLOT_SYMS[i===1?final:rnd(0,SLOT_SYMS.length-1)];inner.appendChild(s);}inner.style.transform='translateY(0)';},50);},idx*200);});
+  setTimeout(()=>{slotsSpinning=false;document.getElementById('slots-btn').disabled=false;slotResult(results,lineAmt,lines);},1200);
+}
+function slotResult(results,lineAmt,lines){
+  const[r0,r1,r2]=results;const match=r0===r1&&r1===r2;const partialMatch=r0===r1||r1===r2||r0===r2;
+  if(match){
+    const mult=SLOT_MULTS[r0];const baseWin=lineAmt*mult*lines;
+    upWallet(baseWin,`SLOTS 3x WIN: +${baseWin}g`,'win');
+    document.getElementById('slots-result').style.color='var(--gold)';
+    document.getElementById('slots-result').textContent=`TRIPLE x${mult}! WON +${baseWin.toLocaleString()}g`;
+    toast(`SLOTS WIN! Triple x${mult} +${baseWin.toLocaleString()}g`,'var(--gold)');
+    setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`SLOTS REINBET: ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('slots-result').textContent=`TRIPLE TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
+  }else if(partialMatch&&lines>=3){
+    const baseWin=Math.floor(lineAmt*.5);
+    upWallet(baseWin,`SLOTS PARTIAL WIN: +${baseWin}g`,'win');
+    document.getElementById('slots-result').style.color='var(--green)';
+    document.getElementById('slots-result').textContent=`PARTIAL MATCH. WON +${baseWin}g`;
+    setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`SLOTS PARTIAL REINBET: ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('slots-result').textContent=`PARTIAL TOTAL: ${final.toLocaleString()}g`;});},400);
+  }else{
+    document.getElementById('slots-result').style.color='var(--red)';
+    document.getElementById('slots-result').textContent='NO MATCH.';
+  }
+}
+
+// BONES
+let bonesVals=[1,1];
+function initBones(){drawBones(document.getElementById('bones-canvas'),[1,1]);}
+function drawBones(cv,vals){
+  const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);const diceSize=60;const gap=20;const x0=cv.width/2-diceSize-gap/2;const x1=cv.width/2+gap/2;[x0,x1].forEach((x,di)=>{const v=vals[di];const y=cv.height/2-diceSize/2;ctx.fillStyle='#1a0030';ctx.strokeStyle='#c800ff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,y,diceSize,diceSize,8);ctx.fill();ctx.stroke();ctx.fillStyle='#e060ff';const dots=getDots(v,x,y,diceSize);dots.forEach(([dx,dy])=>{ctx.beginPath();ctx.arc(dx,dy,5,0,Math.PI*2);ctx.fill();});});}
+function getDots(v,ox,oy,sz){const c=sz/2;const q=sz/4;const p=ox,pp=oy;switch(v){case 1:return[[p+c,pp+c]];case 2:return[[p+q,pp+q*3],[p+q*3,pp+q]];case 3:return[[p+q,pp+q*3],[p+c,pp+c],[p+q*3,pp+q]];case 4:return[[p+q,pp+q],[p+q*3,pp+q],[p+q,pp+q*3],[p+q*3,pp+q*3]];case 5:return[[p+q,pp+q],[p+q*3,pp+q],[p+c,pp+c],[p+q,pp+q*3],[p+q*3,pp+q*3]];case 6:return[[p+q,pp+q],[p+q*3,pp+q],[p+q,pp+c],[p+q*3,pp+c],[p+q,pp+q*3],[p+q*3,pp+q*3]];default:return[];}}
+function rollBones(){
+  const amt=parseInt(document.getElementById('bones-amt').value)||30;const type=document.getElementById('bones-type').value;if(S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-amt,`BONES BET: -${amt}g`,'spend');document.getElementById('bones-btn').disabled=true;document.getElementById('bones-result').textContent='...';
+  let rolls=0;const iv=setInterval(()=>{bonesVals=[rnd(1,6),rnd(1,6)];drawBones(document.getElementById('bones-canvas'),bonesVals);rolls++;if(rolls>15){clearInterval(iv);document.getElementById('bones-btn').disabled=false;bonesResult(bonesVals,type,amt);}},80);
+}
+function bonesResult(vals,type,amt){
+  const[d1,d2]=vals;const total=d1+d2;const isDouble=d1===d2;
+  let won=false;let mult=2;
+  if(type==='high'){won=total>=8;mult=2;}else if(type==='low'){won=total<=6;mult=2;}
+  else if(type==='doubles'){won=isDouble;mult=5;}else if(type==='exact7'){won=total===7;mult=5;}
+  else if(type==='exact2'){won=total===2;mult=30;}else if(type==='exact12'){won=total===12;mult=30;}
+  const baseWin=won?amt*mult:0;
+  if(won){
+    upWallet(baseWin,`BONES WIN (${total}): +${baseWin}g`,'win');
+    document.getElementById('bones-result').style.color='var(--green)';
+    document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. WON +${baseWin.toLocaleString()}g`;
+    toast(`BONES WIN! ${total} — +${baseWin.toLocaleString()}g`,'var(--green)');
+    setTimeout(()=>{triggerReinbet(baseWin,(final)=>{const delta=final-baseWin;if(delta!==0)upWallet(delta,`BONES REINBET (${total}): ${delta>=0?'+':''}${delta}g`,'win');document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. TOTAL: ${final.toLocaleString()}g`;toast(`REINBET: ${final.toLocaleString()}g`,'var(--gold)');});},400);
+  }else{
+    document.getElementById('bones-result').style.color='var(--red)';
+    document.getElementById('bones-result').textContent=`${d1}+${d2}=${total}. LOST.`;
+  }
+}
+function initCasino(){initRoulette();initSlots();initBones();}
+
+// ══ DM ═══════════════════════════════════════════════════════
+function setFame(v){S.fame=parseInt(v);const labs=['NOBODY','LOCAL HEROES','REGIONAL LEGENDS','CONTINENTAL FAMOUS','CHOSEN ONES','MYTHIC'];const lab=labs[Math.floor(S.fame/20)]||'MYTHIC';document.getElementById('fameval').textContent=`${v} — ${lab}`;document.getElementById('famebf').style.width=v+'%';document.getElementById('famedisp').textContent=lab;}
+function dmSet(){const v=parseInt(document.getElementById('setwl').value);if(isNaN(v))return;S.wallet=Math.max(0,v);document.getElementById('wdisp').textContent=S.wallet.toLocaleString();logEntry(`DM SET WALLET: ${S.wallet}`,'spend');toast(`WALLET SET: ${S.wallet}`,'#ff4444');fbPush();}
+function dmAdj(){const v=parseInt(document.getElementById('adjwl').value);if(isNaN(v))return;upWallet(v,`DM ADJUST: ${v>0?'+':''}${v}g`,v>0?'win':'loss');toast(`DM ADJ: ${v>0?'+':''}${v}`,'#ff4444');fbPush();}
+function toggleTimer(){document.getElementById('dmtimerwrap').style.display=document.getElementById('dmtype').value==='timed'?'block':'none';}
+function dmAddMarket(){const q=document.getElementById('dmq').value.trim();if(!q){toast('ENTER A QUESTION','#ff4444');return;}const prob=parseInt(document.getElementById('dmprob').value)||50;const type=document.getElementById('dmtype').value;const special=document.getElementById('dmspecial').value==='yes';const tm=type==='timed'?(parseInt(document.getElementById('dmtimer').value)||10):null;S.markets.push({id:Date.now()+Math.random(),question:q,prob:Math.max(5,Math.min(95,prob)),type,dmSpecial:special,resolved:null,timerEnd:tm?Date.now()+tm*60*1000:null,vol:rnd(10,200)*(special?Math.ceil(S.fame/20+1):1),bets:{}});renderMarkets();refreshDMSelects();toast('MARKET ADDED','#ff4444');document.getElementById('dmq').value='';fbPush();}
+function dmCosts(){S.hpCostPer=parseInt(document.getElementById('dmhp').value)||5;S.dailyCost=parseInt(document.getElementById('dmdaily').value)||50;for(let l=1;l<=9;l++){const i=document.getElementById('dmsl'+l);if(i)S.slotCosts[l-1]=parseInt(i.value)||S.slotCosts[l-1];}if(document.getElementById('pnl-costs').classList.contains('active'))renderCosts();}
+function buildDMSlotInputs(){const g=document.getElementById('dmslotinps');g.innerHTML='';for(let l=1;l<=9;l++){const d=document.createElement('div');d.className='dm-slot-row';d.innerHTML=`<label class="dml">LVL ${l}</label><input type="number" class="dmi" id="dmsl${l}" value="${S.slotCosts[l-1]}" style="width:100%;" oninput="dmCosts()">`;g.appendChild(d);}}
+function buildDMShopRanges(){const g=document.getElementById('dmshopranges');g.innerHTML='';for(let l=0;l<=9;l++){const[mn,mx]=SHOP_RANGES[l]||[10,100];const d=document.createElement('div');d.style.cssText='display:flex;flex-direction:column;gap:2px;';d.innerHTML=`<label class="dml">LV${l} MIN</label><input type="number" class="dmi" id="dmsr${l}min" value="${mn}" style="width:100%;" oninput="updateShopRange(${l})"><label class="dml">LV${l} MAX</label><input type="number" class="dmi" id="dmsr${l}max" value="${mx}" style="width:100%;" oninput="updateShopRange(${l})">`;g.appendChild(d);}}
+function updateShopRange(l){const mn=parseInt(document.getElementById(`dmsr${l}min`)?.value)||0;const mx=parseInt(document.getElementById(`dmsr${l}max`)?.value)||0;SHOP_RANGES[l]=[mn,mx];}
+function refreshDMSelects(){const sel=document.getElementById('resolvesel');if(!sel)return;sel.innerHTML='';S.markets.filter(m=>!m.resolved).forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=m.question.substring(0,50)+(m.question.length>50?'...':'');sel.appendChild(o);});}
+function refreshDMShopSel(){const sel=document.getElementById('dmshopsel');if(!sel)return;sel.innerHTML='';S.shop.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`Lv${s.level} ${s.name} (${s.price}g)`;sel.appendChild(o);});}
+function dmOverrideShop(){const idx=parseInt(document.getElementById('dmshopsel').value);const p=parseInt(document.getElementById('dmshopprice').value);if(isNaN(idx)||isNaN(p))return;const s=S.shop[idx];if(!s)return;s.price=p;s.glitch=p<0;if(document.getElementById('pnl-shop').classList.contains('active'))renderShop();else refreshDMShopSel();toast(`PRICE OVERRIDDEN: ${s.name} = ${p}g`,'#ff4444');}
+function dmAddSponsor(){const nm=document.getElementById('dmspnm').value.trim();const tag=document.getElementById('dmsptag').value.trim();const danger=parseInt(document.getElementById('dmspdan').value)||5;const payout=parseInt(document.getElementById('dmsppay').value)||200;if(!nm){toast('ENTER PRODUCT NAME','#ff4444');return;}S.sponsors.push({name:nm,tagline:tag,danger,payout,shilled:false});if(document.getElementById('pnl-sponsor').classList.contains('active'))renderSponsors();toast('SPONSOR ADDED','#ff4444');document.getElementById('dmspnm').value='';}
+
+// ══ PET SPRITES ══════════════════════════════════════════════
+function drawPet(ctx,petType,x,y,sz){
+  const px=Math.max(1,Math.floor(sz/16));
+  function sq(gx,gy,gw,gh,col){ctx.fillStyle=col;ctx.fillRect(x+gx*px,y+gy*px,gw*px,gh*px);}
+  ctx.save();
+  if(petType==='raven'){
+    // body
+    sq(5,6,6,5,'#1a1a2e');sq(4,5,8,7,'#16213e');
+    // wings
+    sq(2,6,3,4,'#1a1a2e');sq(11,6,3,4,'#1a1a2e');
+    // head
+    sq(5,2,6,5,'#1a1a2e');sq(6,1,4,2,'#16213e');
+    // beak
+    sq(10,4,2,1,'#ff8800');sq(10,5,3,1,'#ff8800');
+    // eye
+    sq(8,3,2,2,'#00f5ff');sq(9,3,1,1,'#ffffff');
+    // tail
+    sq(5,11,6,2,'#111');sq(4,12,8,2,'#0a0a1e');
+    // feet
+    sq(6,13,2,1,'#888');sq(9,13,2,1,'#888');
+  }else if(petType==='spider'){
+    // body
+    sq(5,7,6,5,'#220033');sq(6,6,4,6,'#330044');
+    // head
+    sq(5,4,6,4,'#330044');sq(6,3,4,2,'#220033');
+    // eyes (4 pairs)
+    sq(6,4,1,1,'#ff3366');sq(8,4,1,1,'#ff3366');sq(7,5,1,1,'#ff00cc');sq(9,5,1,1,'#ff00cc');
+    // legs (4 per side)
+    [1,3,5,7].forEach((ly,i)=>{sq(1,ly+3,4,1,'#1a0030');sq(11,ly+3,4,1,'#1a0030');});
+    // fangs
+    sq(6,8,1,2,'#ff3366');sq(9,8,1,2,'#ff3366');
+  }else if(petType==='pseudodragon'){
+    // tail
+    sq(2,10,4,2,'#44aa44');sq(1,11,3,2,'#338833');
+    // body
+    sq(4,7,8,5,'#55bb55');sq(5,6,6,6,'#44aa44');
+    // wings
+    sq(2,5,3,5,'#338833');sq(11,5,3,5,'#338833');
+    sq(2,5,2,4,'#338833');sq(11,5,2,4,'#338833');
+    // neck+head
+    sq(6,2,4,6,'#55bb55');sq(5,1,6,4,'#44aa44');
+    // snout
+    sq(5,3,2,2,'#44aa44');sq(4,4,2,1,'#338833');
+    // eye
+    sq(7,2,2,2,'#ff8800');sq(8,2,1,1,'#ffcc00');
+    // horns
+    sq(6,0,1,2,'#338833');sq(9,0,1,2,'#338833');
+    // feet
+    sq(5,12,2,2,'#338833');sq(9,12,2,2,'#338833');
+  }else if(petType==='tome'){
+    // book body
+    sq(3,2,10,13,'#4a0080');sq(4,3,8,11,'#5a0099');
+    // spine
+    sq(3,2,2,13,'#2a0055');sq(4,3,1,11,'#3a0070');
+    // cover design - eye symbol
+    sq(6,6,4,3,'#c800ff');sq(7,7,2,1,'#ffffff');sq(7,6,2,1,'#ff00ff');sq(7,8,2,1,'#ff00ff');
+    // runes
+    sq(5,4,1,1,'#ffd700');sq(10,4,1,1,'#ffd700');sq(5,11,1,1,'#ffd700');sq(10,11,1,1,'#ffd700');
+    // pages
+    sq(12,3,1,11,'#f0e0c0');sq(13,4,1,9,'#e8d4a8');
+    // clasp
+    sq(11,7,2,2,'#ffd700');
+  }else if(petType==='mephit'){
+    // body
+    sq(5,7,6,5,'#cc4400');sq(4,8,8,4,'#dd5500');
+    // wings (bat-like)
+    sq(1,6,4,5,'#aa3300');sq(11,6,4,5,'#aa3300');
+    sq(2,6,2,4,'#ff550022');sq(12,6,2,4,'#ff550022');
+    // head
+    sq(5,3,6,5,'#dd5500');sq(4,4,8,4,'#cc4400');
+    // horns
+    sq(5,1,2,3,'#aa2200');sq(9,1,2,3,'#aa2200');
+    // eyes
+    sq(6,5,2,2,'#ff8800');sq(10,5,2,2,'#ff8800');sq(7,5,1,1,'#ffff00');sq(11,5,1,1,'#ffff00');
+    // mouth/steam
+    sq(6,8,4,1,'#ffaa00');sq(7,9,2,1,'#ffffff88');
+    // feet
+    sq(5,12,3,2,'#aa3300');sq(8,12,3,2,'#aa3300');
+    // claws
+    sq(5,14,1,1,'#ff5500');sq(7,14,1,1,'#ff5500');sq(9,14,1,1,'#ff5500');sq(11,14,1,1,'#ff5500');
+  }
+  ctx.restore();
+}
+
+function mkPetCanvas(petType,w,h){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle='#05000f';ctx.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=2){ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,y,w,1);}
+  drawPet(ctx,petType,0,0,Math.min(w,h));
+  return c;
+}
+
+// Pet fragments need a petType field
+function mkPetFrag(rarity){
+  const cfg=RC[rarity];const val=Math.round(rnd(cfg.baseMin,cfg.baseMax));
+  const ptIdx=rnd(0,4);
+  return{id:Date.now()+Math.random(),name:PET_NAMES[ptIdx]+' '+rfn().split(' ').slice(-2).join(' '),rarity,slot:'pet',value:val,equippedSlot:null,petType:PET_TYPES[ptIdx]};
+}
+
+// ══ REINBET ENGINE ═══════════════════════════════════════════
+const RB_TAUNTS=[
+  "The Oracle sees great fortune in your future...",
+  "You've already won. But what if you could win MORE?",
+  "One roll. That's all it takes.",
+  "Fortune favors the bold. Are you bold?",
+  "Your base win is safe. Or is it?",
+  "The market whispers: press your luck.",
+  "A 14% chance of quadrupling everything. Think about it.",
+  "The Eternal Gambling Emperor would never decline.",
+  "Just one d100. What's the worst that could happen?",
+  "Even the gods gamble. Probably.",
+  "Your ancestors are watching. Don't embarrass them.",
+  "The d100 is warm. It wants to be rolled.",
+];
+
+let pendingReinbet={active:false,baseWin:0,callback:null,rolled:false};
+
+function triggerReinbet(baseWin,onCollect){
+  pendingReinbet={active:true,baseWin,callback:onCollect,rolled:false,finalAmt:baseWin};
+  const modal=document.getElementById('reinbet-modal');
+  modal.style.display='flex';
+  // Show base win and temptation state — player must actively choose to roll
+  document.getElementById('rb-base-info').textContent=`You just won ${baseWin.toLocaleString()} gems`;
+  document.getElementById('rb-taunt-text').textContent=pk(RB_TAUNTS);
+  document.getElementById('rb-d100-face').textContent='?';
+  document.getElementById('rb-d100-face').style.color='var(--white)';
+  document.getElementById('rb-mult-display').textContent='';
+  document.getElementById('rb-final-display').textContent='';
+  // Show ROLL button, hide COLLECT
+  document.getElementById('rb-confirm-btn').style.display='none';
+  document.getElementById('rb-roll-btn').style.display='block';
+  document.getElementById('rb-decline-note').textContent=`Keep ${baseWin.toLocaleString()}g guaranteed`;
+}
+
+function rollReinbet(){
+  if(!pendingReinbet.active||pendingReinbet.rolled)return;
+  pendingReinbet.rolled=true;
+  document.getElementById('rb-roll-btn').style.display='none';
+  let count=0;
+  const iv=setInterval(()=>{
+    document.getElementById('rb-d100-face').textContent=rnd(1,100);
+    count++;
+    if(count===35){
+      clearInterval(iv);
+      const roll=rnd(1,100);
+      document.getElementById('rb-d100-face').textContent=roll;
+      let mult,col,label;
+      if(roll<=10){mult=0;col='var(--red)';label='BUST — ×0';}
+      else if(roll<=30){mult=1;col='#888888';label='BREAK EVEN — ×1';}
+      else if(roll<=60){mult=2;col='var(--cyan)';label='DOUBLED — ×2';}
+      else if(roll<=85){mult=3;col='var(--green)';label='TRIPLED — ×3';}
+      else{mult=4;col='var(--gold)';label='MAXIMUM — ×4';}
+      document.getElementById('rb-d100-face').style.color=col;
+      document.getElementById('rb-mult-display').textContent=label;
+      document.getElementById('rb-mult-display').style.color=col;
+      const final=Math.floor(pendingReinbet.baseWin*mult);
+      pendingReinbet.finalAmt=final;
+      const diff=final-pendingReinbet.baseWin;
+      const diffStr=diff>=0?`+${diff.toLocaleString()}g`:`${diff.toLocaleString()}g`;
+      document.getElementById('rb-final-display').textContent=`${final.toLocaleString()} gems  (${diffStr})`;
+      document.getElementById('rb-final-display').style.color=col;
+      document.getElementById('rb-confirm-btn').style.display='block';
+      document.getElementById('rb-confirm-btn').textContent=mult===0?'COLLECT 0g (BUST)':`COLLECT ${final.toLocaleString()}g`;
+      document.getElementById('rb-decline-note').textContent='';
+    }
+  },55);
+}
+
+function confirmReinbet(){
+  if(!pendingReinbet.active)return;
+  const amt=pendingReinbet.finalAmt??0;
+  if(pendingReinbet.callback)pendingReinbet.callback(amt);
+  closeReinbet();
+  fbPush();
+}
+
+function closeReinbet(){
+  // If they decline BEFORE rolling, they keep base win
+  if(pendingReinbet.active&&!pendingReinbet.rolled&&pendingReinbet.baseWin>0){
+    if(pendingReinbet.callback)pendingReinbet.callback(pendingReinbet.baseWin);
+  }
+  document.getElementById('reinbet-modal').style.display='none';
+  pendingReinbet={active:false,baseWin:0,callback:null,rolled:false};
+  fbPush();
+}
+
+// ══ CHARACTER SHEET & SPELLBOOK ══════════════════════════════
+const ABILITY_NAMES=['str','dex','con','int','wis','cha'];
+const ABILITY_LABELS={str:'STR',dex:'DEX',con:'CON',int:'INT',wis:'WIS',cha:'CHA'};
+
+function abilityMod(score){return Math.floor((score-10)/2);}
+function modStr(score){const m=abilityMod(score);return(m>=0?'+':'')+m;}
+
+function renderAbilityScores(){
+  const el=document.getElementById('ability-scores-display');if(!el)return;
+  el.innerHTML='';
+  ABILITY_NAMES.forEach(ab=>{
+    const score=S.charSheet[ab];const mod=abilityMod(score);
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid #1a0030;';
+    row.innerHTML=`<span style="font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:1px;">${ABILITY_LABELS[ab]}</span><span style="font-family:var(--fh);font-size:9px;color:var(--w);">${score}</span><span style="font-family:var(--fh);font-size:9px;color:${mod>=0?'var(--green)':'var(--red)'};">${modStr(score)}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function renderProficiencies(){
+  const el=document.getElementById('prof-display');if(!el)return;
+  el.innerHTML=S.charSheet.proficiencies.map(p=>`<span style="color:var(--cyan);">• </span>${p}<br>`).join('')||'<span style="color:var(--dim)">None yet</span>';
+}
+
+function renderPreparedSpells(){
+  const el=document.getElementById('prepared-display');if(!el)return;
+  const byLevel={};S.charSheet.preparedSpells.forEach(s=>{if(!byLevel[s.level])byLevel[s.level]=[];byLevel[s.level].push(s);});
+  el.innerHTML=Object.keys(byLevel).sort((a,b)=>+a-+b).map(lv=>`<div style="color:var(--gold);font-family:var(--fh);font-size:7px;margin-top:3px;">${lv==='0'?'CANTRIPS':'LEVEL '+lv}</div>${byLevel[lv].map(s=>`<div style="color:var(--dim)">• ${s.name}</div>`).join('')}`).join('')||'<span style="color:var(--dim)">No spells prepared</span>';
+}
+
+function renderCharSheet(){renderAbilityScores();renderProficiencies();renderPreparedSpells();}
+
+// SPELLBOOK panel
+function renderSpellbook(){
+  // Ability score inputs
+  const g=document.getElementById('sb-ability-inputs');if(!g)return;g.innerHTML='';
+  ABILITY_NAMES.forEach(ab=>{const d=document.createElement('div');d.style.cssText='display:flex;flex-direction:column;gap:2px;';d.innerHTML=`<label class="dml">${ABILITY_LABELS[ab]}</label><input type="number" class="dmi" id="sb-${ab}" value="${S.charSheet[ab]}" min="1" max="30" style="width:100%;" oninput="S.charSheet.${ab}=parseInt(this.value)||10;renderCharSheet();">`;g.appendChild(d);});
+  // Proficiency list
+  renderSBProfList();
+  // Prepared spells
+  renderSBPreparedList();
+  // Spell slots
+  const ss=document.getElementById('sb-slots-display');if(ss){ss.innerHTML='';for(let l=1;l<=9;l++){const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:5px;margin-bottom:3px;';row.innerHTML=`<span style="font-size:7px;color:var(--dim);font-family:var(--fh);width:28px;">LV ${l}</span><input type="number" class="dmi" id="sbss-${l}" value="${S.charSheet.spellSlots[l-1]}" min="0" max="9" style="width:40px;" oninput="S.charSheet.spellSlots[${l-1}]=parseInt(this.value)||0;"><span style="font-size:7px;color:var(--dim);font-family:var(--fh);">/ <input type="number" class="dmi" id="sbssm-${l}" value="${S.charSheet.spellSlotsMax[l-1]}" min="0" max="9" style="width:35px;display:inline;" oninput="S.charSheet.spellSlotsMax[${l-1}]=parseInt(this.value)||0;"> max</span>`;ss.appendChild(row);}}
+  // Notes
+  const nt=document.getElementById('sb-notes');if(nt)nt.value=S.charSheet.notes||'';
+  // Populate datalist
+  const dl=document.getElementById('all-spells-datalist');if(dl){dl.innerHTML='';Object.values(ALL_SPELLS).flat().forEach(sp=>{const o=document.createElement('option');o.value=sp;dl.appendChild(o);});}
+}
+
+function renderSBProfList(){
+  const el=document.getElementById('sb-prof-list');if(!el)return;
+  el.innerHTML=S.charSheet.proficiencies.map((p,i)=>`<span style="color:var(--cyan);">• </span>${p} <button onclick="removeProficiency(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:9px;">✕</button><br>`).join('')||'<span style="color:var(--dim)">None</span>';
+}
+function addProficiency(){const inp=document.getElementById('sb-prof-inp');const val=inp.value.trim();if(!val)return;S.charSheet.proficiencies.push(val);inp.value='';renderSBProfList();renderCharSheet();}
+function removeProficiency(i){S.charSheet.proficiencies.splice(i,1);renderSBProfList();renderCharSheet();}
+
+function renderSBPreparedList(){
+  const el=document.getElementById('sb-prepared-list');if(!el)return;
+  const byLevel={};S.charSheet.preparedSpells.forEach((s,i)=>{if(!byLevel[s.level])byLevel[s.level]=[];byLevel[s.level].push({...s,_idx:i});});
+  el.innerHTML=Object.keys(byLevel).sort((a,b)=>+a-+b).map(lv=>`
+    <div style="font-family:var(--fh);font-size:7px;color:var(--gold);margin-top:5px;letter-spacing:1px;border-bottom:1px solid #2a0050;padding-bottom:2px;">${lv==='0'?'CANTRIPS':'LEVEL '+lv} SPELLS</div>
+    ${byLevel[lv].map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid #110022;"><span style="font-size:9px;color:var(--w);">${s.name}</span><button onclick="removePrepared(${s._idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:10px;">✕</button></div>`).join('')}`).join('')
+  ||'<div style="color:var(--dim);font-size:9px;margin-top:.4rem;">No spells prepared yet.</div>';
+}
+function addPreparedSpell(){
+  const nm=document.getElementById('sb-spell-inp')?.value.trim();const lv=parseInt(document.getElementById('sb-spell-lvl')?.value)||0;
+  if(!nm)return;S.charSheet.preparedSpells.push({name:nm,level:lv});
+  document.getElementById('sb-spell-inp').value='';
+  renderSBPreparedList();renderCharSheet();
+}
+function removePrepared(i){S.charSheet.preparedSpells.splice(i,1);renderSBPreparedList();renderCharSheet();}
+
+// ══ UPDATE sw() for spellbook ═════════════════════════════════
+function sw(name){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pnl-'+name)?.classList.add('active');
+  document.querySelectorAll('.nt').forEach(t=>{if(t.getAttribute('onclick')?.includes("'"+name+"'"))t.classList.add('active');});
+  if(name==='markets')renderMarkets();
+  if(name==='costs')renderCosts();
+  if(name==='shop')renderShop();
+  if(name==='sponsor')renderSponsors();
+  if(name==='avatar'){drawWizard();renderCharSheet();}
+  if(name==='titles')renderTitles();
+  if(name==='frags')renderFragMkt();
+  if(name==='gacha'){if(!S.currentBanner)rotateBanner();renderBanner();}
+  if(name==='inventory')renderInventory();
+  if(name==='casino')initCasino();
+  if(name==='spellbook')renderSpellbook();
+  if(name==='dm'){buildDMSlotInputs();buildDMShopRanges();refreshDMSelects();refreshDMShopSel();buildWorldBuilder();}
+}
+
+// ══ WORLD BUILDER ════════════════════════════════════════════
+// Capture defaults before any edits
+const WB_DEFAULTS={
+  towns:[...MKT_TOWNS],nobles:[...MKT_NOBLES],factions:[...MKT_FACTIONS],
+  goods:[...MKT_GOODS],crops:[...MKT_CROPS],disasters:[...MKT_DISASTERS],
+  weather:[...MKT_WEATHER],routes:[...MKT_ROUTES],ships:[...MKT_SHIPS],
+  elections:[...MKT_ELECTIONS],events:[...MKT_EVENTS]
+};
+// WB points directly at the live arrays — edits affect generation immediately
+const WB={
+  towns:MKT_TOWNS,nobles:MKT_NOBLES,factions:MKT_FACTIONS,
+  goods:MKT_GOODS,crops:MKT_CROPS,disasters:MKT_DISASTERS,
+  weather:MKT_WEATHER,routes:MKT_ROUTES,ships:MKT_SHIPS,
+  elections:MKT_ELECTIONS,events:MKT_EVENTS
+};
+const WB_LABELS={
+  towns:'Town & Settlement Names',nobles:'Noble & Official Titles',factions:'Factions & Organizations',
+  goods:'Trade Goods & Commodities',crops:'Crops & Agricultural Products',disasters:'Disasters & Calamities',
+  weather:'Weather Descriptors',routes:'Trade Routes & Roads',ships:'Ship Names',
+  elections:'Elected Positions',events:'Festivals & Events'
+};
+function buildWorldBuilder(){
+  const grid=document.getElementById('wb-lists-grid');if(!grid)return;grid.innerHTML='';
+  Object.keys(WB).forEach(key=>{
+    const card=document.createElement('div');card.className='wb-card';
+    card.innerHTML=`<div class="wb-card-title">${WB_LABELS[key]} <span style="color:#440044;font-size:6px;">(${WB[key].length})</span></div><div class="wb-tags" id="wb-tags-${key}"></div><div class="wb-add-row"><input class="wb-inp" type="text" id="wb-inp-${key}" placeholder="Add entry..." onkeydown="if(event.key==='Enter')wbAdd('${key}')"><button class="wb-add-btn" onclick="wbAdd('${key}')">ADD</button></div><button class="wb-reset-btn" onclick="wbReset('${key}')">RESET TO DEFAULTS</button>`;
+    grid.appendChild(card);wbRenderTags(key);
+  });
+}
+function wbRenderTags(key){
+  const c=document.getElementById('wb-tags-'+key);if(!c)return;c.innerHTML='';
+  if(WB[key].length===0){c.innerHTML='<span style="font-size:7px;color:#440044;font-family:var(--fh);font-style:italic;">Empty — add entries!</span>';return;}
+  WB[key].forEach((val,i)=>{
+    const tag=document.createElement('span');tag.className='wb-tag';
+    tag.innerHTML=`${val}<button class="wb-tag-x" onclick="wbRemove('${key}',${i})" title="Remove">×</button>`;
+    c.appendChild(tag);
+  });
+  // Update count in title
+  const titleEl=c.parentElement?.querySelector('.wb-card-title');
+  if(titleEl)titleEl.innerHTML=`${WB_LABELS[key]} <span style="color:#440044;font-size:6px;">(${WB[key].length})</span>`;
+}
+function wbAdd(key){
+  const inp=document.getElementById('wb-inp-'+key);const val=(inp?.value||'').trim();if(!val)return;
+  WB[key].push(val);inp.value='';wbRenderTags(key);
+  toast(`Added to ${WB_LABELS[key]}`,'#ff4444');
+}
+function wbRemove(key,idx){
+  if(WB[key].length<=1){toast('Must keep at least one entry','var(--orange)');return;}
+  WB[key].splice(idx,1);wbRenderTags(key);
+}
+function wbReset(key){
+  WB[key].length=0;WB[key].push(...WB_DEFAULTS[key]);wbRenderTags(key);
+  toast(`Reset ${WB_LABELS[key]} to defaults`,'#ff4444');
+}
+
+function init(){
+  buildTicker();genProcMarkets();initFragMkt();genShop();initSponsors();rotateBanner();
+  // Populate shop level filter
+  const lf=document.getElementById('shopLvlFilter');for(let l=0;l<=9;l++){const o=document.createElement('option');o.value=l;o.textContent=`Level ${l}`;lf.appendChild(o);}
+  // Add a few pet frags to market
+  ['C','U','R'].forEach(r=>{const pf=mkPetFrag(r);pf.marketPrice=rnd(RC[r].baseMin,RC[r].baseMax);pf.priceHistory=[{day:1,price:pf.marketPrice}];S.marketFrags.push(pf);});
+  renderMarkets();renderCosts();renderSlots();drawWizard();equipTitle(0);renderCharSheet();
+  setInterval(tickTimers,1000);setInterval(()=>{const el=document.getElementById('avearn');if(el)el.textContent=`~${Math.floor(S.wallet*TITLES[S.equippedTitle].interest).toLocaleString()}g/day`;},5000);
+  logEntry('ARCANEMARKET ONLINE','win');
+  // Start Firebase live sync
+  try{fbInit();}catch(e){console.warn('Firebase init failed:',e);setSyncStatus('error',false);}
+}
+document.getElementById('hpamt').addEventListener('input',updateHPTotal);
+init();
+</script>
+</body>
+</html>
