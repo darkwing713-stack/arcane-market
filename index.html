@@ -849,6 +849,24 @@ body.dm-mode .nt.player-only{opacity:.6;}
         <option value="0">Cantrip</option><option value="1">Lv1</option><option value="2">Lv2</option><option value="3">Lv3</option><option value="4">Lv4</option><option value="5">Lv5</option><option value="6">Lv6</option><option value="7">Lv7</option><option value="8">Lv8</option><option value="9">Lv9</option>
       </select>
       <button onclick="addToSpellbook()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:4px 10px;border-radius:3px;cursor:pointer;">ADD TO SPELLBOOK</button>
+      <button onclick="toggleCustomSpellForm()" style="background:#0a1a00;border:1px solid var(--green);color:var(--green);font-family:var(--fh);font-size:7px;padding:4px 10px;border-radius:3px;cursor:pointer;">+ CUSTOM SPELL</button>
+    </div>
+    <!-- Custom spell form (hidden by default) -->
+    <div id="custom-spell-form" style="display:none;background:#05000a;border:1px solid #2a0050;border-radius:7px;padding:.6rem;margin-bottom:.5rem;">
+      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">CUSTOM SPELL</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:.3rem;margin-bottom:.3rem;">
+        <div><label class="dml">SPELL NAME</label><input type="text" id="cs-name" class="sb-inp" style="width:100%;"></div>
+        <div><label class="dml">SCHOOL</label><select id="cs-school" class="dmi" style="background:#05000f;color:var(--w);width:100%;"><option>Abjuration</option><option>Conjuration</option><option>Divination</option><option>Enchantment</option><option>Evocation</option><option>Illusion</option><option>Necromancy</option><option>Transmutation</option></select></div>
+        <div><label class="dml">LEVEL</label><select id="cs-level" class="dmi" style="background:#05000f;color:var(--w);width:100%;"><option value="0">Cantrip</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.3rem;margin-bottom:.3rem;">
+        <div><label class="dml">CAST TIME</label><input type="text" id="cs-cast" class="sb-inp" placeholder="1 action" style="width:100%;"></div>
+        <div><label class="dml">RANGE</label><input type="text" id="cs-range" class="sb-inp" placeholder="60 ft" style="width:100%;"></div>
+        <div><label class="dml">COMPONENTS</label><input type="text" id="cs-comp" class="sb-inp" placeholder="V,S,M" style="width:100%;"></div>
+        <div><label class="dml">DURATION</label><input type="text" id="cs-dur" class="sb-inp" placeholder="Instantaneous" style="width:100%;"></div>
+      </div>
+      <div style="margin-bottom:.3rem;"><label class="dml">DESCRIPTION</label><textarea id="cs-desc" class="sb-inp" rows="2" style="width:100%;resize:vertical;"></textarea></div>
+      <button onclick="addCustomSpell()" style="background:#0a1a00;border:1px solid var(--green);color:var(--green);font-family:var(--fh);font-size:7px;padding:4px 12px;border-radius:3px;cursor:pointer;">SAVE CUSTOM SPELL</button>
     </div>
     <datalist id="all-spells-datalist"></datalist>
     <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.4rem;">All spells your wizard has learned. Click a spell to expand. Use → to add to Prepared.</div>
@@ -877,26 +895,35 @@ body.dm-mode .nt.player-only{opacity:.6;}
     <div id="sb-feats-list"></div>
   </div>
 
-  <!-- PROFICIENCIES -->
+  <!-- PROFICIENCIES & SKILLS -->
   <div id="cs-profs" class="cs-section" style="display:none;">
-    <div class="card" style="margin-bottom:.5rem;">
-      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">SAVING THROW PROFICIENCIES</div>
-      <div id="sb-save-profs" style="display:flex;flex-wrap:wrap;gap:.3rem;"></div>
-    </div>
-    <div class="card" style="margin-bottom:.5rem;">
-      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">SKILL &amp; OTHER PROFICIENCIES</div>
-      <div id="sb-prof-list" style="font-size:8px;color:var(--dim);margin-bottom:.4rem;line-height:1.7;"></div>
-      <div style="display:flex;gap:.3rem;">
-        <input type="text" id="sb-prof-inp" class="sb-inp" placeholder="Add proficiency..." style="flex:1;">
-        <button onclick="addProficiency()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;">ADD</button>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;">
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">SKILLS</div>
+        <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.4rem;">Click to toggle proficiency. Proficient skills shown in <span style="color:var(--green);">green</span>.</div>
+        <div id="sb-skills-list" style="display:flex;flex-direction:column;gap:2px;"></div>
       </div>
-    </div>
-    <div class="card">
-      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">LANGUAGES &amp; TOOLS</div>
-      <div id="sb-lang-list" style="font-size:8px;color:var(--dim);margin-bottom:.4rem;line-height:1.7;"></div>
-      <div style="display:flex;gap:.3rem;">
-        <input type="text" id="sb-lang-inp" class="sb-inp" placeholder="Common, Elvish..." style="flex:1;">
-        <button onclick="addLanguage()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;">ADD</button>
+      <div>
+        <div class="card" style="margin-bottom:.5rem;">
+          <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">SAVING THROWS</div>
+          <div id="sb-save-profs" style="display:flex;flex-wrap:wrap;gap:.25rem;"></div>
+        </div>
+        <div class="card" style="margin-bottom:.5rem;">
+          <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">OTHER PROFICIENCIES</div>
+          <div id="sb-prof-list" style="font-size:8px;color:var(--dim);margin-bottom:.35rem;line-height:1.7;"></div>
+          <div style="display:flex;gap:.3rem;">
+            <input type="text" id="sb-prof-inp" class="sb-inp" placeholder="Add proficiency..." style="flex:1;">
+            <button onclick="addProficiency()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;">ADD</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">LANGUAGES &amp; TOOLS</div>
+          <div id="sb-lang-list" style="font-size:8px;color:var(--dim);margin-bottom:.35rem;line-height:1.7;"></div>
+          <div style="display:flex;gap:.3rem;">
+            <input type="text" id="sb-lang-inp" class="sb-inp" placeholder="Common, Elvish..." style="flex:1;">
+            <button onclick="addLanguage()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:3px 8px;border-radius:3px;cursor:pointer;">ADD</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1252,6 +1279,8 @@ function upWallet(d,desc,cls){
   S.wallet=Math.max(0,S.wallet+d);
   if(S.wallet<10&&typeof showAchievement==='function')showAchievement('broke','FINANCIALLY RUINED','Balance below 10◈.','🏚️');
   document.getElementById('wdisp').textContent=S.wallet.toLocaleString();
+  // DM feed logging
+  if(!S.isDM){const bal=S.wallet;const dc=S.dailyCost||50;if(bal<dc*2&&d<0&&typeof logDMEvent==='function')logDMEvent(`⚠ PLAYER BALANCE LOW: ${bal.toLocaleString()}◈`,'dfe-low');if(cls==='win'&&d>100&&typeof logDMEvent==='function')logDMEvent(`Player received ${d.toLocaleString()}◈`.substring(0,80),'dfe-win');}
   if(desc)logEntry(desc,cls);
   // Record balance snapshot
   const last=S.balanceHistory[S.balanceHistory.length-1];
@@ -1461,6 +1490,7 @@ function renderMarkets(){
 
 function placeBet(id,side){
   const m=S.markets.find(x=>String(x.id)===String(id));if(!m||m.resolved)return;
+  if(typeof logDMEvent==='function'){const amt2=parseInt(document.getElementById('ba-'+id)?.value)||10;logDMEvent(`Player bet ${amt2}◈ ${side.toUpperCase()} — "${(m?.question||'').substring(0,35)}..."`, 'dfe-bet');}
   const amt=parseInt(document.getElementById('ba-'+id)?.value)||10;
   if(amt<=0||S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}
   upWallet(-amt,`BET ${side.toUpperCase()} "${m.question.substring(0,28)}..." -${amt}◈`,'spend');
@@ -1564,6 +1594,7 @@ function updateTaxDisplay(){
 }
 
 function payDaily(){
+  if(typeof logDMEvent==='function')logDMEvent(`Player paid daily tax: ${S.dailyCost}◈`,'dfe-tax');
   if(S.taxPaidToday){toast('ALREADY PAID TODAY','var(--dim)');return;}
   if(S.wallet<S.dailyCost){toast('YOU CANNOT AFFORD TO LIVE','var(--red)');return;}
   upWallet(-S.dailyCost,`DAILY TAX: -${S.dailyCost}◈`,'loss');
@@ -2215,75 +2246,209 @@ const SPELL_SCHOOLS={
   'Transmutation':{school:'Transmutation',color:'#ff8800',svgKey:'Transmutation'},
 };
 
-function getSchoolSVG(school,color){const s=SCHOOL_SVGS[school];if(!s)return`<svg width="18" height="18"><circle cx="9" cy="9" r="7" fill="none" stroke="${color||'#888'}" stroke-width="1.5"/></svg>`;return s.svg(color||s.color);}
+function getSchoolSVG(school,color){try{const s=SCHOOL_SVGS[school];if(!s)return`<svg width="18" height="18"><circle cx="9" cy="9" r="7" fill="none" stroke="${color||'#888'}" stroke-width="1.5"/></svg>`;return s.svg(color||s.color);}catch(e){return`<svg width="18" height="18"><circle cx="9" cy="9" r="7" fill="none" stroke="${color||'#888'}" stroke-width="1.5"/></svg>`;}}
 
 // Compact 5e spell data: [school, castTime, range, components, duration, description]
 const SPELL_DATA={
-  'Fireball':['Evocation','1 action','150 ft','V,S,M','Instantaneous','A bright streak flashes from your finger to a point you choose within range, blossoming into a 20-foot-radius sphere of fire. Each creature must make a Dex save or take 8d6 fire damage.'],
-  'Magic Missile':['Evocation','1 action','120 ft','V,S','Instantaneous','You create three glowing darts of magical force. Each dart hits a creature of your choice, dealing 1d4+1 force damage.'],
-  'Shield':['Abjuration','1 reaction','Self','V,S','1 round','+5 to AC until start of next turn, including the triggering attack. Immune to magic missile.'],
-  'Counterspell':['Abjuration','1 reaction','60 ft','S','Instantaneous','Attempt to interrupt a creature in the process of casting a spell. If casting Lv3 or lower, it automatically fails.'],
-  'Misty Step':['Conjuration','1 bonus action','Self','V','Instantaneous','Teleport up to 30 feet to an unoccupied space you can see.'],
-  'Invisibility':['Illusion','1 action','Touch','V,S,M','Concentration, 1 hour','A creature becomes invisible until the spell ends or until they attack or cast a spell.'],
-  'Detect Magic':['Divination','1 action','Self','V,S','Concentration, 10 min','Sense the presence of magic within 30 feet. Learn the school of magic for any spell or magical object you can see.'],
-  'Sleep':['Enchantment','1 action','90 ft','V,S,M','1 minute','Roll 5d8; total is how many HP of creatures this spell can affect (weakest creatures first).'],
-  'Charm Person':['Enchantment','1 action','30 ft','V,S','1 hour','A humanoid must succeed on a Wis save or be charmed. Regards you as a friendly acquaintance.'],
-  'Mirror Image':['Illusion','1 action','Self','V,S','1 minute','Three duplicates of yourself appear. Attackers must roll to hit you vs. a duplicate.'],
-  'Haste':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 min','Target creature gains double speed, +2 AC, advantage on Dex saves, and extra action each turn.'],
-  'Slow':['Transmutation','1 action','120 ft','V,S,M','Concentration, 1 min','Up to 6 creatures must succeed on a Wis save or be slowed: halved speed, -2 AC and Dex saves, no reactions.'],
-  'Fly':['Transmutation','1 action','Touch','V,S,M','Concentration, 10 min','Target gains a flying speed of 60 feet for the duration.'],
-  'Lightning Bolt':['Evocation','1 action','Self (100ft line)','V,S,M','Instantaneous','A stroke of lightning forming a 100ft line, 5ft wide. Each creature makes Dex save or takes 8d6 lightning damage.'],
-  'Cone of Cold':['Evocation','1 action','Self (60ft cone)','V,S,M','Instantaneous','60-foot cone. Each creature makes a Con save or takes 8d8 cold damage (half on success).'],
-  'Dimension Door':['Conjuration','1 action','500 ft','V','Instantaneous','Teleport yourself and one willing creature to any location within range.'],
-  'Greater Invisibility':['Illusion','1 action','Touch','V,S','Concentration, 1 min','Target becomes invisible. Invisibility does not end if they attack or cast spells.'],
-  'Polymorph':['Transmutation','1 action','60 ft','V,S,M','Concentration, 1 hour','Transform a creature into a new form. Use the target creature\'s stat block replaced with the beast\'s stats.'],
-  'Mage Armor':['Abjuration','1 action','Touch','V,S,M','8 hours','Touch a willing creature. AC = 13 + Dex modifier if not wearing armor.'],
-  'Identify':['Divination','1 minute','Touch','V,S,M','Instantaneous','Learn the properties of a magic item including how to use it, whether it requires attunement, and any charges.'],
-  'Animate Dead':['Necromancy','1 minute','10 ft','V,S,M','Instantaneous','Create an undead servant from a pile of bones or a corpse within range.'],
-  'Vampiric Touch':['Necromancy','1 action','Self','V,S','Concentration, 1 min','Touch attack dealing 3d6 necrotic damage. You regain HP equal to half the damage dealt.'],
-  'Scrying':['Divination','10 minutes','Self','V,S,M','Concentration, 10 min','Spy on a creature on the same plane. Target makes Wis save, modified by how well you know them.'],
-  'Sending':['Evocation','1 action','Unlimited','V,S,M','1 round','Send a 25-word message to a creature you are familiar with. They can reply with 25 words.'],
-  'Teleport':['Conjuration','1 action','10 ft','V','Instantaneous','Teleport yourself and up to 8 willing creatures to a destination you describe. Accuracy varies by familiarity.'],
-  'Time Stop':['Transmutation','1 action','Self','V','Instantaneous','Briefly stop the flow of time. Take 1d4+1 turns while everyone else is frozen.'],
-  'Wish':['Conjuration','1 action','Self','V','Instantaneous','The most powerful mortal spell. Duplicate any spell of 8th level or lower, or attempt something greater at GM discretion.'],
-  'Foresight':['Divination','1 minute','Touch','V,S,M','8 hours','Target can\'t be surprised and has advantage on attack rolls, ability checks, and saving throws. Attackers have disadvantage.'],
-  'Mage Hand':['Conjuration','1 action','30 ft','V,S','1 minute','A spectral floating hand appears, manipulating objects up to 10 pounds within range.'],
-  'Prestidigitation':['Transmutation','1 action','10 ft','V,S','Up to 1 hour','Minor magical trick: clean/soil object, light/snuff candle, chill/warm/flavor food, leave mark, trinket, or smell.'],
-  'Fire Bolt':['Evocation','1 action','120 ft','V,S','Instantaneous','Ranged spell attack dealing 1d10 fire damage (cantrip, scales with level).'],
-  'Ray of Frost':['Evocation','1 action','60 ft','V,S','Instantaneous','Beam of frost dealing 1d8 cold damage and reducing speed by 10 feet until start of your next turn.'],
-  'Minor Illusion':['Illusion','1 action','30 ft','S,M','1 minute','Create a sound or an image of an object within range that lasts for 1 minute.'],
-  'Shocking Grasp':['Evocation','1 action','Touch','V,S','Instantaneous','Lightning springs from your hand. On hit: 1d8 lightning damage and target can\'t take reactions until next turn.'],
-  'Toll the Dead':['Necromancy','1 action','60 ft','V,S','Instantaneous','Wis save or 1d8 necrotic (1d12 if missing HP). Scales with level.'],
-  'Chill Touch':['Necromancy','1 action','120 ft','V,S','1 round','Necromantic claw: 1d8 necrotic damage, target can\'t regain HP until next turn. Undead also have disadvantage on attack rolls.'],
-  'Thunderwave':['Evocation','1 action','Self (15ft cube)','V,S','Instantaneous','Con save or 2d8 thunder damage and pushed 10 feet. Loud boom heard 300 feet away.'],
-  'Fog Cloud':['Conjuration','1 action','120 ft','V,S','Concentration, 1 hour','20-foot-radius sphere of fog centered on a point. Heavily obscures the area.'],
-  'Grease':['Conjuration','1 action','60 ft','V,S,M','1 minute','10-foot square becomes slick grease. Creatures entering must make Dex save or fall prone.'],
-  'Burning Hands':['Evocation','1 action','Self (15ft cone)','V,S','Instantaneous','15-foot cone of searing flame. Dex save or 3d6 fire damage (scales).'],
-  'Chromatic Orb':['Evocation','1 action','90 ft','V,S,M','Instantaneous','Choose acid/cold/fire/lightning/poison/thunder. Ranged attack dealing 3d8 damage.'],
-  'Witch Bolt':['Evocation','1 action','30 ft','V,S,M','Concentration, 1 min','Beam of crackling energy: 1d12 lightning on hit. Bonus action each turn to deal 1d12 more.'],
-  'Web':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 hour','20-foot cube of webbing. Difficult terrain. Str save or restrained.'],
-  'Scorching Ray':['Evocation','1 action','120 ft','V,S','Instantaneous','Create 3 rays, each a ranged spell attack. On hit: 2d6 fire damage each.'],
-  'Hold Person':['Enchantment','1 action','60 ft','V,S,M','Concentration, 1 min','Wis save or paralyzed for duration. Repeat save each turn.'],
-  'Suggestion':['Enchantment','1 action','30 ft','V,M','Concentration, 8 hours','Magically compel a creature to follow a reasonable course of activity you describe (Wis save).'],
-  'Dispel Magic':['Abjuration','1 action','120 ft','V,S','Instantaneous','End spells on a target. Automatic for Lv3 or lower; Ability check (DC 10 + spell level) for higher.'],
-  'Fear':['Illusion','1 action','Self (30ft cone)','V,S,M','Concentration, 1 min','Creatures in cone make Wis save or become frightened and must use movement to flee.'],
-  'Hypnotic Pattern':['Illusion','1 action','120 ft','V,S,M','Concentration, 1 min','Twisting pattern in 30-foot cube. Wis save or incapacitated and speed 0. Ends if creature takes damage.'],
-  'Wall of Fire':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','Create a line of fire 60 ft long, 20 ft tall, 1 ft thick. 5d8 fire damage to creatures that end their turn in the wall.'],
-  'Banishment':['Abjuration','1 action','60 ft','V,S,M','Concentration, 1 min','Cha save or target is banished. On home plane: harmlessly incapacitated. On different plane: sent there.'],
-  'Arcane Hand':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','Create a Large hand of magical force. Can interpose, push, grasp, or pummel creatures.'],
-  'Dominate Person':['Enchantment','1 action','60 ft','V,S','Concentration, 1 min','Wis save or charmed. Issue commands as a bonus action.'],
-  'Modify Memory':['Enchantment','1 action','30 ft','V,S','Concentration, 1 min','Alter up to 10 minutes of a target\'s memory during the last 24 hours.'],
-  'Disintegrate':['Transmutation','1 action','60 ft','V,S,M','Instantaneous','Dex save or 10d6+40 force damage. Target reduced to dust if HP drops to 0.'],
-  'Eyebite':['Necromancy','1 action','Self','V,S','Concentration, 1 min','Choose asleep, panicked, or sickened. Wis save each turn or affected.'],
-  'Globe of Invulnerability':['Abjuration','1 action','Self (10ft)','V,S,M','Concentration, 1 min','Spells of Lv5 or lower cast from outside the sphere can\'t affect anything inside.'],
-  'Chain Lightning':['Evocation','1 action','150 ft','V,S,M','Instantaneous','4 bolts of lightning strike up to 4 targets: Dex save or 10d8 lightning damage each.'],
-  'Prismatic Spray':['Evocation','1 action','Self (60ft cone)','V,S','Instantaneous','Each creature in cone struck by a random-colored ray with different effects.'],
-  'Power Word Kill':['Enchantment','1 action','60 ft','V','Instantaneous','Speak a word of power to a creature with 100 HP or fewer. It dies instantly.'],
-  'Meteor Swarm':['Evocation','1 action','1 mile','V,S','Instantaneous','Four 40-foot-radius spheres of fire and bludgeoning damage (20d6 each type) rain from the sky.'],
+  // CANTRIPS
+  'Acid Splash':['Conjuration','1 action','60 ft','V,S','Instantaneous','Hurl a bubble of acid at one or two creatures within 5 ft of each other. Dex save or 1d6 acid (scales).'],
+  'Blade Ward':['Abjuration','1 action','Self','V,S','1 round','Resistance to bludgeoning, piercing, slashing damage from weapon attacks until end of next turn.'],
+  'Booming Blade':['Evocation','1 action','Self (5ft)','V,M','1 round','Attack with a melee weapon. On hit, weapon thunders. If target moves before next turn: 1d8 extra thunder damage (scales).'],
+  'Chill Touch':['Necromancy','1 action','120 ft','V,S','1 round','Ranged spell attack: 1d8 necrotic, target can\'t regain HP until next turn. Undead also get disadvantage on attacks.'],
+  'Control Flames':['Transmutation','1 action','60 ft','S','Instantaneous/1 hr','Choose nonmagical flame up to 5ft cube. Expand/extinguish/move it or create shapes within it.'],
+  'Dancing Lights':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','Create up to 4 torch-bright lights you can move 60ft per turn. Combine them into a glowing humanoid shape.'],
+  'Fire Bolt':['Evocation','1 action','120 ft','V,S','Instantaneous','Ranged spell attack dealing 1d10 fire damage. Ignites flammable objects. Scales to 2d10 at 5th, 3d10 at 11th, 4d10 at 17th.'],
+  'Frostbite':['Evocation','1 action','60 ft','V,S','Instantaneous','Con save or 1d6 cold damage and disadvantage on next weapon attack roll. Scales.'],
+  'Green-Flame Blade':['Evocation','1 action','Self (5ft)','V,M','Instantaneous','Melee weapon attack. On hit, green fire leaps to creature within 5ft: INT mod fire damage (scales).'],
+  'Infestation':['Conjuration','1 action','30 ft','V,S,M','Instantaneous','Con save or 1d6 poison damage and forced to move 5ft in a random direction.'],
+  'Light':['Evocation','1 action','Touch','V,M','1 hour','Object touched sheds bright light in 20ft radius, dim for another 20. Dex save to avoid if worn.'],
+  'Lightning Lure':['Evocation','1 action','Self (15ft)','V','Instantaneous','Pull a creature within 15ft toward you (Str save negates). If pulled adjacent: 1d8 lightning damage.'],
+  'Mage Hand':['Conjuration','1 action','30 ft','V,S','1 minute','Spectral hand carries up to 10 lbs, opens containers, manipulates objects within 30ft. Bonus action to control.'],
+  'Mending':['Transmutation','1 minute','Touch','V,S,M','Instantaneous','Repair a single break or tear in an object. Magical item damage requires a spell slot.'],
+  'Message':['Transmutation','1 action','120 ft','V,S,M','1 round','Whisper to a target — only they can hear you. They can reply in a whisper only you hear.'],
+  'Mind Sliver':['Enchantment','1 action','60 ft','V','Instantaneous','Int save or 1d6 psychic damage and subtract 1d4 from next saving throw before end of your next turn.'],
+  'Minor Illusion':['Illusion','1 action','30 ft','S,M','1 minute','Create a sound or image of an object in a 5ft cube. Investigation check vs your spell DC to disbelieve.'],
+  'Mold Earth':['Transmutation','1 action','30 ft','S','Instantaneous/1 hr','Excavate/move 5ft cube of earth or stone, or shape difficult terrain, or change earth color/texture.'],
+  'Poison Spray':['Conjuration','1 action','10 ft','V,S','Instantaneous','Con save or 1d12 poison damage. Scales.'],
+  'Prestidigitation':['Transmutation','1 action','10 ft','V,S','Up to 1 hour','Minor magical tricks: clean, soil, light/snuff flame, chill/warm/flavor, color, trinket, mark, or smell.'],
+  'Ray of Frost':['Evocation','1 action','60 ft','V,S','Instantaneous','1d8 cold damage and target\'s speed reduced by 10ft until start of your next turn. Scales.'],
+  'Shocking Grasp':['Evocation','1 action','Touch','V,S','Instantaneous','Melee spell attack with advantage vs. armored creatures. 1d8 lightning; target can\'t take reactions until next turn.'],
+  'Sword Burst':['Conjuration','1 action','5 ft','V','Instantaneous','Spectral blades whirl around you. All creatures within 5ft make Dex save or 1d6 force damage. Scales.'],
+  'Thunderclap':['Evocation','1 action','5 ft','S','Instantaneous','All creatures within 5ft: Con save or 1d6 thunder. Audible 100ft away.'],
+  'Toll the Dead':['Necromancy','1 action','60 ft','V,S','Instantaneous','Wis save or 1d8 necrotic. 1d12 if missing any HP. Scales.'],
+  'True Strike':['Divination','1 action','30 ft','S','Concentration, 1 round','Gain advantage on your next attack roll against the target before end of next turn.'],
+  // LV1
+  'Absorb Elements':['Abjuration','1 reaction','Self','S','1 round','When taking acid/cold/fire/lightning/thunder damage: resistance to the triggering damage type. Next melee attack adds 1d6 of that type.'],
+  'Alarm':['Abjuration','1 minute','30 ft','V,S,M','8 hours','Ward a 20ft cube. Alert when creature of chosen size or larger enters (mental or audible bell).'],
+  'Burning Hands':['Evocation','1 action','Self (15ft cone)','V,S','Instantaneous','15-foot cone. Dex save or 3d6 fire damage (half on success). Ignites flammable objects. +1d6/slot.'],
+  'Catapult':['Transmutation','1 action','60 ft','S','Instantaneous','Hurl a 1-5 lb object 90ft. If creature in path: Dex save or 3d8 bludgeoning. +1d8/slot.'],
+  'Charm Person':['Enchantment','1 action','30 ft','V,S','1 hour','Wis save or charmed — regards you as friendly acquaintance. Ends if harmed. +1 target/slot.'],
+  'Chromatic Orb':['Evocation','1 action','90 ft','V,S,M','Instantaneous','Choose acid/cold/fire/lightning/poison/thunder. Ranged attack: 3d8 damage of chosen type. +1d8/slot.'],
+  'Color Spray':['Illusion','1 action','Self (15ft cone)','V,S,M','1 round','Blind creatures in cone up to combined 6d10 HP (weakest first). +2d10/slot.'],
+  'Comprehend Languages':['Divination','1 action','Self','V,S,M','1 hour','Understand literal meaning of any spoken or written language you see.'],
+  'Detect Magic':['Divination','1 action','Self','V,S','Concentration, 10 min','Sense magic within 30ft. Learn school of any spell or magical object visible.'],
+  'Disguise Self':['Illusion','1 action','Self','V,S','1 hour','Change appearance (clothing, features, height ±1ft). Investigation check vs spell DC to disbelieve.'],
+  'Expeditious Retreat':['Transmutation','1 bonus action','Self','V,S','Concentration, 10 min','Take Dash action as a bonus action each turn.'],
+  'False Life':['Necromancy','1 action','Self','V,S,M','1 hour','Gain 1d4+4 temporary HP. +5 temp HP/slot.'],
+  'Feather Fall':['Transmutation','1 reaction','60 ft','V,M','1 minute','Up to 5 falling creatures fall at 60ft/round and take no falling damage.'],
+  'Find Familiar':['Conjuration','1 hour','10 ft','V,S,M','Instantaneous','Summon a fey, fiend, or celestial spirit taking a familiar form. Acts independently or delivers touch spells.'],
+  'Fog Cloud':['Conjuration','1 action','120 ft','V,S','Concentration, 1 hour','20ft radius sphere of fog. Heavily obscured. +20ft radius/slot.'],
+  'Grease':['Conjuration','1 action','60 ft','V,S,M','1 minute','10ft square becomes slick. Creatures entering make Dex save or fall prone.'],
+  'Identify':['Divination','1 minute','Touch','V,S,M','Instantaneous','Learn the magical properties of a magic item, how to use it, if attuned, and any charges.'],
+  'Jump':['Transmutation','1 action','Touch','V,S,M','1 minute','Triple the target\'s jump distance.'],
+  'Longstrider':['Transmutation','1 action','Touch','V,S,M','1 hour','Touch up to 1 creature per slot level. Speed increases by 10ft.'],
+  'Mage Armor':['Abjuration','1 action','Touch','V,S,M','8 hours','AC = 13 + Dex modifier for willing creature not wearing armor.'],
+  'Magic Missile':['Evocation','1 action','120 ft','V,S','Instantaneous','Three darts, each dealing 1d4+1 force damage. Automatically hits. +1 dart/slot.'],
+  'Protection from Evil and Good':['Abjuration','1 action','Touch','V,S,M','Concentration, 10 min','Aberrations, celestials, elementals, fey, fiends, undead: disadvantage on attacks vs. target, can\'t possess/charm/frighten.'],
+  'Ray of Sickness':['Necromancy','1 action','60 ft','V,S','Instantaneous','Ranged spell attack: 2d8 poison. Target makes Con save or poisoned until end of your next turn. +1d8/slot.'],
+  'Shield':['Abjuration','1 reaction','Self','V,S','1 round','+5 AC until start of next turn (including triggering attack). Immune to Magic Missile.'],
+  'Silent Image':['Illusion','1 action','60 ft','V,S,M','Concentration, 10 min','Create a visual illusion of a creature or object up to 15ft cube. Investigation vs. DC to disbelieve.'],
+  'Sleep':['Enchantment','1 action','90 ft','V,S,M','1 minute','Roll 5d8 — creatures with that many HP (weakest first) fall unconscious. +2d8/slot.'],
+  'Tasha\'s Hideous Laughter':['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Wis save or target falls prone and incapacitated with laughter. Repeat save each turn.'],
+  'Thunderwave':['Evocation','1 action','Self (15ft cube)','V,S','Instantaneous','Con save or 2d8 thunder and pushed 10ft. Audible 300ft away. +1d8/slot.'],
+  'Witch Bolt':['Evocation','1 action','30 ft','V,S,M','Concentration, 1 min','Ranged attack: 1d12 lightning. Bonus action each turn: 1d12 more lightning. +1d12/slot.'],
+  'Unseen Servant':['Conjuration','1 action','60 ft','V,S,M','1 hour','Invisible force performs simple tasks within 60ft: carry, pour, hold, etc. Strength 2.'],
+  // LV2
+  'Alter Self':['Transmutation','1 action','Self','V,S','Concentration, 1 hour','Change appearance, grow natural weapons (1d6 +spell attack bonus), or gain water breathing.'],
+  'Arcane Lock':['Abjuration','1 action','Touch','V,S,M','Until dispelled','Lock door, window, or container. Can specify creatures that can open freely. DC to pick/break +10.'],
+  'Blindness/Deafness':['Necromancy','1 action','30 ft','V','1 minute','Con save or blind or deaf (your choice). Repeat save each turn. +1 target/slot.'],
+  'Blur':['Illusion','1 action','Self','V','Concentration, 1 min','Attackers have disadvantage on attack rolls against you (unless echolocation or truesight).'],
+  'Cloud of Daggers':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 min','5ft cube of spinning daggers. Any creature in cube takes 4d4 slashing. +2d4/slot.'],
+  'Continual Flame':['Evocation','1 action','Touch','V,S,M','Until dispelled','Create a flameless torch-level light on an object. Not extinguishable by water. Magical.'],
+  'Crown of Madness':['Enchantment','1 action','120 ft','V,S','Concentration, 1 min','Wis save or charmed. Use action to control what creature attacks. Repeat save each turn.'],
+  'Darkness':['Evocation','1 action','60 ft','V,M','Concentration, 10 min','20ft radius magical darkness. No nonmagical light, darkvision blocked.'],
+  'Darkvision':['Transmutation','1 action','Touch','V,S,M','8 hours','Touch willing creature — it gains 60ft darkvision.'],
+  'Detect Thoughts':['Divination','1 action','Self','V,S,M','Concentration, 1 min','Read surface thoughts of creatures within 30ft. Focus to probe deeper (Wis save).'],
+  'Dragon\'s Breath':['Transmutation','1 bonus action','Touch','V,S,M','Concentration, 1 min','Touched creature exhales energy in 15ft cone (Dex save or 3d6; choose type). Bonus action. +1d6/slot.'],
+  'Earthbind':['Transmutation','1 action','300 ft','V','Concentration, 1 min','Str save or yellow strands bind creature, reducing fly speed to 0 and preventing flight.'],
+  'Enlarge/Reduce':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 min','Enlarge: +1d4 weapon damage, advantage Str checks/saves. Reduce: -1d4, disadvantage Str checks/saves.'],
+  'Flaming Sphere':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 min','5ft ball of fire. Bonus action to move 30ft. Adjacent creatures: Dex save or 2d6. +1d6/slot.'],
+  'Hold Person':['Enchantment','1 action','60 ft','V,S,M','Concentration, 1 min','Wis save or paralyzed. Repeat save each turn. +1 creature/slot.'],
+  'Invisibility':['Illusion','1 action','Touch','V,S,M','Concentration, 1 hour','Target invisible until attacks or casts spell. +1 creature/slot.'],
+  'Knock':['Transmutation','1 action','60 ft','V','Instantaneous','Unlock a lock, stuck/barred door, shackles, or chest. Loud knock audible 300ft.'],
+  'Levitate':['Transmutation','1 action','60 ft','V,S,M','Concentration, 10 min','Con save or rise/hover up to 20ft. Can move up and down 20ft per turn.'],
+  'Magic Mouth':['Illusion','1 minute','30 ft','V,S,M','Until dispelled','Imbue object with a message up to 25 words, spoken when trigger condition is met.'],
+  'Magic Weapon':['Transmutation','1 bonus action','Touch','V,S','Concentration, 1 hour','+1 to attack and damage rolls (+2 at 4th slot, +3 at 6th). Counts as magical.'],
+  'Melf\'s Acid Arrow':['Evocation','1 action','90 ft','V,S,M','Instantaneous','Ranged spell attack: 4d4 acid + 2d4 acid at end of target\'s next turn. +1d4 each type/slot.'],
+  'Mirror Image':['Illusion','1 action','Self','V,S','1 minute','3 duplicates. Roll d20 to hit you or a duplicate (6=third, 8=second, 11=first). Destroyed if hit.'],
+  'Misty Step':['Conjuration','1 bonus action','Self','V','Instantaneous','Teleport up to 30ft to unoccupied visible space.'],
+  'Phantasmal Force':['Illusion','1 action','60 ft','V,S,M','Concentration, 1 min','Int save or target believes in an illusion you create. 1d6 psychic per turn from hallucinated threats.'],
+  'Scorching Ray':['Evocation','1 action','120 ft','V,S','Instantaneous','3 ranged spell attacks, each dealing 2d6 fire. +1 ray/slot.'],
+  'See Invisibility':['Divination','1 action','Self','V,S,M','1 hour','See invisible creatures and objects, and into the Ethereal Plane.'],
+  'Shadow Blade':['Illusion','1 bonus action','Self','V,S','Concentration, 1 min','Weave shadows into a longsword-equivalent blade. 2d8 psychic, finesse, light, thrown (20/60). +1d8 at 4th/6th/7th.'],
+  'Shatter':['Evocation','1 action','60 ft','V,S,M','Instantaneous','10ft sphere: Con save or 3d8 thunder. Inorganic objects automatically fail. +1d8/slot.'],
+  'Suggestion':['Enchantment','1 action','30 ft','V,M','Concentration, 8 hours','Wis save or follow a reasonable suggestion you state. Ends if harmed or suggestion completed.'],
+  'Web':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 hour','20ft cube of webs. Difficult terrain, flammable. Str save or restrained. Str check to escape.'],
+  // LV3
+  'Animate Dead':['Necromancy','1 minute','10 ft','V,S,M','Instantaneous','Create an undead servant from bones or a corpse. Zombie or skeleton. Controlled for 24 hours. +2 undead/slot.'],
+  'Bestow Curse':['Necromancy','1 action','Touch','V,S','Concentration (see text)','Wis save or cursed. Choose: disadvantage on ability checks/saves, -1d8 to attacks, wasted action on save, or +1d8 necrotic.'],
+  'Blink':['Transmutation','1 action','Self','V,S','1 minute','Roll d20 at end of each turn (11+): vanish to Ethereal Plane until start of next turn. Attacks miss.'],
+  'Clairvoyance':['Divination','10 minutes','1 mile','V,S,M','Concentration, 10 min','Create invisible sensor at a known location within 1 mile. See or hear through it.'],
+  'Counterspell':['Abjuration','1 reaction','60 ft','S','Instantaneous','Interrupt a spell being cast. Lv3 or lower auto-succeeds. Higher: Ability check DC 10+spell level.'],
+  'Dispel Magic':['Abjuration','1 action','120 ft','V,S','Instantaneous','End one spell on target. Lv3 or lower auto-succeeds. Higher: Ability check DC 10+spell level.'],
+  'Enemies Abound':['Enchantment','1 action','120 ft','V,S','Concentration, 1 min','Int save or creature can\'t distinguish friend from foe — attacks nearest creature.'],
+  'Fear':['Illusion','1 action','Self (30ft cone)','V,S,M','Concentration, 1 min','Wis save or frightened and must flee. Drop held objects. Repeat save each turn.'],
+  'Fireball':['Evocation','1 action','150 ft','V,S,M','Instantaneous','20ft radius sphere. Dex save or 8d6 fire (half on success). Ignites objects. +1d6/slot.'],
+  'Fly':['Transmutation','1 action','Touch','V,S,M','Concentration, 10 min','Touch willing creature gets 60ft fly speed. +1 creature/slot.'],
+  'Gaseous Form':['Transmutation','1 action','Touch','V,S,M','Concentration, 1 hour','Transform into misty gas: fly 10ft, can\'t attack, immune to nonmagical damage, resist all damage.'],
+  'Haste':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 min','Double speed, +2 AC, advantage Dex saves, extra action (attack/dash/disengage/hide/use object). Lethargic after.'],
+  'Hypnotic Pattern':['Illusion','1 action','120 ft','V,S,M','Concentration, 1 min','30ft cube twisting pattern. Wis save or incapacitated, speed 0. Ends if creature takes damage or someone shakes them.'],
+  'Leomund\'s Tiny Hut':['Evocation','1 minute','Self','V,S,M','8 hours','Immovable 10ft dome fits 9 medium creatures. Comfortable, atmosphere controlled, blocks weather.'],
+  'Lightning Bolt':['Evocation','1 action','Self (100ft line)','V,S,M','Instantaneous','100ft line, 5ft wide. Dex save or 8d6 lightning (half on success). +1d6/slot.'],
+  'Major Image':['Illusion','1 action','120 ft','V,S,M','Concentration, 10 min','20ft cube illusion with sound, smell, temperature. Investigation check vs DC to disbelieve.'],
+  'Nondetection':['Abjuration','1 action','Touch','V,S,M','8 hours','Target hidden from divination magic and scrying for 8 hours.'],
+  'Sending':['Evocation','1 action','Unlimited','V,S,M','1 round','Send 25-word message to known creature. They can reply with 25 words.'],
+  'Slow':['Transmutation','1 action','120 ft','V,S,M','Concentration, 1 min','Up to 6 creatures: Wis save or halved speed, -2 AC and Dex saves, no reactions, 1 action or bonus action only.'],
+  'Stinking Cloud':['Conjuration','1 action','90 ft','V,S,M','Concentration, 1 min','20ft radius nauseating cloud. Con save or waste action retching (can\'t do anything useful).'],
+  'Tongues':['Divination','1 action','Touch','V,M','1 hour','Creature understands any spoken language and is understood by any speaker.'],
+  'Vampiric Touch':['Necromancy','1 action','Self','V,S','Concentration, 1 min','Melee attack: 3d6 necrotic damage. Regain HP equal to half damage dealt. +1d6/slot.'],
+  // LV4
+  'Arcane Eye':['Divination','1 action','30 ft','V,S,M','Concentration, 1 hour','Create invisible magical eye. See everything in 30ft (dim past that). Move 30ft/turn.'],
+  'Banishment':['Abjuration','1 action','60 ft','V,S,M','Concentration, 1 min','Cha save or banished. Home plane: incapacitated. Different plane: sent there permanently if concentration holds 1 min. +1 creature/slot.'],
+  'Blight':['Necromancy','1 action','30 ft','V,S','Instantaneous','Con save or 8d8 necrotic (half success). Plants: no save, max damage. Undead/constructs: unaffected. +1d8/slot.'],
+  'Confusion':['Enchantment','1 action','90 ft','V,S,M','Concentration, 1 min','Wis save or confused (roll d10 each turn for random behavior). +1 creature/slot.'],
+  'Dimension Door':['Conjuration','1 action','500 ft','V','Instantaneous','Teleport self and one willing creature to any location within 500ft.'],
+  'Evard\'s Black Tentacles':['Conjuration','1 action','90 ft','V,S,M','Concentration, 1 min','20ft square: difficult terrain, Dex save or restrained. Restrained creatures: 3d6 bludgeoning per turn.'],
+  'Fabricate':['Transmutation','10 minutes','120 ft','V,S','Instantaneous','Convert raw materials into a finished item (up to 5ft cube wood/10ft³ stone). Can\'t create magic items.'],
+  'Greater Invisibility':['Illusion','1 action','Touch','V,S','Concentration, 1 min','Target invisible even when attacking or casting spells.'],
+  'Ice Storm':['Evocation','1 action','300 ft','V,S,M','Instantaneous','20ft radius, 40ft tall cylinder. Dex save or 2d8 bludgeoning + 4d6 cold (half success). Difficult terrain. +1d8/slot.'],
+  'Leomund\'s Secret Chest':['Conjuration','1 action','Touch','V,S,M','Instantaneous','Hide a 3ft chest on Ethereal Plane. Recall as bonus action using tiny replica.'],
+  'Mordenkainen\'s Faithful Hound':['Conjuration','1 action','30 ft','V,S,M','8 hours','Invisible spectral hound guards area. Barks at intruders, attacks for 4d8 piercing within 5ft of it.'],
+  'Polymorph':['Transmutation','1 action','60 ft','V,S,M','Concentration, 1 hour','Wis save or transform into a beast with CR ≤ target\'s level/4 (or any beast if willing). Use beast\'s stats.'],
+  'Wall of Fire':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','60ft line or 20ft circle, 20ft high, 1ft thick. 5d8 fire damage to creatures in/adjacent to designated side. +1d8/slot.'],
+  // LV5
+  'Animate Objects':['Transmutation','1 action','120 ft','V,S','Concentration, 1 min','Animate up to 10 nonmagical objects. Tiny: +2d4 per, Small: 2d6, Medium: 2d8, Large: 2d10, Huge: 2d12. Obey commands.'],
+  'Arcane Hand':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','Large magical hand: Clenched Fist (4d8 force), Forceful Hand (push), Grasping Hand (restrain), Interposing Hand (cover). +2d8/slot.'],
+  'Cloudkill':['Conjuration','1 action','120 ft','V,S','Concentration, 10 min','20ft sphere of yellow-green fog. Con save or 5d8 poison (half success). Moves 10ft/turn. +1d8/slot.'],
+  'Cone of Cold':['Evocation','1 action','Self (60ft cone)','V,S,M','Instantaneous','Con save or 8d8 cold (half success). Kills → frozen statue. +1d8/slot.'],
+  'Conjure Elemental':['Conjuration','1 minute','90 ft','V,S,M','Concentration, 1 hour','Summon an air/earth/fire/water elemental (up to CR 5 per slot level). Obeys commands while concentrated.'],
+  'Dominate Person':['Enchantment','1 action','60 ft','V,S','Concentration, 1 min','Wis save or charmed — follow telepathic commands as a bonus action. Repeat save when harmed. +1 duration/slot.'],
+  'Hold Monster':['Enchantment','1 action','90 ft','V,S,M','Concentration, 1 min','Wis save or paralyzed (any creature, not just humanoids). Repeat save each turn. +1 creature/slot.'],
+  'Modify Memory':['Enchantment','1 action','30 ft','V,S','Concentration, 1 min','Wis save or alter up to 10 min of target\'s memory from past 24 hours. Higher slot = longer ago.'],
+  'Mislead':['Illusion','1 action','Self','S','Concentration, 1 hour','Become invisible and leave an illusory double. Control double as a bonus action.'],
+  'Passwall':['Transmutation','1 action','30 ft','V,S,M','1 hour','Create passage 5ft wide, 8ft tall, 20ft deep through wood, plaster, or stone.'],
+  'Scrying':['Divination','10 minutes','Self','V,S,M','Concentration, 10 min','Wis save (modified by familiarity) or spy on target via an invisible sensor near them.'],
+  'Seeming':['Illusion','1 action','30 ft','V,S','8 hours','Change appearance of up to 1 creature/slot level. Cha save to disbelieve.'],
+  'Synaptic Static':['Enchantment','1 action','120 ft','V,S','Instantaneous','Int save or 8d6 psychic and subtract 1d6 from all attack rolls, ability checks, concentration saves for 1 minute.'],
+  'Telekinesis':['Transmutation','1 action','60 ft','V,S','Concentration, 10 min','Move creatures/objects with your mind. Large or smaller: Str vs spell DC. Objects up to 1000 lbs.'],
+  'Teleportation Circle':['Conjuration','1 minute','10 ft','V,M','1 round','10ft diameter portal to a permanent teleportation circle you know.'],
+  'Wall of Force':['Evocation','1 action','120 ft','V,S,M','Concentration, 10 min','Invisible, immune-to-damage wall (flat or hemisphere up to ten 10×10 panels). Immune to all damage and dispel magic (except Disintegrate).'],
+  // LV6
+  'Arcane Gate':['Conjuration','1 action','500 ft','V,S','Concentration, 10 min','Linked portals (up to 500ft apart) that creatures can step through.'],
+  'Chain Lightning':['Evocation','1 action','150 ft','V,S,M','Instantaneous','Primary target + 3 secondary targets within 30ft: Dex save or 10d8 lightning each. +1 target/slot.'],
+  'Circle of Death':['Necromancy','1 action','150 ft','V,S,M','Instantaneous','60ft sphere: Con save or 8d6 necrotic (half success). +2d6/slot.'],
+  'Contingency':['Evocation','10 minutes','Self','V,S,M','10 days','Cast a spell of 5th level or lower. It triggers automatically when a specified circumstance occurs.'],
+  'Disintegrate':['Transmutation','1 action','60 ft','V,S,M','Instantaneous','Dex save or 10d6+40 force damage. Reduced to dust if HP drops to 0. Disintegrate a nonmagical object.'],
+  'Eyebite':['Necromancy','1 action','Self','V,S','Concentration, 1 min','Each turn: choose asleep, panicked, or sickened effect on one creature within 60ft. Wis save.'],
+  'Globe of Invulnerability':['Abjuration','1 action','Self (10ft)','V,S,M','Concentration, 1 min','Barrier — spells of 5th level or lower cast from outside can\'t affect anything inside. +1 level/slot.'],
+  'Programmed Illusion':['Illusion','1 action','120 ft','V,S,M','Until dispelled','Create illusion up to 30ft cube. Activates when triggered condition occurs, runs for 5 min.'],
+  'Sunbeam':['Evocation','1 action','Self (60ft line)','V,S,M','Concentration, 1 min','60ft line: Con save or 6d8 radiant + blinded until next turn. Undead/oozes: disadvantage. Bonus action to reuse.'],
+  'True Seeing':['Divination','1 action','Touch','V,S,M','1 hour','Target sees invisible/ethereal, see through illusions (True Sight), see true forms of shapechangers.'],
+  'Wall of Ice':['Evocation','1 action','120 ft','V,S,M','Concentration, 10 min','Create a wall of ice panels (each 10×10×1ft). 10d6 cold if caught inside. +2d6/slot.'],
+  // LV7
+  'Crown of Stars':['Evocation','1 action','Self','V,S','1 hour','7 motes of light. Bonus action: hurl one — ranged spell attack, 4d12 radiant. Lasts until all used or spell ends.'],
+  'Delayed Blast Fireball':['Evocation','1 action','150 ft','V,S,M','Concentration, 1 min','Beam to point — builds energy. Can detonate early (Dex save or 12d6 fire) or wait up to 1 min. +1d6/turn waiting. +1d6/slot.'],
+  'Etherealness':['Transmutation','1 action','Self','V,S','8 hours','Enter Ethereal Plane. Can\'t be seen or affected by Material Plane. Hear it dimly. +3 targets at 8th slot.'],
+  'Finger of Death':['Necromancy','1 action','60 ft','V,S','Instantaneous','Con save or 7d8+30 necrotic (half success). Humanoid killed this way rises as zombie under your control.'],
+  'Forcecage':['Evocation','1 action','100 ft','V,S,M','1 hour','20ft cube cage of force bars, or solid 10ft box. No teleportation escape. Cha save to leave via magic.'],
+  'Mirage Arcane':['Illusion','10 minutes','Sight','V,S','10 days','Illusion over a 1-mile square terrain. Looks, sounds, feels, smells real. Lasts 10 days.'],
+  'Mordenkainen\'s Sword':['Evocation','1 action','60 ft','V,S,M','Concentration, 1 min','Floating spectral sword. Bonus action to move 20ft and attack (melee spell attack, 3d10 force).'],
+  'Plane Shift':['Conjuration','1 action','Touch','V,S,M','Instantaneous','Transport self and up to 8 willing creatures to another plane. Or melee attack vs unwilling target: Con save or transported.'],
+  'Prismatic Spray':['Evocation','1 action','Self (60ft cone)','V,S','Instantaneous','Each creature hit by random colored ray: red (10d6 fire), orange (10d6 acid), yellow (10d6 lightning), green (poison), blue (cold), indigo (restrained), violet (transported), or 2 rays.'],
+  'Reverse Gravity':['Transmutation','1 action','100 ft','V,S,M','Concentration, 1 min','50ft radius, 100ft tall cylinder: everything not attached falls upward (Dex save). Falls at end of spell.'],
+  'Simulacrum':['Illusion','12 hours','Touch','V,S,M','Until dispelled','Create an illusory duplicate of a humanoid or beast. Half max HP. Can\'t cast spell slots again. Obeys commands.'],
+  'Teleport':['Conjuration','1 action','10 ft','V','Instantaneous','Teleport self + up to 8 willing creatures to any location on same plane. Familiarity determines accuracy.'],
+  // LV8
+  'Antimagic Field':['Abjuration','1 action','Self (10ft)','V,S,M','Concentration, 1 hour','10ft sphere suppresses and blocks magic. Spells fail, magic items suppressed, summoned creatures wink out.'],
+  'Clone':['Necromancy','1 hour','Touch','V,S,M','Instantaneous','Create a dormant clone of a creature. When the original dies, soul transfers to clone. Awakens in 2d4 days.'],
+  'Demiplane':['Conjuration','1 action','60 ft','S','1 hour','Door appears, leading to a 30ft-radius extradimensional room. Multiple casts can link rooms.'],
+  'Dominate Monster':['Enchantment','1 action','60 ft','V,S','Concentration, 1 hour','Wis save or any creature type charmed. Telepathic commands. Repeat save when harmed.'],
+  'Feeblemind':['Enchantment','1 action','150 ft','V,S,M','Instantaneous','Int save or Int and Cha drop to 1. Can\'t cast spells, activate items, understand language, or communicate intelligibly. Repeat save every 30 days.'],
+  'Maze':['Conjuration','1 action','60 ft','V,S','Concentration, 10 min','Banish creature to extradimensional labyrinth. Int check DC 20 to escape (action). Minotaurs auto-escape.'],
+  'Mind Blank':['Abjuration','1 action','Touch','V,S','24 hours','Immune to psychic damage, divination, charm, frightened, reading thoughts.'],
+  'Power Word Stun':['Enchantment','1 action','60 ft','V','Instantaneous','If creature has 150 HP or fewer: stunned. Con save at end of each turn to end.'],
+  'Sunburst':['Evocation','1 action','150 ft','V,S,M','Instantaneous','60ft radius sphere of sunlight. Con save or 12d6 radiant + blinded 1 min. Undead/oozes: disadvantage.'],
+  'Telepathy':['Evocation','1 action','Unlimited','V,S,M','24 hours','Telepathic link with willing creature on same plane. Speak at any distance; share memories/emotions.'],
+  // LV9
+  'Astral Projection':['Necromancy','1 hour','10 ft','V,S,M','Special','Project self and up to 8 willing creatures into Astral Plane. Physical body stays behind. Severed silver cord = death.'],
+  'Foresight':['Divination','1 minute','Touch','V,S,M','8 hours','Can\'t be surprised, advantage on attacks/checks/saves, attackers have disadvantage.'],
+  'Gate':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 min','Open a circular portal to another plane. Speak a deity or unique being\'s name to attempt to summon them.'],
+  'Imprisonment':['Abjuration','1 minute','30 ft','V,S,M','Until dispelled','Wis save or imprisoned: buried, chained, hedged in, miniated, or slumbering (your choice of form). Immune to all damage.'],
+  'Meteor Swarm':['Evocation','1 action','1 mile','V,S','Instantaneous','4 meteors, each 40ft radius sphere. Dex save or 20d6 fire + 20d6 bludgeoning (half on success). Each sphere must be 40ft apart.'],
+  'Power Word Kill':['Enchantment','1 action','60 ft','V','Instantaneous','If creature has 100 HP or fewer: it dies. No save. No further effect if more HP.'],
+  'Prismatic Wall':['Abjuration','1 action','60 ft','V,S','10 minutes','90×30ft wall of 7 colored layers. Each layer has different effect and can be destroyed in specific order.'],
+  'Psychic Scream':['Enchantment','1 action','90 ft','V','Instantaneous','Up to 10 creatures: Int save or 14d6 psychic + stunned. If killed: head explodes (unless immune).'],
+  'Shapechange':['Transmutation','1 action','Self','V,S,M','Concentration, 1 hour','Assume any creature\'s form (CR ≤ level). Use its stats, special attacks. Change form as action.'],
+  'Time Stop':['Transmutation','1 action','Self','V','Instantaneous','Stop time for 1d4+1 turns. No one else can move or act. Ends if you affect another creature.'],
+  'True Polymorph':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 hour','Transform a creature or object into any creature or object. Permanent if concentrated 1 hour.'],
+  'Weird':['Illusion','1 action','120 ft','V,S','Concentration, 1 min','30ft sphere. Wis save or frightened and take 4d10 psychic per turn (save negates psychic each turn).'],
+  'Wish':['Conjuration','1 action','Self','V','Instantaneous','Duplicate any spell 8th level or lower. Or: restore HP, neutralize conditions, grant immunity, revive up to 10 dead, or attempt anything — DM decides consequences. Risk of losing Wish forever.'],
 };
-
 function getSpellInfo(name){
-  return SPELL_DATA[name]||['Unknown','-','-','?','-','No description available. A mysterious arcane force.'];
+  // Check custom spells first
+  const custom=(S.charSheet.customSpells||[]).find(s=>s.name===name);
+  if(custom)return[custom.school||'Unknown',custom.castTime||'-',custom.range||'-',custom.components||'?',custom.duration||'-',custom.description||'Custom spell.'];
+  return SPELL_DATA[name]||['Unknown','-','-','?','-','No data. Use the Custom Spell option to add details.'];
 }
 
 function getSchoolInfo(school){return SPELL_SCHOOLS[school]||{school:school||'Unknown',color:'#888',svgKey:null};}
@@ -2296,14 +2461,14 @@ function csTab(tab,btn){
   if(tab==='spellbook')renderSBSpellbookList();
   if(tab==='prepared')renderSBPreparedList();
   if(tab==='feats')renderSBFeatsList();
-  if(tab==='profs')renderSBProfList();
+  if(tab==='profs'){renderSBProfList();renderSkillsList();}
   if(tab==='stats'){renderSBAbilityInputs();renderSBDerived();}
   if(tab==='slots')renderSBSlots();
 }
 
 function renderSpellbook(){
   // Render the first tab (stats) by default
-  renderSBAbilityInputs();renderSBDerived();renderSBSlots();renderSBSpellbookList();renderSBPreparedList();renderSBProfList();renderSBFeatsList();
+  renderSBAbilityInputs();renderSBDerived();renderSBSlots();renderSBSpellbookList();renderSBPreparedList();renderSBProfList();renderSkillsList();renderSBFeatsList();
   const dl=document.getElementById('all-spells-datalist');if(dl){dl.innerHTML='';Object.values(ALL_SPELLS).flat().forEach(sp=>{const o=document.createElement('option');o.value=sp;dl.appendChild(o);});}
   const nt=document.getElementById('sb-notes');if(nt)nt.value=S.charSheet.notes||'';
   // HP
@@ -2376,7 +2541,7 @@ function renderSBSpellbookList(){
         <span class="spell-card-name">${sp.name}</span>
         <span class="spell-card-school" style="background:${sch.color}22;color:${sch.color};border:1px solid ${sch.color}44;">${sch.school||info[0]}</span>
         <span class="spell-card-level">${lv===0?'CANTRIP':'LV'+lv}</span>
-        ${isPrepared?'<span style="font-size:7px;color:var(--green);font-family:var(--fh);">PREPARED</span>':`<button class="spell-move-btn" style="border-color:var(--green);color:var(--green);" onclick="event.stopPropagation();prepareSpell('${sp.name}')">→ PREPARE</button>`}
+        ${isPrepared?'<span style="font-size:7px;color:var(--green);font-family:var(--fh);border:1px solid var(--green);border-radius:3px;padding:1px 5px;">PREPARED ✓</span>':`<button class="spell-move-btn" style="border-color:#ffd700;color:#ffd700;background:#1a1000;" onclick="event.stopPropagation();prepareSpell('${sp.name}')">→ PREPARE</button>`}
         <button class="spell-move-btn" style="border-color:var(--red);color:var(--red);" onclick="event.stopPropagation();removeFromSpellbook('${sp.name}')">✕</button>
       </div>
       <div class="spell-card-body">
@@ -2504,41 +2669,6 @@ function logDMEvent(msg,cls){
   feed.prepend(entry);while(feed.children.length>40)feed.removeChild(feed.lastChild);
 }
 
-// Patch upWallet to log DM events
-const _origUpWallet=upWallet;
-function upWallet(d,desc,cls){
-  _origUpWallet(d,desc,cls);
-  // Log notable player events for DM feed
-  if(S.isDM)return;// When DM is watching, all actions are obvious
-  const balance=S.wallet;const dailyCost=S.dailyCost||50;
-  if(balance<dailyCost*2&&d<0)logDMEvent(`⚠ PLAYER BALANCE LOW: ${balance.toLocaleString()}◈ (can't survive ${Math.floor(balance/dailyCost)} days)`,'dfe-low');
-  if(cls==='win'&&d>0&&d>100)logDMEvent(`Player received ${d.toLocaleString()}◈ — ${desc||''}`.substring(0,80),'dfe-win');
-}
-
-// Patch placeBet to log
-const _origPlaceBet=placeBet;
-function placeBet(id,side){
-  const m=S.markets?.find(x=>String(x.id)===String(id));
-  const amt=parseInt(document.getElementById('ba-'+id)?.value)||10;
-  logDMEvent(`Player bet ${amt}◈ ${side.toUpperCase()} — "${(m?.question||'').substring(0,40)}..."`, 'dfe-bet');
-  _origPlaceBet(id,side);
-}
-
-// Patch doPull to log
-const _origDoPull=doPull;
-function doPull(count){
-  logDMEvent(`Player pulled gacha ×${count} (${count===1?(S.pull1Cost||50):(S.pull10Cost||450)}◈)`,'dfe-pull');
-  _origDoPull(count);
-}
-
-// Patch payDaily to log
-const _origPayDaily=payDaily;
-function payDaily(){
-  logDMEvent(`Player paid daily tax: ${S.dailyCost}◈`,'dfe-tax');
-  _origPayDaily();
-}
-
-// ══ GACHA ════════════════════════════════════════════════════
 
 const BANNER_THEMES=[
   {name:'VOID CONVERGENCE',color:'#c800ff',bg:'linear-gradient(135deg,#0a0020,#1a0040,#0a0020)'},
@@ -2577,6 +2707,7 @@ function updateGachaBtnLabels(){
 }
 
 function doPull(count){
+  if(typeof logDMEvent==='function')logDMEvent(`Player pulled gacha ×${count} (${count===1?(S.pull1Cost||50):(S.pull10Cost||450)}◈)`,'dfe-pull');
   const cost=count===1?(S.pull1Cost||50):(S.pull10Cost||450);
   if(S.wallet<cost){toast('INSUFFICIENT GEMS','var(--red)');return;}
   upWallet(-cost,`GACHA ×${count}: -${cost}◈`,'spend');
@@ -3258,7 +3389,6 @@ function showAchievement(id,title,desc,icon){
 }
 
 // Patch upWallet to trigger broke achievement
-const _origUpWalletAch=upWallet;
 
 // ══ ORACLE SPEAKS ════════════════════════════════════════════
 const ORACLE_TEMPLATES=[
@@ -3300,14 +3430,15 @@ const INTERVENTION_MSGS=[
   {from:'The Wizards\' Guild Welfare Committee',body:`We have received concerns from several members regarding your mana gem expenditure patterns. The Guild recommends a mandatory 24-hour cooling off period. Your account has been noted.`},
   {from:'Your Familiar (via the Tome)',body:`I cannot in good conscience continue to observe this. You have placed ${Math.floor(Math.random()*20)+8} bets today. I am writing this on behalf of everyone who cares about you. Please stop.`},
   {from:'Anonymous Market Participant',body:`Stop. Just stop. You're moving the odds on every market you touch and it's making everyone else's predictions worse. You are a hazard to the information economy. Signed, concerned.`},
-  {from:'The Bank of ${pk(MKT_TOWNS)}',body:`Dear valued customer, your account activity has triggered our Compulsive Speculation Alert system. We are legally required to inform you that the market does not love you back.`},
+  {from:()=>`The Bank of ${pk(MKT_TOWNS)}`,body:`Dear valued customer, your account activity has triggered our Compulsive Speculation Alert system. We are legally required to inform you that the market does not love you back.`},
 ];
 
 function fireIntervention(){
   const msg=pk(INTERVENTION_MSGS);
-  const body=msg.body.replace('${pk(MKT_TOWNS)}',pk(MKT_TOWNS));
+  const from=typeof msg.from==='function'?msg.from():msg.from;
+  const body=msg.body;
   S._pendingPlayerEvent={type:'intervention',from:msg.from,body,ts:Date.now()};
-  if(!S.isDM)showInterventionModal(msg.from,body);
+  if(!S.isDM)showInterventionModal(from,body);
   fbPush();toast('INTERVENTION SENT','#ff8800');
   logDMEvent('DM fired intervention notice','dfe-low');
 }
@@ -3711,6 +3842,72 @@ function init(){
   document.getElementById('hp-current')?.addEventListener('input',updateHPDisplay);
   document.getElementById('hp-max')?.addEventListener('input',updateHPDisplay);
   try{fbInit();}catch(e){console.warn('Firebase fail, running offline:',e);setSyncStatus('offline',false);generateFreshState();}
+}
+
+// ══ CUSTOM SPELLS ════════════════════════════════════════════
+function toggleCustomSpellForm(){
+  const f=document.getElementById('custom-spell-form');if(f)f.style.display=f.style.display==='none'?'block':'none';
+}
+function addCustomSpell(){
+  const name=document.getElementById('cs-name')?.value.trim();if(!name){toast('Enter spell name','var(--orange)');return;}
+  const spell={name,school:document.getElementById('cs-school')?.value||'Unknown',level:parseInt(document.getElementById('cs-level')?.value)||0,castTime:document.getElementById('cs-cast')?.value||'1 action',range:document.getElementById('cs-range')?.value||'-',components:document.getElementById('cs-comp')?.value||'?',duration:document.getElementById('cs-dur')?.value||'-',description:document.getElementById('cs-desc')?.value||''};
+  if(!S.charSheet.customSpells)S.charSheet.customSpells=[];
+  const existing=S.charSheet.customSpells.findIndex(s=>s.name===name);
+  if(existing>=0)S.charSheet.customSpells[existing]=spell;else S.charSheet.customSpells.push(spell);
+  // Also add to spellbook
+  if(!S.charSheet.knownSpells)S.charSheet.knownSpells=[];
+  if(!S.charSheet.knownSpells.some(s=>s.name===name))S.charSheet.knownSpells.push({name,level:spell.level});
+  // Clear form
+  ['cs-name','cs-cast','cs-range','cs-comp','cs-dur','cs-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('custom-spell-form').style.display='none';
+  renderSBSpellbookList();renderCharSheet();fbPush();
+  toast(`Custom spell "${name}" added to spellbook`,'var(--green)');
+}
+
+// ══ SKILLS (combined with proficiencies) ═════════════════════
+const SKILLS_LIST=[
+  {name:'Acrobatics',ability:'dex'},{name:'Animal Handling',ability:'wis'},{name:'Arcana',ability:'int'},
+  {name:'Athletics',ability:'str'},{name:'Deception',ability:'cha'},{name:'History',ability:'int'},
+  {name:'Insight',ability:'wis'},{name:'Intimidation',ability:'cha'},{name:'Investigation',ability:'int'},
+  {name:'Medicine',ability:'wis'},{name:'Nature',ability:'int'},{name:'Perception',ability:'wis'},
+  {name:'Performance',ability:'cha'},{name:'Persuasion',ability:'cha'},{name:'Religion',ability:'int'},
+  {name:'Sleight of Hand',ability:'dex'},{name:'Stealth',ability:'dex'},{name:'Survival',ability:'wis'},
+];
+
+function renderSkillsList(){
+  const el=document.getElementById('sb-skills-list');if(!el)return;el.innerHTML='';
+  const profBonus=S.charSheet.level?Math.ceil(S.charSheet.level/4)+1:3;
+  const skillProfs=S.charSheet.skillProficiencies||[];
+  const expertises=S.charSheet.expertises||[];
+  SKILLS_LIST.forEach(sk=>{
+    const isProficient=skillProfs.includes(sk.name);const isExpertise=expertises.includes(sk.name);
+    const abilScore=S.charSheet[sk.ability]||10;const abilMod=abilityMod(abilScore);
+    const bonus=abilMod+(isProficient?profBonus:0)*(isExpertise?2:1);
+    const bonusStr=(bonus>=0?'+':'')+bonus;
+    const row=document.createElement('div');
+    row.style.cssText=`display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:4px;cursor:pointer;transition:background .15s;${isProficient?'background:rgba(0,255,136,.06);':''}`;
+    row.innerHTML=`
+      <div style="width:14px;height:14px;border-radius:50%;border:2px solid ${isProficient?'var(--green)':'#2a0050'};background:${isExpertise?'var(--gold)':isProficient?'var(--green)':'transparent'};flex-shrink:0;transition:all .15s;" title="${isExpertise?'Expertise':isProficient?'Proficient':'Not proficient'}"></div>
+      <div style="font-family:var(--fh);font-size:7px;color:${isProficient?'var(--green)':'var(--dim)'};flex:1;letter-spacing:.5px;">${sk.name}</div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);">${ABILITY_LABELS[sk.ability]}</div>
+      <div style="font-family:var(--fh);font-size:8px;font-weight:bold;color:${bonus>=0?'var(--green)':'var(--red)'};min-width:28px;text-align:right;">${bonusStr}</div>`;
+    // Click: cycle through not proficient → proficient → expertise → not proficient
+    row.addEventListener('click',()=>{
+      if(!S.charSheet.skillProficiencies)S.charSheet.skillProficiencies=[];
+      if(!S.charSheet.expertises)S.charSheet.expertises=[];
+      const spIdx=S.charSheet.skillProficiencies.indexOf(sk.name);const exIdx=S.charSheet.expertises.indexOf(sk.name);
+      if(exIdx>=0){// expertise → remove both
+        S.charSheet.expertises.splice(exIdx,1);S.charSheet.skillProficiencies.splice(S.charSheet.skillProficiencies.indexOf(sk.name),1);
+      }else if(spIdx>=0){// proficient → expertise
+        S.charSheet.expertises.push(sk.name);
+      }else{// none → proficient
+        S.charSheet.skillProficiencies.push(sk.name);
+      }
+      renderSkillsList();renderSBDerived();fbPush();
+    });
+    el.appendChild(row);
+  });
+  const hint=document.createElement('div');hint.style.cssText='font-size:7px;color:#440066;font-family:var(--fh);margin-top:4px;';hint.textContent='Click: none → proficient (green) → expertise (gold pip) → none';el.appendChild(hint);
 }
 
 document.addEventListener('DOMContentLoaded',init);
