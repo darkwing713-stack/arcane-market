@@ -1019,7 +1019,7 @@ body.dm-mode .nt.player-only{opacity:.6;}
 <!-- NOTIFICATION & TOAST -->
 <!-- DOUBLE OR NOTHING MODAL -->
 <style>
-@keyframes don-bg-flash{0%,100%{background:rgba(0,0,0,.96);}12%{background:rgba(180,0,0,.18);}25%{background:rgba(0,0,0,.96);}37%{background:rgba(180,0,0,.22);}50%{background:rgba(0,0,0,.96);}62%{background:rgba(180,0,0,.15);}75%{background:rgba(0,0,0,.96);}87%{background:rgba(180,0,0,.2);}}
+@keyframes don-bg-flash{0%,100%{background:rgba(0,0,0,.96);}50%{background:rgba(140,0,0,.14);}}
 @keyframes don-title-rage{0%{text-shadow:0 0 10px #ff0000,0 0 30px #ff0000;transform:scale(1);}20%{text-shadow:0 0 30px #ff0000,0 0 80px #ff6600,0 0 120px #ff0000;transform:scale(1.08) skew(-2deg);}40%{text-shadow:0 0 10px #ff0000,0 0 20px #ff0000;transform:scale(.98) skew(1deg);}60%{text-shadow:0 0 50px #ff0000,0 0 100px #ff0000,0 0 200px #ff6600;transform:scale(1.12) skew(-1deg);}100%{text-shadow:0 0 10px #ff0000,0 0 30px #ff0000;transform:scale(1);}}
 @keyframes don-danger-scroll{from{transform:translateX(0) rotate(-35deg);}to{transform:translateX(-50%) rotate(-35deg);}}
 @keyframes don-danger-scroll2{from{transform:translateX(-50%) rotate(35deg);}to{transform:translateX(0) rotate(35deg);}}
@@ -1027,15 +1027,23 @@ body.dm-mode .nt.player-only{opacity:.6;}
 @keyframes don-btn-throb{0%,100%{box-shadow:0 0 20px rgba(255,0,0,.6);transform:scale(1);}50%{box-shadow:0 0 60px rgba(255,0,0,1),0 0 120px rgba(255,100,0,.5);transform:scale(1.05);}}
 @keyframes don-safe-pulse{0%,100%{opacity:.45;}50%{opacity:.9;}}
 @keyframes don-coin-result{0%{transform:scale(0) rotate(-720deg);opacity:0;}60%{transform:scale(1.3) rotate(10deg);opacity:1;}80%{transform:scale(.95) rotate(-5deg);}100%{transform:scale(1) rotate(0deg);opacity:1;}}
-@keyframes don-border-chase{0%{border-color:#ff0000;}25%{border-color:#ff6600;}50%{border-color:#ff0000;}75%{border-color:#ff4400;}100%{border-color:#ff0000;}}
-#don-modal{position:fixed;inset:0;z-index:9500;display:none;align-items:center;justify-content:center;animation:don-bg-flash .35s ease-in-out infinite;overflow:hidden;}
+@keyframes don-border-chase{0%,100%{border-color:#ff0000;box-shadow:0 0 40px rgba(255,0,0,.4);}50%{border-color:#ff4400;box-shadow:0 0 80px rgba(255,80,0,.7);}}
+#don-modal{position:fixed;inset:0;z-index:9500;display:none;align-items:center;justify-content:center;animation:don-bg-flash 2.4s ease-in-out infinite;overflow:hidden;}
 #don-modal.show{display:flex;}
-.don-danger-layer{position:absolute;white-space:nowrap;font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:8px;color:rgba(255,0,0,.15);pointer-events:none;z-index:1;width:300%;}
-.don-danger-layer.a{top:5%;animation:don-danger-scroll 3.5s linear infinite;}
-.don-danger-layer.b{top:30%;animation:don-danger-scroll2 4s linear infinite;color:rgba(255,60,0,.12);}
-.don-danger-layer.c{top:55%;animation:don-danger-scroll 5s linear infinite;color:rgba(255,0,0,.1);}
-.don-danger-layer.d{top:78%;animation:don-danger-scroll2 3s linear infinite;color:rgba(255,40,0,.14);}
-#don-box{position:relative;z-index:2;background:linear-gradient(160deg,#110000,#1e0000,#110000);border:3px solid #ff0000;border-radius:16px;padding:1.6rem 1.8rem;max-width:400px;width:94vw;display:flex;flex-direction:column;align-items:center;gap:.7rem;box-shadow:0 0 80px rgba(255,0,0,.5),0 0 160px rgba(255,0,0,.2),inset 0 0 40px rgba(255,0,0,.06);animation:don-border-chase .5s linear infinite;}
+/* DANGER panels — fixed to screen edges, bracketing the modal like PM Lobcorp */
+@keyframes don-panel-pulse{0%,100%{opacity:.85;}50%{opacity:1;}}
+@keyframes don-panel-flicker{0%,100%{opacity:.85;}48%{opacity:.85;}50%{opacity:.3;}52%{opacity:.85;}}
+.don-danger-panel{position:fixed;background:#0a0000;border:3px solid #cc0000;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:9501;overflow:hidden;box-shadow:0 0 24px rgba(255,0,0,.5),inset 0 0 20px rgba(180,0,0,.2);}
+.don-danger-panel-inner{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:6px;color:#ff0000;text-shadow:0 0 10px #ff0000;text-align:center;line-height:1.4;animation:don-panel-pulse 1.4s ease-in-out infinite;}
+.don-danger-panel.flicker .don-danger-panel-inner{animation:don-panel-flicker 2.1s ease-in-out infinite;}
+.don-danger-panel.vert .don-danger-panel-inner{writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:8px;}
+/* Horizontal bars top & bottom */
+.don-danger-panel.top-bar{top:0;left:0;right:0;height:44px;border-left:none;border-right:none;border-top:none;flex-direction:row;gap:2rem;}
+.don-danger-panel.bot-bar{bottom:0;left:0;right:0;height:44px;border-left:none;border-right:none;border-bottom:none;flex-direction:row;gap:2rem;}
+/* Vertical bars left & right */
+.don-danger-panel.left-bar{top:44px;bottom:44px;left:0;width:44px;border-top:none;border-bottom:none;border-left:none;flex-direction:column;gap:1.5rem;}
+.don-danger-panel.right-bar{top:44px;bottom:44px;right:0;width:44px;border-top:none;border-bottom:none;border-right:none;flex-direction:column;gap:1.5rem;}
+#don-box{position:relative;z-index:2;background:linear-gradient(160deg,#110000,#1e0000,#110000);border:3px solid #ff0000;border-radius:16px;padding:1.6rem 1.8rem;max-width:400px;width:94vw;display:flex;flex-direction:column;align-items:center;gap:.7rem;box-shadow:0 0 80px rgba(255,0,0,.5),0 0 160px rgba(255,0,0,.2),inset 0 0 40px rgba(255,0,0,.06);animation:don-border-chase 1.8s ease-in-out infinite;}
 .don-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:8px;color:#ff0000;text-align:center;animation:don-title-rage .55s ease-in-out infinite;line-height:1;}
 .don-subtitle{font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:3px;color:#ff4400;text-align:center;text-transform:uppercase;}
 .don-amount{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#ffd700;letter-spacing:4px;text-shadow:0 0 20px #ffd700,0 0 40px #ffd700;}
@@ -1058,10 +1066,19 @@ body.dm-mode .nt.player-only{opacity:.6;}
 #don-collect-btn:hover{transform:scale(1.04);}
 </style>
 <div id="don-modal">
-  <div class="don-danger-layer a">DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! </div>
-  <div class="don-danger-layer b">DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! </div>
-  <div class="don-danger-layer c">DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! </div>
-  <div class="don-danger-layer d">DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! DANGER!! </div>
+  <!-- PM-style danger panels bracketing the modal -->
+  <div class="don-danger-panel top-bar">
+    <div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div>
+  </div>
+  <div class="don-danger-panel bot-bar flicker">
+    <div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div><div class="don-danger-panel-inner">⚠ DANGER ⚠</div>
+  </div>
+  <div class="don-danger-panel left-bar vert">
+    <div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div>
+  </div>
+  <div class="don-danger-panel right-bar vert flicker">
+    <div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div><div class="don-danger-panel-inner">DANGER</div>
+  </div>
   <div id="don-box">
     <div class="don-title">DOUBLE OR NOTHING</div>
     <div class="don-subtitle">The Oracle offers you everything. Or nothing.</div>
@@ -2304,7 +2321,7 @@ const SPELL_DATA={
   'Shield':['Abjuration','1 reaction','Self','V,S','1 round','+5 AC until start of next turn (including triggering attack). Immune to Magic Missile.'],
   'Silent Image':['Illusion','1 action','60 ft','V,S,M','Concentration, 10 min','Create a visual illusion of a creature or object up to 15ft cube. Investigation vs. DC to disbelieve.'],
   'Sleep':['Enchantment','1 action','90 ft','V,S,M','1 minute','Roll 5d8 — creatures with that many HP (weakest first) fall unconscious. +2d8/slot.'],
-  'Tasha\'s Hideous Laughter':['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Wis save or target falls prone and incapacitated with laughter. Repeat save each turn.'],
+  "Tasha's Hideous Laughter":['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Wis save or target falls prone and incapacitated with laughter. Repeat save each turn.'],
   'Thunderwave':['Evocation','1 action','Self (15ft cube)','V,S','Instantaneous','Con save or 2d8 thunder and pushed 10ft. Audible 300ft away. +1d8/slot.'],
   'Witch Bolt':['Evocation','1 action','30 ft','V,S,M','Concentration, 1 min','Ranged attack: 1d12 lightning. Bonus action each turn: 1d12 more lightning. +1d12/slot.'],
   'Unseen Servant':['Conjuration','1 action','60 ft','V,S,M','1 hour','Invisible force performs simple tasks within 60ft: carry, pour, hold, etc. Strength 2.'],
@@ -2319,7 +2336,7 @@ const SPELL_DATA={
   'Darkness':['Evocation','1 action','60 ft','V,M','Concentration, 10 min','20ft radius magical darkness. No nonmagical light, darkvision blocked.'],
   'Darkvision':['Transmutation','1 action','Touch','V,S,M','8 hours','Touch willing creature — it gains 60ft darkvision.'],
   'Detect Thoughts':['Divination','1 action','Self','V,S,M','Concentration, 1 min','Read surface thoughts of creatures within 30ft. Focus to probe deeper (Wis save).'],
-  'Dragon\'s Breath':['Transmutation','1 bonus action','Touch','V,S,M','Concentration, 1 min','Touched creature exhales energy in 15ft cone (Dex save or 3d6; choose type). Bonus action. +1d6/slot.'],
+  "Dragon's Breath":['Transmutation','1 bonus action','Touch','V,S,M','Concentration, 1 min','Touched creature exhales energy in 15ft cone (Dex save or 3d6; choose type). Bonus action. +1d6/slot.'],
   'Earthbind':['Transmutation','1 action','300 ft','V','Concentration, 1 min','Str save or yellow strands bind creature, reducing fly speed to 0 and preventing flight.'],
   'Enlarge/Reduce':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 min','Enlarge: +1d4 weapon damage, advantage Str checks/saves. Reduce: -1d4, disadvantage Str checks/saves.'],
   'Flaming Sphere':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 min','5ft ball of fire. Bonus action to move 30ft. Adjacent creatures: Dex save or 2d6. +1d6/slot.'],
@@ -2329,7 +2346,7 @@ const SPELL_DATA={
   'Levitate':['Transmutation','1 action','60 ft','V,S,M','Concentration, 10 min','Con save or rise/hover up to 20ft. Can move up and down 20ft per turn.'],
   'Magic Mouth':['Illusion','1 minute','30 ft','V,S,M','Until dispelled','Imbue object with a message up to 25 words, spoken when trigger condition is met.'],
   'Magic Weapon':['Transmutation','1 bonus action','Touch','V,S','Concentration, 1 hour','+1 to attack and damage rolls (+2 at 4th slot, +3 at 6th). Counts as magical.'],
-  'Melf\'s Acid Arrow':['Evocation','1 action','90 ft','V,S,M','Instantaneous','Ranged spell attack: 4d4 acid + 2d4 acid at end of target\'s next turn. +1d4 each type/slot.'],
+  "Melf's Acid Arrow":['Evocation','1 action','90 ft','V,S,M','Instantaneous','Ranged spell attack: 4d4 acid + 2d4 acid at end of target\'s next turn. +1d4 each type/slot.'],
   'Mirror Image':['Illusion','1 action','Self','V,S','1 minute','3 duplicates. Roll d20 to hit you or a duplicate (6=third, 8=second, 11=first). Destroyed if hit.'],
   'Misty Step':['Conjuration','1 bonus action','Self','V','Instantaneous','Teleport up to 30ft to unoccupied visible space.'],
   'Phantasmal Force':['Illusion','1 action','60 ft','V,S,M','Concentration, 1 min','Int save or target believes in an illusion you create. 1d6 psychic per turn from hallucinated threats.'],
@@ -2353,7 +2370,7 @@ const SPELL_DATA={
   'Gaseous Form':['Transmutation','1 action','Touch','V,S,M','Concentration, 1 hour','Transform into misty gas: fly 10ft, can\'t attack, immune to nonmagical damage, resist all damage.'],
   'Haste':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 min','Double speed, +2 AC, advantage Dex saves, extra action (attack/dash/disengage/hide/use object). Lethargic after.'],
   'Hypnotic Pattern':['Illusion','1 action','120 ft','V,S,M','Concentration, 1 min','30ft cube twisting pattern. Wis save or incapacitated, speed 0. Ends if creature takes damage or someone shakes them.'],
-  'Leomund\'s Tiny Hut':['Evocation','1 minute','Self','V,S,M','8 hours','Immovable 10ft dome fits 9 medium creatures. Comfortable, atmosphere controlled, blocks weather.'],
+  "Leomund's Tiny Hut":['Evocation','1 minute','Self','V,S,M','8 hours','Immovable 10ft dome fits 9 medium creatures. Comfortable, atmosphere controlled, blocks weather.'],
   'Lightning Bolt':['Evocation','1 action','Self (100ft line)','V,S,M','Instantaneous','100ft line, 5ft wide. Dex save or 8d6 lightning (half on success). +1d6/slot.'],
   'Major Image':['Illusion','1 action','120 ft','V,S,M','Concentration, 10 min','20ft cube illusion with sound, smell, temperature. Investigation check vs DC to disbelieve.'],
   'Nondetection':['Abjuration','1 action','Touch','V,S,M','8 hours','Target hidden from divination magic and scrying for 8 hours.'],
@@ -2368,12 +2385,12 @@ const SPELL_DATA={
   'Blight':['Necromancy','1 action','30 ft','V,S','Instantaneous','Con save or 8d8 necrotic (half success). Plants: no save, max damage. Undead/constructs: unaffected. +1d8/slot.'],
   'Confusion':['Enchantment','1 action','90 ft','V,S,M','Concentration, 1 min','Wis save or confused (roll d10 each turn for random behavior). +1 creature/slot.'],
   'Dimension Door':['Conjuration','1 action','500 ft','V','Instantaneous','Teleport self and one willing creature to any location within 500ft.'],
-  'Evard\'s Black Tentacles':['Conjuration','1 action','90 ft','V,S,M','Concentration, 1 min','20ft square: difficult terrain, Dex save or restrained. Restrained creatures: 3d6 bludgeoning per turn.'],
+  "Evard's Black Tentacles":['Conjuration','1 action','90 ft','V,S,M','Concentration, 1 min','20ft square: difficult terrain, Dex save or restrained. Restrained creatures: 3d6 bludgeoning per turn.'],
   'Fabricate':['Transmutation','10 minutes','120 ft','V,S','Instantaneous','Convert raw materials into a finished item (up to 5ft cube wood/10ft³ stone). Can\'t create magic items.'],
   'Greater Invisibility':['Illusion','1 action','Touch','V,S','Concentration, 1 min','Target invisible even when attacking or casting spells.'],
   'Ice Storm':['Evocation','1 action','300 ft','V,S,M','Instantaneous','20ft radius, 40ft tall cylinder. Dex save or 2d8 bludgeoning + 4d6 cold (half success). Difficult terrain. +1d8/slot.'],
-  'Leomund\'s Secret Chest':['Conjuration','1 action','Touch','V,S,M','Instantaneous','Hide a 3ft chest on Ethereal Plane. Recall as bonus action using tiny replica.'],
-  'Mordenkainen\'s Faithful Hound':['Conjuration','1 action','30 ft','V,S,M','8 hours','Invisible spectral hound guards area. Barks at intruders, attacks for 4d8 piercing within 5ft of it.'],
+  "Leomund's Secret Chest":['Conjuration','1 action','Touch','V,S,M','Instantaneous','Hide a 3ft chest on Ethereal Plane. Recall as bonus action using tiny replica.'],
+  "Mordenkainen's Faithful Hound":['Conjuration','1 action','30 ft','V,S,M','8 hours','Invisible spectral hound guards area. Barks at intruders, attacks for 4d8 piercing within 5ft of it.'],
   'Polymorph':['Transmutation','1 action','60 ft','V,S,M','Concentration, 1 hour','Wis save or transform into a beast with CR ≤ target\'s level/4 (or any beast if willing). Use beast\'s stats.'],
   'Wall of Fire':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','60ft line or 20ft circle, 20ft high, 1ft thick. 5d8 fire damage to creatures in/adjacent to designated side. +1d8/slot.'],
   // LV5
@@ -2412,7 +2429,7 @@ const SPELL_DATA={
   'Finger of Death':['Necromancy','1 action','60 ft','V,S','Instantaneous','Con save or 7d8+30 necrotic (half success). Humanoid killed this way rises as zombie under your control.'],
   'Forcecage':['Evocation','1 action','100 ft','V,S,M','1 hour','20ft cube cage of force bars, or solid 10ft box. No teleportation escape. Cha save to leave via magic.'],
   'Mirage Arcane':['Illusion','10 minutes','Sight','V,S','10 days','Illusion over a 1-mile square terrain. Looks, sounds, feels, smells real. Lasts 10 days.'],
-  'Mordenkainen\'s Sword':['Evocation','1 action','60 ft','V,S,M','Concentration, 1 min','Floating spectral sword. Bonus action to move 20ft and attack (melee spell attack, 3d10 force).'],
+  "Mordenkainen's Sword":['Evocation','1 action','60 ft','V,S,M','Concentration, 1 min','Floating spectral sword. Bonus action to move 20ft and attack (melee spell attack, 3d10 force).'],
   'Plane Shift':['Conjuration','1 action','Touch','V,S,M','Instantaneous','Transport self and up to 8 willing creatures to another plane. Or melee attack vs unwilling target: Con save or transported.'],
   'Prismatic Spray':['Evocation','1 action','Self (60ft cone)','V,S','Instantaneous','Each creature hit by random colored ray: red (10d6 fire), orange (10d6 acid), yellow (10d6 lightning), green (poison), blue (cold), indigo (restrained), violet (transported), or 2 rays.'],
   'Reverse Gravity':['Transmutation','1 action','100 ft','V,S,M','Concentration, 1 min','50ft radius, 100ft tall cylinder: everything not attached falls upward (Dex save). Falls at end of spell.'],
@@ -2443,6 +2460,209 @@ const SPELL_DATA={
   'True Polymorph':['Transmutation','1 action','30 ft','V,S,M','Concentration, 1 hour','Transform a creature or object into any creature or object. Permanent if concentrated 1 hour.'],
   'Weird':['Illusion','1 action','120 ft','V,S','Concentration, 1 min','30ft sphere. Wis save or frightened and take 4d10 psychic per turn (save negates psychic each turn).'],
   'Wish':['Conjuration','1 action','Self','V','Instantaneous','Duplicate any spell 8th level or lower. Or: restore HP, neutralize conditions, grant immunity, revive up to 10 dead, or attempt anything — DM decides consequences. Risk of losing Wish forever.'],
+
+  // ── NON-WIZARD SPELLS (accessible via feats like Magic Initiate, Spell Sniper, etc.) ──
+  // CANTRIPS
+  'Druidcraft':['Transmutation','1 action','30 ft','V,S','Instantaneous','Minor nature effects: predict weather, make flower bloom, light/snuff campfire, create harmless sensory effect.'],
+  'Eldritch Blast':['Evocation','1 action','120 ft','V,S','Instantaneous','1d10 force damage beam to one creature. Gains additional beams at 5th (2), 11th (3), 17th (4) level.'],
+  'Guidance':['Divination','1 action','Touch','V,S','Concentration, 1 min','Add 1d4 to one ability check of your choice. Can be used before or after rolling.'],
+  'Hand of Radiance':['Evocation','1 action','5 ft','V,S','Instantaneous','Radiant energy deals 1d6 to each creature you choose within 5ft (Con save negates). Scales.'],
+  'Magic Stone':['Transmutation','1 bonus action','Touch','V,S','1 minute','Imbue up to 3 pebbles with magic. +spell attack bonus to hit, 1d6+spell attack mod bludgeoning. Scales.'],
+  'Primal Savagery':['Transmutation','1 action','Self','S','Instantaneous','Your teeth or nails become natural weapons: melee spell attack for 1d10 acid damage. Scales.'],
+  'Produce Flame':['Conjuration','1 action','Self','V,S','10 minutes','Flame in hand (bright light 10ft, dim 10ft). Use action to hurl it: 1d8 fire, ranged spell attack 30ft. Scales.'],
+  'Resistance':['Abjuration','1 action','Touch','V,S,M','Concentration, 1 min','Add 1d4 to one saving throw of your choice before the spell ends.'],
+  'Sacred Flame':['Evocation','1 action','60 ft','V,S','Instantaneous','Dex save or 1d8 radiant. No benefit from cover. Scales.'],
+  'Shape Water':['Transmutation','1 action','30 ft','S','Instantaneous/1 hr','Move/animate up to 5ft cube of water, freeze it, change its color/opacity, or create simple shapes.'],
+  'Shillelagh':['Transmutation','1 bonus action','Touch','V,S,M','1 minute','Club/quarterstaff uses spell attack mod for attacks and 1d8 damage (magical).'],
+  'Spare the Dying':['Necromancy','1 action','Touch','V,S','Instantaneous','Touch dying creature — it becomes stable. No effect on undead or constructs.'],
+  'Thaumaturgy':['Transmutation','1 action','30 ft','V','Up to 1 min','Create minor miraculous effect: voice booms, flames flicker, ground trembles, eyes glow, doors slam. Up to 3 active.'],
+  'Vicious Mockery':['Enchantment','1 action','60 ft','V','Instantaneous','Wis save or 1d4 psychic and disadvantage on next attack roll before end of its next turn. Scales.'],
+  'Word of Radiance':['Evocation','1 action','5 ft','V,M','Instantaneous','Each creature you choose within 5ft: Con save or 1d6 radiant. Scales.'],
+  // LV1 NON-WIZARD
+  'Animal Friendship':['Enchantment','1 action','30 ft','V,S,M','24 hours','Wis save (if Int 4+) or charmed by you for 24hrs (beast must be able to see/hear you). +1 beast/slot.'],
+  'Armor of Agathys':['Abjuration','1 action','Self','V,S,M','1 hour','Gain 5 temp HP. While they last, attacker takes 5 cold damage when it hits you in melee. +5 each/slot.'],
+  'Arms of Hadar':['Conjuration','1 action','Self (10ft)','V,S','Instantaneous','Str save or 2d6 necrotic and lose reactions until next turn. Half on success. +1d6/slot.'],
+  'Bane':['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Up to 3 creatures: Cha save or subtract 1d4 from attack rolls and saving throws. +1 creature/slot.'],
+  'Beast Bond':['Divination','1 action','Touch','V,S,M','Concentration, 10 min','Telepathic link with a beast (Int 3 or lower). Share senses, communicate simple ideas.'],
+  'Bless':['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Up to 3 creatures add 1d4 to attack rolls and saving throws. +1 creature/slot.'],
+  'Branding Smite':['Evocation','1 bonus action','Self','V','Concentration, 1 min','Next weapon hit deals +2d6 radiant extra and target becomes visible if invisible. +1d6/slot.'],
+  'Command':['Enchantment','1 action','60 ft','V','1 round','Wis save or follow one-word command (Approach, Drop, Flee, Grovel, Halt). +1 creature/slot at 2nd.'],
+  'Compelled Duel':['Enchantment','1 bonus action','30 ft','V','Concentration, 1 min','Wis save or forced to duel you: disadvantage vs others, must move toward you.'],
+  'Create or Destroy Water':['Transmutation','1 action','30 ft','V,S,M','Instantaneous','Create 10 gallons of water or destroy 10 gallons in open container. +10 gallons/slot.'],
+  'Cure Wounds':['Evocation','1 action','Touch','V,S','Instantaneous','Restore 1d8+spell mod HP to a creature. +1d8/slot.'],
+  'Detect Evil and Good':['Divination','1 action','Self','V,S','Concentration, 10 min','Know if aberrations/celestials/elementals/fey/fiends/undead are within 30ft and their location.'],
+  'Detect Poison and Disease':['Divination','1 action','Self','V,S,M','Concentration, 10 min','Sense presence/location of poisons and diseases within 30ft.'],
+  'Divine Favor':['Evocation','1 bonus action','Self','V,S','Concentration, 1 min','Your weapon attacks deal +1d4 radiant extra until the spell ends.'],
+  'Dissonant Whispers':['Enchantment','1 action','60 ft','V','Instantaneous','Wis save or 3d6 psychic and must use reaction to flee. Half psychic on success, no move. +1d6/slot.'],
+  'Earth Tremor':['Evocation','1 action','Self (10ft)','V,S','Instantaneous','Dex save or 1d6 bludgeoning and knocked prone. Ground becomes difficult terrain. +1d6/slot.'],
+  'Ensnaring Strike':['Conjuration','1 bonus action','Self','V','Concentration, 1 min','Next hit: Str save or restrained. Restrained: 1d6 piercing/turn. +1d6/slot.'],
+  'Entangle':['Conjuration','1 action','90 ft','V,S','Concentration, 1 min','20ft square: difficult terrain, Str save or restrained. Repeat save each turn to break free.'],
+  'Faerie Fire':['Evocation','1 action','60 ft','V','Concentration, 1 min','20ft cube: Dex save or outlined in blue/green/violet light. Outlined: attackers have advantage, can\'t be invisible.'],
+  'Goodberry':['Transmutation','1 action','Touch','V,S,M','Instantaneous','Create 10 berries, each restores 1 HP and provides enough nourishment for a day.'],
+  'Guiding Bolt':['Evocation','1 action','120 ft','V,S','1 round','Ranged spell attack: 4d6 radiant. Next attack vs target before your next turn has advantage. +1d6/slot.'],
+  'Hail of Thorns':['Conjuration','1 bonus action','Self','V','Concentration, 1 min','Next ranged weapon hit: Dex save or 1d10 piercing to target and adjacent creatures. +1d10/slot.'],
+  'Healing Word':['Evocation','1 bonus action','60 ft','V','Instantaneous','Restore 1d4+spell mod HP to one creature you can see. +1d4/slot.'],
+  'Hellish Rebuke':['Evocation','1 reaction','60 ft','V,S','Instantaneous','When damaged: attacker makes Dex save or 2d10 fire (half on success). +1d10/slot.'],
+  'Heroism':['Enchantment','1 action','Touch','V,S','Concentration, 1 min','Willing creature immune to frightened, gains temp HP equal to spell mod each turn.'],
+  'Hex':['Enchantment','1 bonus action','90 ft','V,S,M','Concentration, 1 hour','Curse target: +1d6 necrotic when you hit. Disadvantage on chosen ability checks. Curse transfers on target death. Longer duration per slot.'],
+  "Hunter's Mark":['Divination','1 bonus action','90 ft','V','Concentration, 1 hour','+1d6 damage to marked creature when you hit. Advantage on Perception/Survival to find it. Reapply on target death.'],
+  'Ice Knife':['Conjuration','1 action','60 ft','S,M','Instantaneous','Ranged attack: 1d10 piercing. Hit or miss: 5ft radius Dex save or 2d6 cold. +1d6 cold/slot.'],
+  'Inflict Wounds':['Necromancy','1 action','Touch','V,S','Instantaneous','Melee spell attack: 3d10 necrotic. +1d10/slot.'],
+  'Purify Food and Drink':['Transmutation','1 action','10 ft','V,S','Instantaneous','All nonmagical food and drink within a 5ft sphere purified of poison and disease.'],
+  'Sanctuary':['Abjuration','1 bonus action','30 ft','V,S,M','1 minute','Wis save or attacker must choose new target. Ends if ward attacks or casts spell.'],
+  'Searing Smite':['Evocation','1 bonus action','Self','V','Concentration, 1 min','Next melee hit: +1d6 fire extra and Con save or set on fire (1d6 fire/turn). +1d6/slot.'],
+  'Shield of Faith':['Abjuration','1 bonus action','60 ft','V,S,M','Concentration, 10 min','+2 AC to a creature you can see until the spell ends.'],
+  'Speak with Animals':['Divination','1 action','Self','V,S','10 minutes','Comprehend and communicate with beasts. They may not be intelligent or helpful.'],
+  'Thunderous Smite':['Evocation','1 bonus action','Self','V','Concentration, 1 min','Next melee hit: +2d6 thunder. Target: Str save or pushed 10ft and knocked prone.'],
+  'Wrathful Smite':['Evocation','1 bonus action','Self','V','Concentration, 1 min','Next melee hit: +1d6 psychic. Wis save or frightened until end of your next turn.'],
+  'Zephyr Strike':['Transmutation','1 bonus action','Self','V','Concentration, 1 min','Attacks don\'t provoke opportunity attacks. Once before end: +1d8 and advantage on one attack.'],
+  // LV2 NON-WIZARD
+  'Aid':['Abjuration','1 action','30 ft','V,S,M','8 hours','Up to 3 creatures gain +5 max HP and current HP. +5 per slot level above 2nd.'],
+  'Animal Messenger':['Enchantment','1 action','30 ft','V,S,M','24 hours','Tiny beast delivers message to described person within 25 miles. Speaks message in your voice.'],
+  'Augury':['Divination','1 minute','Self','V,S,M','Instantaneous','Ask about action within 30 min. Get: Weal, Woe, Weal and Woe, or Nothing. Losing accuracy on repeat casts.'],
+  'Barkskin':['Transmutation','1 action','Touch','V,S,M','Concentration, 1 hour','Target\'s AC can\'t be less than 16 (doesn\'t stack with armor that gives higher).'],
+  'Beast Sense':['Divination','1 action','Touch','S','Concentration, 1 hour','Use beast\'s senses (sight/hearing) while the spell lasts. The beast is incapacitated while you do.'],
+  'Calm Emotions':['Enchantment','1 action','60 ft','V,S','Concentration, 1 min','20ft radius sphere: Cha save or suppressed charm/frighten effects, or indifference to hostile creatures.'],
+  'Cordon of Arrows':['Transmutation','1 action','5 ft','V,S,M','8 hours','Plant up to 4 arrows. Each teleports and fires at creatures that come within 30ft: +spell mod piercing. +2/slot.'],
+  'Enhance Ability':['Transmutation','1 action','Touch','V,S,M','Concentration, 1 hour','Grant one of: Bear\'s Endurance (Con adv + 2d6 temp HP), Bull\'s Strength (Str adv/double carry), Cat\'s Grace (Dex adv, no fall dmg), Eagle\'s Splendor (Cha adv), Fox\'s Cunning (Int adv), Owl\'s Wisdom (Wis adv).'],
+  'Enthrall':['Enchantment','1 action','60 ft','V,S','1 minute','Wis save or creatures fixated on you, disadvantage on Perception checks against others.'],
+  'Find Steed':['Conjuration','10 minutes','30 ft','V,S','Instantaneous','Summon a loyal steed (warhorse, pony, camel, elk, or mastiff). Telepathic bond within 1 mile.'],
+  'Find Traps':['Divination','1 action','120 ft','V,S','Instantaneous','Sense whether any traps are present within range. Doesn\'t reveal exact location or type.'],
+  'Flame Blade':['Evocation','1 bonus action','Self','V,S,M','Concentration, 10 min','Fiery scimitar in hand: 3d6 fire, sheds light. Use action to attack. +1d6 per 2 slots above 2nd.'],
+  'Gust of Wind':['Evocation','1 action','Self (60ft line)','V,S,M','Concentration, 1 min','60ft line of strong wind. Str save or pushed 15ft. Difficult terrain, disperses gases/vapors.'],
+  'Heat Metal':['Transmutation','1 action','60 ft','V,S,M','Concentration, 1 min','Metal object becomes red hot: 2d8 fire to holder, bonus action to deal again. Drop or take disadvantage on attacks/checks.'],
+  "Jim's Magic Missile":['Evocation','1 action','120 ft','V,S,M','Instantaneous','Like Magic Missile but: roll d6 first — on 1 it fails and costs 1 sp. On success: 2d4+2 force to each target. +1 dart/slot.'],
+  'Lesser Restoration':['Abjuration','1 action','Touch','V,S','Instantaneous','Remove one disease or condition (blinded, deafened, paralyzed, or poisoned).'],
+  'Locate Animals or Plants':['Divination','1 action','Self','V,S,M','Instantaneous','Name a beast or plant. Know direction and distance to nearest such creature within 5 miles (if any).'],
+  'Moonbeam':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','5ft radius cylinder of moonlight (40ft tall). Con save or 2d10 radiant (half success). Shapechangers disadvantaged. Move it 60ft/turn. +1d10/slot.'],
+  'Pass without Trace':['Abjuration','1 action','Self','V,S,M','Concentration, 1 hour','+10 to Stealth checks, can\'t be tracked by nonmagical means. Applies to all willing creatures within 30ft.'],
+  'Prayer of Healing':['Evocation','10 minutes','30 ft','V','Instantaneous','Up to 6 creatures regain 2d8+spell mod HP each. +1d8/slot.'],
+  'Protection from Poison':['Abjuration','1 action','Touch','V,S','1 hour','Advantage on saves vs poison, resistance to poison damage. If poisoned: neutralize one poison.'],
+  'Silence':['Illusion','1 action','120 ft','V,S','Concentration, 10 min','20ft radius sphere: no sound in or out. Immunity to thunder. Spells with verbal components can\'t be cast inside.'],
+  'Spike Growth':['Transmutation','1 action','150 ft','V,S,M','Concentration, 10 min','20ft radius difficult terrain of spikes. Creatures moving through take 2d4 piercing per 5ft of movement.'],
+  'Spiritual Weapon':['Evocation','1 bonus action','60 ft','V,S','1 minute','Create floating weapon (free hand not needed). Bonus action: move 20ft and attack (melee spell attack, 1d8+spell mod force). +1d8 per 2 slots.'],
+  'Warding Bond':['Abjuration','1 action','Touch','V,S,M','1 hour','+1 AC and saves, resistance to all damage to target. You share all damage taken by them. Must stay within 60ft.'],
+  'Warding Wind':['Evocation','1 action','Self','V','Concentration, 10 min','5mph wind around you. Deafened, ranged attacks against you have disadvantage, nonmagical flames extinguished.'],
+  'Wither and Bloom':['Necromancy','1 action','60 ft','V,S,M','Instantaneous','Up to 1+slot creatures in 10ft sphere: Con save or 2d6 necrotic + can\'t regain HP. Each creature beyond first triggers 1d6 healing to one nearby creature.'],
+  'Zone of Truth':['Enchantment','1 action','60 ft','V,S','10 minutes','15ft radius sphere. Cha save or can\'t deliberately lie while inside. Know if creatures are affected.'],
+  // LV3 NON-WIZARD
+  'Aura of Vitality':['Evocation','1 action','Self','V','Concentration, 1 min','30ft aura. Bonus action: restore 2d6 HP to one creature in range.'],
+  'Beacon of Hope':['Abjuration','1 action','30 ft','V,S','Concentration, 1 min','Up to 3 creatures: advantage on Wis saves and death saves, maximum HP when healed.'],
+  'Call Lightning':['Conjuration','1 action','120 ft','V,S','Concentration, 10 min','Storm cloud appears (100ft radius). Bonus action: 3d10 lightning in 5ft cylinder from cloud. Outdoors: +1d10. +1d10/slot.'],
+  'Catnap':['Enchantment','1 action','30 ft','V,S,M','10 minutes','Up to 3 willing creatures: fall asleep for 10 min then wake refreshed (as if short rest). +1 creature/slot.'],
+  'Conjure Animals':['Conjuration','1 action','60 ft','V,S','Concentration, 1 hour','Conjure fey spirits in beast forms. Choose CR-based quantity. They obey commands. +more per slot.'],
+  'Conjure Barrage':['Conjuration','1 action','Self (60ft cone)','V,S,M','Instantaneous','Throw weapon into 60ft cone. Dex save or 3d8 weapon damage type. +1d8/slot.'],
+  'Create Food and Water':['Conjuration','1 action','30 ft','V,S','Instantaneous','Create 45 lbs of food and 30 gallons of water — enough for 15 humanoids (or 5 steeds) for 24 hrs.'],
+  "Crusader's Mantle":['Evocation','1 action','Self','V','Concentration, 1 min','30ft aura. Friendly creatures\' weapon attacks deal +1d4 radiant damage.'],
+  'Daylight':['Evocation','1 action','60 ft','V,S','1 hour','60ft radius sphere of bright light (dim for 60ft beyond). Dispels darkness created by spells of 3rd or lower.'],
+  'Flame Arrows':['Transmutation','1 action','Touch','V,S','Concentration, 1 hour','Up to 12 pieces of ammunition deal +1d6 fire damage on hit.'],
+  'Hunger of Hadar':['Conjuration','1 action','150 ft','V,S,M','Concentration, 1 min','20ft radius sphere of utter darkness. Dex save for 2d6 cold or Con save for 2d6 acid per turn. Blindsight can\'t see inside.'],
+  'Lightning Arrow':['Transmutation','1 bonus action','Self','V,S','Concentration, 1 min','Next ranged attack: instead of normal damage, 4d8 lightning. Miss: 2d8 lightning. Adjacent creatures: half. +1d8/slot.'],
+  'Meld into Stone':['Transmutation','1 action','Touch','V,S','8 hours','Merge into a Medium+ stone object. Can perceive outside but can\'t move or act. Exit same stone or within 5ft.'],
+  'Mass Healing Word':['Evocation','1 bonus action','60 ft','V','Instantaneous','Up to 6 creatures regain 1d4+spell mod HP. +1d4/slot.'],
+  'Plant Growth':['Transmutation','1 action or 8 hours','150 ft','V,S','Instantaneous','1 action: 100ft radius, plants impede movement (4× movement through). 8 hrs: plants flourish, double crop yield.'],
+  'Revivify':['Necromancy','1 action','Touch','V,S,M','Instantaneous','Restore life to a creature that died within 1 minute. Returns with 1 HP. Material component: 300gp diamond.'],
+  'Spirit Guardians':['Conjuration','1 action','Self (15ft)','V,S,M','Concentration, 10 min','Spirits protect you. Enemies in range: Wis save or halved speed; 3d8 radiant or necrotic. +1d8/slot.'],
+  'Spirit Shroud':['Necromancy','1 bonus action','Self','V,S','Concentration, 1 min','Spirits from beyond: 1d8 necrotic/cold/radiant per attack hit, enemies within 10ft can\'t regain HP, -10ft speed. +1d8 per 2 slots.'],
+  'Speak with Plants':['Transmutation','1 action','Self (30ft)','V,S','10 minutes','Plants in range can communicate, tell what happened in the area, move branches/vines on request.'],
+  'Water Breathing':['Transmutation','1 action','30 ft','V,S,M','24 hours','Up to 10 willing creatures can breathe underwater for 24hrs.'],
+  'Water Walk':['Transmutation','1 action','30 ft','V,S,M','1 hour','Up to 10 willing creatures can walk on liquid as if solid. +1 creature/slot.'],
+  'Wind Wall':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','Wall of strong wind (50ft long, 15ft high, 1ft thick). Str save or 3d8 bludgeoning. Blocks gases, deflects small projectiles.'],
+  // LV4 NON-WIZARD
+  'Aura of Life':['Abjuration','1 action','Self (30ft)','V','Concentration, 10 min','30ft aura: resistance to necrotic, max HP can\'t be reduced, stabilize at 0 HP.'],
+  'Aura of Purity':['Abjuration','1 action','Self (30ft)','V','Concentration, 10 min','30ft aura: immune to disease, resistant to poison, advantage on saves vs certain conditions.'],
+  'Compulsion':['Enchantment','1 action','30 ft','V,S','Concentration, 1 min','Cha save or compelled to move in direction you choose (no attacks or spells). Repeat save each turn.'],
+  'Conjure Woodland Beings':['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 hour','Summon fey creatures. Choose CR combination. They obey your commands.'],
+  'Death Ward':['Abjuration','1 action','Touch','V,S','8 hours','If target would drop to 0 HP from damage: instead drops to 1 HP and spell ends. Or negates death spell once.'],
+  'Dominate Beast':['Enchantment','1 action','60 ft','V,S','Concentration, 1 min','Wis save or beast charmed and follows telepathic commands. Repeat save when harmed.'],
+  'Freedom of Movement':['Abjuration','1 action','Touch','V,S,M','1 hour','Ignore difficult terrain, paralyzed/restrained conditions, underwater movement/attack penalties. Can\'t be held by magic.'],
+  'Giant Insect':['Transmutation','1 action','30 ft','V,S','Concentration, 10 min','Transform up to 10 centipedes, 3 wasps, 1 beetle, or 1 spider into giant versions under your control.'],
+  'Grasping Vine':['Conjuration','1 bonus action','30 ft','V,S','Concentration, 1 min','Vine appears at a point. Bonus action: lash at creature (Dex save or pulled 20ft toward vine, takes 1d6 bludgeoning).'],
+  'Gravity Sinkhole':['Evocation','1 action','120 ft','V,S,M','Instantaneous','20ft radius sphere. Con save or 5d10 force and pulled 60ft toward center. +1d10/slot.'],
+  'Guardian of Faith':['Conjuration','1 action','30 ft','V','8 hours','Large spectral guardian appears. Hostile creatures that move within 10ft: Dex save or 20 radiant. 60 HP total, then vanishes.'],
+  'Guardian of Nature':['Transmutation','1 bonus action','Self','V','Concentration, 1 min','Primal Beast form: darkvision, advantage on Str, Dex attacks deal +1d6 force. Tree form: plant creature type, +1d6 from attacks, Con checks advantage.'],
+  'Shadow of Moil':['Necromancy','1 action','Self','V,S,M','Concentration, 1 min','Surrounded by shadow flames: resistance to radiant, lightly obscured, attackers take 2d8 necrotic when they hit.'],
+  'Spirit of Death':['Necromancy','1 action','60 ft','V,S,M','Concentration, 1 hour','Reaper spirit: flies 30ft, immune to most damage. Attack: 1d8+spell mod necrotic. Herd undead. +1d8/slot.'],
+  'Staggering Smite':['Evocation','1 bonus action','Self','V','Concentration, 1 min','Next melee hit: +4d6 psychic, Wis save or disadvantage on attacks/saves, can\'t take reactions until next turn.'],
+  'Stone Shape':['Transmutation','1 action','Touch','V,S,M','Instantaneous','Reshape up to 5 cubic feet of stone into any shape. Rough detail only.'],
+  'Stoneskin':['Abjuration','1 action','Touch','V,S,M','Concentration, 1 hour','Resistance to nonmagical bludgeoning/piercing/slashing damage.'],
+  // LV5 NON-WIZARD
+  'Antilife Shell':['Abjuration','1 action','Self (10ft)','V,S','Concentration, 1 hour','10ft barrier prevents living creatures from passing. Aberrations, undead, etc. unaffected.'],
+  'Awaken':['Transmutation','8 hours','Touch','V,S,M','Instantaneous','Touch a beast or plant — it gains Intelligence 10, one language, Fey Ancestry, and friendly toward you for 30 days. Requires 1000gp agate.'],
+  'Banishing Smite':['Abjuration','1 bonus action','Self','V','Concentration, 1 min','Next weapon hit: +5d10 force. If target has 50 HP or fewer it\'s banished to harmless demiplane while concentrated.'],
+  'Circle of Power':['Abjuration','1 action','Self (30ft)','V','Concentration, 10 min','30ft aura: advantage on saves vs magical effects. On successful save vs spell with half damage: take none instead.'],
+  'Commune':['Divination','1 minute','Self','V,S,M','Instantaneous','Contact your deity — ask 3 yes/no questions and get truthful answers. Each use beyond once per day risks garbled answers.'],
+  'Commune with Nature':['Divination','1 minute','Self','V,S','Instantaneous','Gain 3 facts about territory within 3 miles (outdoors) or 300ft (underground): terrain, bodies of water, plants, minerals, animals, races, buildings, magical areas.'],
+  'Contagion':['Necromancy','1 action','Touch','V,S','7 days','Melee spell attack: on hit target makes Con saves; fail 3 times → diseased for 7 days (blinding sickness, filth fever, flesh rot, mindfire, seizure, or slimy doom).'],
+  'Control Winds':['Transmutation','1 action','300 ft','V,S','Concentration, 1 hour','100ft cube of wind: Gusts (Dex save or fall prone when dashing), Downdraft (no flying), Updraft (+10ft speed/move toward sky).'],
+  'Destructive Wave':['Evocation','1 action','Self (30ft)','V','Instantaneous','30ft radius: Con save or 5d6 thunder + 5d6 radiant or necrotic, knocked prone. Half on success.'],
+  'Dispel Evil and Good':['Abjuration','1 action','Self','V,S,M','Concentration, 1 min','Celestials/elementals/fey/fiends/undead: disadvantage vs you, attacks against them have advantage. Reaction: banish one; or touch to end charm/frightened/possession.'],
+  'Dream':['Illusion','1 minute','Special','V,S,M','8 hours','Enter dreams of a sleeping creature within 1 mile. Shape dream as messenger or nightmare (3d6 psychic on wake).'],
+  'Flame Strike':['Evocation','1 action','60 ft','V,S,M','Instantaneous','10ft radius, 40ft tall cylinder. Dex save or 4d6 fire + 4d6 radiant (half success). +1d6 each type/slot.'],
+  'Geas':['Enchantment','1 minute','60 ft','V','30 days','Wis save or magically bound to complete a service or refrain from an action. Disobeying: 5d10 psychic daily.'],
+  'Greater Restoration':['Abjuration','1 action','Touch','V,S,M','Instantaneous','End one of: charmed/petrified/curse/ability score reduction/hit point max reduction.'],
+  'Holy Weapon':['Evocation','1 bonus action','Touch','V,S','Concentration, 1 hour','+2d8 radiant on weapon hits. Dismiss as bonus action: 24d8 radiant burst, 30ft, Con save or blinded 1 min.'],
+  'Infernal Calling':['Conjuration','1 minute','90 ft','V,S,M','Concentration, 1 hour','Summon a devil (up to CR 4 + 1 per slot above 5th). Charisma contest to control; it may refuse.'],
+  'Insect Plague':['Conjuration','1 action','300 ft','V,S,M','Concentration, 10 min','20ft radius sphere of biting locusts: difficult terrain, Con save or 4d10 piercing (half success). +1d10/slot.'],
+  'Maelstrom':['Evocation','1 action','120 ft','V,S,M','Concentration, 1 min','30ft radius circle of churning water. 6d6 bludgeoning per turn. Str save or pulled 10ft toward center. Difficult terrain.'],
+  'Mass Cure Wounds':['Evocation','1 action','60 ft','V,S','Instantaneous','Up to 6 creatures in 30ft radius: each regains 3d8+spell mod HP. +1d8/slot.'],
+  'Raise Dead':['Necromancy','1 hour','Touch','V,S,M','Instantaneous','Restore life to dead creature (died within 10 days). Returns with 1 HP. -4 to d20 rolls for 4 days. Requires 500gp diamond.'],
+  'Reincarnate':['Transmutation','1 hour','Touch','V,S,M','Instantaneous','Restore a dead creature (died within 10 days) in a new body (roll d100 for race). Full HP in new form.'],
+  'Swift Quiver':['Transmutation','1 bonus action','Touch','V,S,M','Concentration, 1 min','Quiver generates infinite ammunition. Bonus action: two attacks from it. +1d6 piercing vs. non-magic immunity.'],
+  'Tree Stride':['Conjuration','1 action','Self','V,S','Concentration, 1 min','Teleport from one living tree to another of same species within 500ft (or 3 miles for larger trees). One per turn.'],
+  'Wrath of Nature':['Evocation','1 action','120 ft','V,S','Concentration, 1 min','60ft cube: trees restrain (Dex save), grass roots (Str save or restrained), roots entangle, winds give ranged disadvantage.'],
+  // LV6 NON-WIZARD
+  'Blade Barrier':['Evocation','1 action','90 ft','V,S','Concentration, 10 min','Wall of spinning blades (up to 100ft long, 20ft high, 5ft thick). Dex save or 6d10 slashing. Difficult terrain, blocks movement.'],
+  'Bones of the Earth':['Transmutation','1 action','120 ft','V,S','Instantaneous','Up to 6 pillars of stone erupt (up to 30ft tall, 5ft diameter). Str save if beneath: 6d6 bludgeoning, pushed up. +2 pillars/slot.'],
+  'Conjure Fey':['Conjuration','1 minute','90 ft','V,S','Concentration, 1 hour','Summon fey creature (CR 6 or lower). Obeys commands while concentrated. +1 CR/slot.'],
+  'Find the Path':['Divination','1 minute','Self','V,S,M','Concentration, 1 day','Know the most direct physical route to a specific fixed location you\'ve seen.'],
+  'Forbiddance':['Abjuration','10 minutes','Touch','V,S,M','1 day','Ward against magical travel (teleportation, planar travel) in a 40,000 sq ft space. 5d10 radiant or necrotic to chosen creature types.'],
+  'Harm':['Necromancy','1 action','60 ft','V,S','Instantaneous','Con save or 14d6 necrotic (half success). Reduces target\'s HP max by damage taken until long rest.'],
+  'Heal':['Evocation','1 action','60 ft','V,S','Instantaneous','Restore 70 HP and remove blindness, deafness, disease, and any spells causing such conditions. +10 HP/slot.'],
+  "Heroes' Feast":['Conjuration','10 minutes','30 ft','V,S,M','Instantaneous','Feast for 12: cured of diseases/poison, immune to poison/frightened, Wis save advantage, +2d10 max HP, full heal. Lasts 24hrs. Requires 1000gp gem bowl.'],
+  'Mass Suggestion':['Enchantment','1 action','60 ft','V,M','24 hours','Like Suggestion but affects up to 12 creatures. +longer duration per slot.'],
+  'Planar Ally':['Conjuration','10 minutes','60 ft','V,S','Instantaneous','Call a celestial/elemental/fiend to serve you. Must negotiate payment. May refuse.'],
+  'Primordial Ward':['Abjuration','1 action','Self','V,S','Concentration, 1 min','Resistance to acid/cold/fire/lightning/thunder. When damaged by one: drop that resistance, gain immunity to it until end of next turn.'],
+  'Transport via Plants':['Conjuration','1 action','10 ft','V,S','1 round','Teleport through any two plants of same kind within 1 mile that you can see.'],
+  'Wall of Thorns':['Conjuration','1 action','120 ft','V,S,M','Concentration, 10 min','60ft long, 10ft high, 5ft thick thorn wall. Dex save or 7d8 piercing to enter. Moving through: 15d8. +1d8/slot.'],
+  'Wind Walk':['Transmutation','1 minute','30 ft','V,S,M','8 hours','Up to 10 creatures become gaseous form (fly 300ft, AC 13, resistance to nonmagical damage). Can revert as bonus action (takes 1 min).'],
+  'Word of Recall':['Conjuration','1 action','5 ft','V','Instantaneous','Teleport self and up to 5 willing creatures to a sanctuary you\'ve previously designated.'],
+  // LV7 NON-WIZARD
+  'Conjure Celestial':['Conjuration','1 minute','90 ft','V,S','Concentration, 1 hour','Summon a celestial (CR 4 or lower, or CR 5/6/7/8+ with higher slots). Obeys commands.'],
+  'Create Magen':['Transmutation','Special','Special','V,S,M','Instantaneous','Create one of three types of magen: Galvan (lightning), Hypnos (paralysis), Tindal (invisible scout).'],
+  'Divine Word':['Evocation','1 bonus action','30 ft','V','Instantaneous','Any creature you choose: if 50 HP or fewer: blinded/deafened/stunned/killed. Celestials/elementals/fey/fiends: banished permanently.'],
+  'Fire Storm':['Evocation','1 action','150 ft','V,S','Instantaneous','Up to 10 10-ft cubes (each adjacent). Dex save or 7d10 fire (half success). Plants auto-fail.'],
+  'Power Word Pain':['Enchantment','1 action','60 ft','V','Instantaneous','If target has more than 100 HP: Con save each action or can\'t move, -4 to attacks/saves/checks, can\'t concentrate.'],
+  'Regenerate':['Transmutation','1 minute','Touch','V,S,M','1 hour','Touch creature: regains 4d8+15 HP immediately. Regrows 1 HP per turn and regrows severed limbs in 2 minutes.'],
+  'Resurrection':['Necromancy','1 hour','Touch','V,S,M','Instantaneous','Restore life to creature dead up to 100 years. Returns with full HP. Permanent -1 to all rolls for each prior resurrection. Requires 1000gp diamond.'],
+  'Symbol':['Abjuration','1 minute','Touch','V,S,M','Until dispelled','Inscribe harmful glyph. When triggered: affects all creatures within 60ft (choose effect: death, discord, fear, hopelessness, insanity, pain, sleep, or stunning).'],
+  'Temple of the Gods':['Conjuration','1 hour','120 ft','V,S,M','24 hours','Create a temple up to 120×120ft. Unholy creatures can\'t enter without Wis save. Spells within may be enhanced/suppressed.'],
+  'Tether Essence':['Necromancy','1 action','60 ft','V,S,M','Concentration, 1 hour','Link two creatures. Either damaging one deals the same to the other. Str check to separate.'],
+  // LV8 NON-WIZARD
+  'Antipathy/Sympathy':['Enchantment','1 hour','60 ft','V,S,M','10 days','Object or area of 200ft cube: choose a creature type — they\'re repelled (Wis save flee 60ft) or attracted (must approach).'],
+  'Control Weather':['Transmutation','10 minutes','Self (5 mile radius)','V,S,M','Concentration, 8 hours','Change weather conditions in 5-mile radius: precipitation and temperature stage by stage over 1d4×10 minutes.'],
+  'Earthquake':['Evocation','1 action','500 ft','V,S,M','Concentration, 1 min','100ft radius of violent shaking: Concentration checks DC 15, difficult terrain, structures take 50 damage/turn, fissures open (Dex save or fall 1d6×10 ft).'],
+  'Holy Aura':['Abjuration','1 action','30 ft','V,S,M','Concentration, 1 min','Dim light aura. Creatures within 30ft: advantage on saves, attack rolls against them have disadvantage, undead/fiends hitting them: Con save or blinded.'],
+  'Tsunami':['Conjuration','1 minute','Sight','V,S','Concentration, 6 rounds','300ft long, 300ft high, 50ft wide wall of water. 6d10 bludgeoning each round. Moved inland 50ft each turn.'],
+  // LV9 NON-WIZARD
+  'Mass Heal':['Evocation','1 action','60 ft','V,S','Instantaneous','Restore up to 700 HP split however you choose among any creatures in range. Also removes blindness, deafness, and disease.'],
+  'Power Word Heal':['Evocation','1 action','Touch','V,S','Instantaneous','Target regains all HP. If frightened/charmed/paralyzed/stunned, condition ends. Target can use reaction to stand up.'],
+  'True Resurrection':['Necromancy','1 hour','Touch','V,S,M','Instantaneous','Restore life to creature dead any length of time (if soul willing). Provides a new body if needed. Requires 25,000gp diamond.'],
+  // MISC / SPECIAL
+  'Fast Friends':['Enchantment','1 action','30 ft','V','Concentration, 1 hour','Wis save or charmed and must fulfill simple requests for 1 hour. Remembers being magically commanded afterward.'],
+  'Incite Greed':['Enchantment','1 action','30 ft','V,S,M','Concentration, 1 min','Show a gem — Wis save or charmed, focused on gem, can\'t take reactions.'],
+  'Motivational Speech':['Enchantment','1 minute','60 ft','V','1 hour','Up to 5 creatures: 5 temp HP, advantage on Wis saves, +1d4 to attack rolls once per turn.'],
+  "Nature's Allies":['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 hour','Summon a swarm of beasts or a spirit in beast form depending on slot used.'],
+  'Otherworldly Form':['Transmutation','1 action','Self','V,S,M','Concentration, 1 min','Your form becomes otherworldly: fly 40ft, resistance to nonmagical bludgeoning/piercing/slashing, and each turn you can emit 30ft burst of 2d6 damage of chosen type.'],
+  'Wild Cunning':['Transmutation','1 action','120 ft','V,S','Instantaneous','Call upon nature spirits: extinguish fire, create a campfire, pull water from air, or signal landmarks within 1 mile.'],
+  "Yolande's Regal Presence":['Enchantment','1 action','Self (30ft)','V,S','Concentration, 1 min','You exude royal authority. Creatures of your choice in 30ft: Wis save or frightened and prone until end of their next turn. +1d4 radiant when they fail.'],
+
+  "Crusader's Mantle":['Evocation','1 action','Self','V','Concentration, 1 min','Holy energy radiates from you in a 30ft aura. Each non-undead, non-construct ally in range adds 1d4 radiant to weapon damage.'],
+  "Heroes' Feast":['Conjuration','10 minutes','30 ft','V,S,M','Instantaneous','Feast for up to 12 creatures. Cures disease/poison, immune to poison and frightened, Wis save advantage, +2d10 max HP and current HP for 24 hrs. 1000gp gem bowl consumed.'],
+  "Hunter's Mark":['Divination','1 bonus action','90 ft','V','Concentration, 1 hour','Mark one creature. Your attacks deal +1d6 damage to it. Advantage on Perception/Survival to track it. On death, move mark as bonus action. Longer duration per slot.'],
+  "Jim's Magic Missile":['Evocation','1 action','120 ft','V,S,M','Instantaneous','Roll 1d6: on 1 it fails (material component consumed). On any other result, fire 3 darts like Magic Missile each dealing 2d4+2 force. +1 dart per slot above 1st.'],
+  "Nature's Allies":['Conjuration','1 action','60 ft','V,S,M','Concentration, 1 hour','Summon a spirit in the form of a beast. At 2nd slot: CR 1/4 swarm. Higher slots unlock greater creatures. Obeys your commands.'],
+  "Yolande's Regal Presence":['Enchantment','1 action','Self (30ft)','V,S','Concentration, 1 min','You exude majestic authority. Creatures of your choice within 30ft make Wis saves or are frightened and fall prone until end of their next turn. On failure they also take 4d10 radiant.'],
 };
 function getSpellInfo(name){
   // Check custom spells first
@@ -2572,7 +2792,7 @@ function renderSBPreparedList(){
         <span class="spell-card-name">${sp.name}</span>
         <span class="spell-card-school" style="background:${sch.color}22;color:${sch.color};border:1px solid ${sch.color}44;">${sch.school||info[0]}</span>
         <span class="spell-card-level">${lv===0?'CANTRIP':'LV'+lv}</span>
-        <button class="spell-move-btn" style="border-color:var(--dim);color:var(--dim);" onclick="event.stopPropagation();unprepareSpell('${sp.name}')">← UNPREPARE</button>
+        <button class="spell-move-btn" style="border-color:var(--dim);color:var(--dim);background:transparent;" onclick="event.stopPropagation();unprepareSpell('${sp.name}')">← UNPREPARE</button>
         <button class="spell-move-btn" style="border-color:var(--red);color:var(--red);" onclick="event.stopPropagation();removePrepared(${i})">✕</button>
       </div>
       <div class="spell-card-body">
@@ -3217,7 +3437,7 @@ function renderEmote(name){
     // BetterTTV CDN
     return `<img src="https://cdn.betterttv.net/emote/${id}/1x" alt="${name}" title="${name}" style="height:20px;vertical-align:middle;margin:0 1px;display:inline-block;" onerror="this.outerHTML='<span class=\"tc-emote-box\">${name}</span>'">`; 
   }
-  return `<span class="tc-emote-box">${name}</span>`;
+  return `<span class="tc-emote-box">${name}</span>`;// only for text emote fallback
 }
 const TC_FANTAS=['🔮','💎','⚡','🎰','👁','💀','🌙','⭐','🏆','💸','🎲','🧙','🪄','📈','📉'];
 
@@ -3236,16 +3456,20 @@ function spawnTwitchChat(won,amount,ctx){
     const gap=Math.floor((rnd(200,700)*fameMult)+(i===0?0:300*fameMult));cum+=gap;
     setTimeout(()=>{
       const arch=viewer.arch;const pool2=won?arch.winMsgs:arch.loseMsgs;let text=pk(pool2);
-      const emotes=[];if(Math.random()<.4)emotes.push(pk(TC_EMOTE_KEYS));if(Math.random()<.25)emotes.push(pk(TC_FANTAS));
+      const emoteHtmlParts=[];if(Math.random()<.4)emoteHtmlParts.push(renderEmote(pk(TC_EMOTE_KEYS)));if(Math.random()<.25)emoteHtmlParts.push(`<span style="font-size:14px;vertical-align:middle;margin:0 1px;">${pk(TC_FANTAS)}</span>`);
       const msgEl=document.createElement('div');msgEl.className='tc-msg';
       const badge=arch.badge?`<span style="margin-right:2px;">${arch.badge}</span>`:'';
-      const emoteHTML=emotes.map(e=>renderEmote(e)).join('');
+      const emoteHTML=emoteHtmlParts.join('');
       msgEl.innerHTML=`${badge}<span class="tc-name" style="color:${arch.color};">${viewer.name}</span><span style="color:#888;font-size:9px;">: </span><span class="tc-text">${text}</span>${emoteHTML}`;
       msgs.appendChild(msgEl);msgs.scrollTop=msgs.scrollHeight;
     },cum);
   });
   // Pure emote spam
-  const eCnt=won?rnd(1,3):rnd(0,2);for(let e=0;e<eCnt;e++){const xd=cum+rnd(100,400)*(e+1);setTimeout(()=>{const fakeColor=`hsl(${rnd(0,360)},70%,65%)`;const es=Array.from({length:rnd(2,5)},()=>won?pk([...TC_EMOTE_KEYS,...TC_FANTAS]):pk(['💀','NotLikeThis','FeelsBadMan','KEKW','LUL','Sadge','PepeHands'])).map(em=>renderEmote(em)).join('');const el=document.createElement('div');el.className='tc-msg';el.innerHTML=`<span class="tc-name" style="color:${fakeColor};">anon${rnd(100,9999)}</span><span style="color:#888;font-size:9px;">: </span>${es}`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;},xd);}
+  const eCnt=won?rnd(1,3):rnd(0,2);for(let e=0;e<eCnt;e++){const xd=cum+rnd(100,400)*(e+1);setTimeout(()=>{const fakeColor=`hsl(${rnd(0,360)},70%,65%)`;const es=Array.from({length:rnd(2,5)},()=>{
+            const useEmote=Math.random()<.5;
+            if(won){return useEmote?renderEmote(pk(TC_EMOTE_KEYS)):`<span style="font-size:14px;vertical-align:middle;">${pk(TC_FANTAS)}</span>`;}
+            else{const losers=['NotLikeThis','FeelsBadMan','KEKW','LUL','Sadge','PepeHands'];return useEmote?renderEmote(pk(losers)):`<span style="font-size:14px;vertical-align:middle;">${pk(['💀','📉','😭'])}</span>`;}
+          }).join('');const el=document.createElement('div');el.className='tc-msg';el.innerHTML=`<span class="tc-name" style="color:${fakeColor};">anon${rnd(100,9999)}</span><span style="color:#888;font-size:9px;">: </span>${es}`;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;},xd);}
   // 10 seconds display
   twitchCloseTimer=setTimeout(()=>closeTwitchChat(),Math.max(10000,cum+3000));
 }
@@ -3410,11 +3634,15 @@ const ORACLE_TEMPLATES=[
 ];
 
 function dmFireOracle(){
-  const text=pk(ORACLE_TEMPLATES)();
+  // Check for a custom typed message first
+  const customInp=document.getElementById('dm-oracle-custom');
+  const text=customInp&&customInp.value.trim()?customInp.value.trim():pk(ORACLE_TEMPLATES)();
+  if(customInp)customInp.value='';
   S.dailyOracle={text,day:S.day,ts:Date.now()};
   showOracleBanner(text);
   S._pendingPlayerEvent={type:'oracle',text,ts:Date.now()};
   fbPush();toast('ORACLE PROPHECY SENT','var(--cyan)');
+  logDMEvent(`Oracle: "${text.substring(0,50)}..."`, 'dfe-equip');
 }
 
 function showOracleBanner(text){
@@ -3533,7 +3761,7 @@ function buildDMPanel(){
     <div class="dmsec">
       <div class="dmttl">FAME & WALLET</div>
       <div class="dmrow">
-        <div><label class="dml">FAME (0-100)</label><input type="range" class="dmi" id="famesl" min="0" max="100" value="${S.fame||0}" oninput="S.fame=parseInt(this.value);document.getElementById('fvl').textContent=this.value;renderMarkets();" style="width:140px;"><span id="fvl" style="color:var(--gold);font-family:var(--fh);font-size:8px;margin-left:4px;">${S.fame||0}</span></div>
+        <div><label class="dml">FAME (0-100)</label><input type="range" class="dmi" id="famesl" min="0" max="100" value="${S.fame||0}" oninput="S.fame=parseInt(this.value);document.getElementById('fvl').textContent=this.value;const ff=document.getElementById('famef');if(ff)ff.style.width=this.value+'%';renderMarkets();" style="width:140px;"><span id="fvl" style="color:var(--gold);font-family:var(--fh);font-size:8px;margin-left:4px;">${S.fame||0}</span></div>
       </div>
       <div class="fame-bar"><div class="fame-fill" id="famef" style="width:${S.fame||0}%"></div></div>
       <div class="dmrow">
@@ -3655,13 +3883,28 @@ function buildDMPanel(){
     </div>
 
     <div class="dmsec">
+      <div class="dmttl">ORACLE MESSAGES</div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.4rem;">Type a custom prophecy to send directly, or leave blank to pick randomly from the pool.</div>
+      <div class="dmrow" style="margin-bottom:.4rem;">
+        <input type="text" class="dmi" id="dm-oracle-custom" placeholder="The stars foretell... (leave blank for random)" style="flex:1;">
+        <button class="dmbtn" onclick="dmFireOracle()" style="border-color:var(--cyan);color:var(--cyan);">🔮 SEND</button>
+      </div>
+      <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.3rem;">RANDOM POOL — add or remove prophecies:</div>
+      <div id="dm-oracle-pool" style="max-height:140px;overflow-y:auto;scrollbar-width:thin;margin-bottom:.35rem;display:flex;flex-direction:column;gap:3px;"></div>
+      <div class="dmrow">
+        <input type="text" class="dmi" id="dm-oracle-new" placeholder="Add prophecy to pool..." style="flex:1;">
+        <button class="dmbtn" onclick="dmAddOracleTemplate()" style="border-color:var(--cyan);color:var(--cyan);">ADD</button>
+      </div>
+    </div>
+
+    <div class="dmsec">
       <div class="dmttl">WORLD BUILDER — PROPER NOUNS</div>
       <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.6rem;">Edit names used in procedural market generation.</div>
       <div id="wb-lists-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.5rem;"></div>
     </div>
   `;
   // Fill in dynamic parts
-  buildDMSlotInputs();buildDMShopRanges();buildDMFragRanges();buildDMSpellClasses();buildDMValueBands();buildDMSponsorPool();buildDMNewsList();buildWorldBuilder();refreshDMSelects();refreshDMShopSel();refreshDMShillSel();
+  buildDMSlotInputs();buildDMShopRanges();buildDMFragRanges();buildDMSpellClasses();buildDMValueBands();buildDMSponsorPool();buildDMNewsList();buildDMOraclePool();buildWorldBuilder();refreshDMSelects();refreshDMShopSel();refreshDMShillSel();
 }
 
 function dmSet(){const v=parseInt(document.getElementById('setwl').value);if(isNaN(v))return;S.wallet=Math.max(0,v);document.getElementById('wdisp').textContent=S.wallet.toLocaleString();logEntry(`DM SET WALLET: ${S.wallet}`,'spend');toast(`WALLET SET: ${S.wallet}`,'#ff4444');fbPush();}
@@ -3751,6 +3994,47 @@ function dmRemoveNews(i){S.newsTicker.splice(i,1);buildDMNewsList();buildNewsTic
 const WB_DEFAULTS={towns:[...MKT_TOWNS],nobles:[...MKT_NOBLES],factions:[...MKT_FACTIONS],goods:[...MKT_GOODS],crops:[...MKT_CROPS],disasters:[...MKT_DISASTERS],weather:[...MKT_WEATHER],routes:[...MKT_ROUTES],ships:[...MKT_SHIPS],elections:[...MKT_ELECTIONS],events:[...MKT_EVENTS]};
 const WB={towns:MKT_TOWNS,nobles:MKT_NOBLES,factions:MKT_FACTIONS,goods:MKT_GOODS,crops:MKT_CROPS,disasters:MKT_DISASTERS,weather:MKT_WEATHER,routes:MKT_ROUTES,ships:MKT_SHIPS,elections:MKT_ELECTIONS,events:MKT_EVENTS};
 const WB_LABELS={towns:'Town Names',nobles:'Noble Titles',factions:'Factions',goods:'Trade Goods',crops:'Crops',disasters:'Disasters',weather:'Weather',routes:'Routes',ships:'Ships',elections:'Elected Positions',events:'Events'};
+// Oracle pool management
+// S.customOraclePool = array of custom template strings (shown alongside ORACLE_TEMPLATES)
+function buildDMOraclePool(){
+  const g=document.getElementById('dm-oracle-pool');if(!g)return;g.innerHTML='';
+  const pool=S.customOraclePool||[];
+  if(!pool.length){g.innerHTML='<div style="font-size:7px;color:#440066;font-family:var(--fh);">No custom entries yet — using built-in pool only.</div>';return;}
+  pool.forEach((t,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:4px;align-items:flex-start;background:#05000f;border:1px solid #1a0030;border-radius:4px;padding:3px 6px;';
+    row.innerHTML=`<span style="flex:1;font-size:7px;color:var(--dim);font-family:var(--fm);line-height:1.4;">${t}</span><button onclick="dmRemoveOracleTemplate(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:10px;flex-shrink:0;padding:0;">✕</button>`;
+    g.appendChild(row);
+  });
+}
+function dmAddOracleTemplate(){
+  const inp=document.getElementById('dm-oracle-new');const val=inp?.value.trim();if(!val)return;
+  if(!S.customOraclePool)S.customOraclePool=[];
+  S.customOraclePool.push(val);inp.value='';buildDMOraclePool();fbPush();
+  toast('Oracle message added','var(--cyan)');
+}
+function dmRemoveOracleTemplate(i){
+  if(!S.customOraclePool)return;S.customOraclePool.splice(i,1);buildDMOraclePool();fbPush();
+}
+
+// Override dmFireOracle to also use S.customOraclePool
+function dmFireOracle(){
+  const customInp=document.getElementById('dm-oracle-custom');
+  let text;
+  if(customInp&&customInp.value.trim()){
+    text=customInp.value.trim();customInp.value='';
+  }else{
+    // Merge built-in + custom pool
+    const allTemplates=[...ORACLE_TEMPLATES,...(S.customOraclePool||[]).map(t=>()=>t)];
+    text=pk(allTemplates)();
+  }
+  S.dailyOracle={text,day:S.day,ts:Date.now()};
+  showOracleBanner(text);
+  S._pendingPlayerEvent={type:'oracle',text,ts:Date.now()};
+  fbPush();toast('ORACLE PROPHECY SENT','var(--cyan)');
+  logDMEvent(`Oracle: "${text.substring(0,50)}..."`, 'dfe-equip');
+}
+
 function buildWorldBuilder(){const g=document.getElementById('wb-lists-grid');if(!g)return;g.innerHTML='';Object.keys(WB).forEach(k=>{const card=document.createElement('div');card.className='wb-card';card.innerHTML=`<div class="wb-card-title">${WB_LABELS[k]} <span style="color:#440044;font-size:6px;">(${WB[k].length})</span></div><div class="wb-tags" id="wb-tags-${k}"></div><div class="wb-add-row"><input class="wb-inp" type="text" id="wb-inp-${k}" placeholder="Add..." onkeydown="if(event.key==='Enter')wbAdd('${k}')"><button class="wb-add-btn" onclick="wbAdd('${k}')">ADD</button></div><button class="wb-reset-btn" onclick="wbReset('${k}')">RESET</button>`;g.appendChild(card);wbRenderTags(k);});}
 function wbRenderTags(k){const c=document.getElementById('wb-tags-'+k);if(!c)return;c.innerHTML='';WB[k].forEach((v,i)=>{const t=document.createElement('span');t.className='wb-tag';t.innerHTML=`${v}<button class="wb-tag-x" onclick="wbRemove('${k}',${i})">×</button>`;c.appendChild(t);});const ttl=c.parentElement?.querySelector('.wb-card-title');if(ttl)ttl.innerHTML=`${WB_LABELS[k]} <span style="color:#440044;font-size:6px;">(${WB[k].length})</span>`;}
 function wbAdd(k){const inp=document.getElementById('wb-inp-'+k);const v=(inp?.value||'').trim();if(!v)return;WB[k].push(v);inp.value='';wbRenderTags(k);}
