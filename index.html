@@ -1628,7 +1628,7 @@ function renderMarkets(){
       <div class="mkt-q">${m.question}</div>
       <div class="mkt-meta">
         <div class="mkt-type">${m.type.toUpperCase()} &bull; VOL:${totalPool.toLocaleString()} &bull; FAME:${Math.floor(S.fame/20)||1}×</div>
-        <div class="mkt-tmr">${timerStr}</div>
+        <div class="mkt-tmr" id="tmr-${m.id}">${timerStr}</div>
       </div>
       <div class="pool-info">Pool YES: ${(m.bets.yes||0).toLocaleString()}◈ | NO: ${(m.bets.no||0).toLocaleString()}g${myTotalBet>0?` | MY SHARE: ${myPct}%`:''}</div>
       <div class="pb"><div class="pbf pby" style="width:${Math.min(99.9,m.prob)}%">${probDisplay}%</div></div>
@@ -4285,8 +4285,16 @@ function init(){
   // Shop level filter options
   const lf=document.getElementById('shopLvlFilter');for(let l=0;l<=9;l++){const o=document.createElement('option');o.value=l;o.textContent=`Level ${l}`;lf.appendChild(o);}
   buildTicker();
-  setInterval(tickTimers,1000);
-  setInterval(()=>{const el=document.getElementById('avearn');if(el)el.textContent=`~${Math.floor(S.wallet*(TITLES[S.equippedTitle]||TITLES[0]).interest).toLocaleString()}g/day`;},5000);
+  // Timer loop: use rAF, throttled to ~1/sec, only when markets tab is open
+  let _lastTick=0;
+  function timerLoop(ts){
+    requestAnimationFrame(timerLoop);
+    if(ts-_lastTick<980)return; // ~1 per second
+    _lastTick=ts;
+    tickTimers();
+  }
+  requestAnimationFrame(timerLoop);
+  // avearn updates happen in equipTitle() and advanceDay() - no interval needed
   // Attach HP input listeners
   document.getElementById('hp-current')?.addEventListener('input',updateHPDisplay);
   document.getElementById('hp-max')?.addEventListener('input',updateHPDisplay);
@@ -4362,63 +4370,82 @@ function renderSkillsList(){
 // ══ AUDIO ENGINE ══════════════════════════════════════════════
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 let _actx=null;
-function getACtx(){if(!_actx)try{_actx=new AudioCtx();}catch(e){}return _actx;}
+let _activeNodes=0;
+const MAX_NODES=6; // hard cap on simultaneous oscillators
 
-function playTone(freq,dur,type='sine',vol=.18,delay=0){
-  const ctx=getACtx();if(!ctx)return;
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.connect(g);g.connect(ctx.destination);
-  o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);
-  g.gain.setValueAtTime(0,ctx.currentTime+delay);
-  g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+.01);
-  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+dur);
-  o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+.05);
+function getACtx(){
+  if(!_actx){try{_actx=new AudioCtx();}catch(e){return null;}}
+  // Resume if suspended (browser autoplay policy)
+  if(_actx.state==='suspended')_actx.resume();
+  return _actx;
 }
 
-function playChord(freqs,dur,type='sine',vol=.12){freqs.forEach((f,i)=>playTone(f,dur,type,vol,i*.04));}
+function playTone(freq,dur,type='sine',vol=.14,delay=0){
+  if(_activeNodes>=MAX_NODES)return; // drop note rather than lag
+  const ctx=getACtx();if(!ctx)return;
+  _activeNodes++;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type=type;
+  const t=ctx.currentTime+delay;
+  o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(Math.min(vol,.25),t+.01);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t);
+  const stopAt=t+dur+.05;
+  o.stop(stopAt);
+  // Release node count after it finishes
+  const releaseMs=(delay+dur+.1)*1000;
+  setTimeout(()=>{_activeNodes=Math.max(0,_activeNodes-1);},releaseMs);
+}
+
+// Play at most 3 notes of a melody, spread over time — never all at once
+function playMelody(freqs,noteDur,type='sine',vol=.12,spacing=.13){
+  const limited=freqs.slice(0,4); // cap melody length
+  limited.forEach((f,i)=>playTone(f,noteDur,type,vol,i*spacing));
+}
 
 const SFX={
-  // Casino & gambling
-  spin:()=>{for(let i=0;i<8;i++)playTone(200+i*40,.06,'square',.08,i*.055);},
-  cardFlip:()=>{playTone(800,.04,'square',.06);playTone(600,.05,'square',.04,.05);},
-  chipStack:()=>{playTone(440,.08,'triangle',.12);playTone(880,.06,'triangle',.08,.09);},
-  slotSpin:()=>{for(let i=0;i<5;i++)playTone(150+Math.random()*100,.04,'sawtooth',.05,i*.08);},
-  slotWin:()=>{const notes=[523,659,784,1047];notes.forEach((f,i)=>playTone(f,.2,'sine',.15,i*.12));},
-  rouletteRoll:()=>{let t=0;for(let i=0;i<20;i++){playTone(300+Math.random()*200,.03,'square',.04,t);t+=.05+i*.006;}},
-  bonesRoll:()=>{for(let i=0;i<3;i++){playTone(150+Math.random()*100,.05,'square',.08,i*.06);}},
-  bjCard:()=>{playTone(660,.05,'triangle',.1);playTone(990,.04,'triangle',.07,.06);},
-  bjBust:()=>{for(let i=0;i<3;i++)playTone(300-i*60,.15,'sawtooth',.1,i*.1);},
-  bjBlackjack:()=>{[523,659,784,1047,1319].forEach((f,i)=>playTone(f,.25,'sine',.15,i*.08));},
-  // Wins
-  smallWin:()=>{playChord([523,659,784],.3,'sine',.12);playTone(1047,.4,'sine',.15,.2);},
-  bigWin:()=>{[523,659,784,988,1047,1319,1568].forEach((f,i)=>playTone(f,.3,'sine',.14,i*.07));},
-  reignbet:()=>{// Ominous rising tone
-    playTone(110,.8,'sine',.2);playTone(165,.6,'sine',.15,.3);playTone(220,.5,'sine',.12,.6);
-    playTone(880,.1,'square',.08,1.0);playTone(440,.2,'sine',.1,1.0);},
-  reignbetWin:()=>{playChord([440,554,659,880],.5,'sine',.15);playTone(1760,.3,'sine',.1,.4);},
-  reignbetBust:()=>{playTone(220,.5,'sawtooth',.2);playTone(110,.8,'sine',.15,.3);},
-  reignbetX4:()=>{// Dramatic swell
-    for(let i=0;i<6;i++)playTone(440+i*110,.15+i*.05,'sine',.1+i*.02,i*.1);
-    playTone(1760,.4,'sine',.2,.7);},
-  // DON
-  donOpen:()=>{playTone(55,1.5,'sine',.3);playTone(110,.8,'sawtooth',.2,.3);playTone(220,.5,'square',.15,.8);},
-  donWin:()=>{[261,329,392,523,659,784,1047,1568].forEach((f,i)=>playTone(f,.4,'sine',.16,i*.06));},
-  donLose:()=>{for(let i=0;i<4;i++)playTone(220-i*30,.3,'sawtooth',.15,i*.12);},
+  // Casino
+  slotSpin:()=>{playTone(180,.06,'square',.07);playTone(240,.06,'square',.06,.08);playTone(160,.06,'square',.06,.16);},
+  slotWin:()=>{playMelody([523,659,784,1047],.25,'sine',.13,.1);},
+  rouletteRoll:()=>{
+    // 4 clicks spread over 300ms instead of 20 simultaneous nodes
+    [0,.08,.18,.30].forEach((t,i)=>playTone(280+i*30,.04,'square',.07,t));
+  },
+  bonesRoll:()=>{playTone(160,.05,'square',.09);playTone(200,.05,'square',.07,.07);},
+  bjCard:()=>{playTone(700,.04,'triangle',.1);},
+  bjBust:()=>{playTone(280,.12,'sawtooth',.1);playTone(220,.18,'sawtooth',.08,.1);},
+  bjBlackjack:()=>{playMelody([523,659,784,1047,1319],.2,'sine',.13,.09);},
+  chipStack:()=>{playTone(440,.07,'triangle',.1);playTone(660,.05,'triangle',.07,.08);},
+  // Wins (simplified — 3-4 notes max)
+  smallWin:()=>{playMelody([523,659,784,1047],.25,'sine',.12,.1);},
+  bigWin:()=>{playMelody([523,784,1047,1568],.3,'sine',.13,.12);},
+  // Reignbet — ominous but cheap
+  reignbet:()=>{playTone(110,.7,'sine',.18);playTone(165,.5,'sine',.12,.35);playTone(220,.4,'sine',.09,.65);},
+  reignbetWin:()=>{playMelody([440,554,659,880],.4,'sine',.13,.1);},
+  reignbetBust:()=>{playTone(220,.4,'sawtooth',.12);playTone(110,.6,'sine',.1,.3);},
+  reignbetX4:()=>{playMelody([440,550,660,880],.2,'sine',.13,.1);playTone(1760,.35,'sine',.15,.5);},
+  // DON — simplified bass pulse, not 1.5s drone
+  donOpen:()=>{playTone(80,.4,'sine',.2);playTone(110,.3,'sawtooth',.12,.35);playTone(165,.25,'square',.08,.6);},
+  donWin:()=>{playMelody([261,392,523,784],.35,'sine',.14,.1);},
+  donLose:()=>{playTone(220,.3,'sawtooth',.12);playTone(165,.35,'sawtooth',.1,.2);playTone(110,.4,'sine',.1,.4);},
   // Market
-  marketWin:()=>{playChord([392,494,587],.4,'sine',.12);playTone(1174,.3,'sine',.1,.35);},
-  marketResolve:()=>{playTone(440,.1,'square',.08);playTone(880,.2,'sine',.1,.15);},
-  // Gacha
-  gacha:()=>{for(let i=0;i<10;i++)playTone(200+i*80,.07,'sine',.08,i*.07);},
-  gachaSSR:()=>{[261,329,392,494,587,740,880,1174,1568].forEach((f,i)=>playTone(f,.3,'sine',.15,i*.05));setTimeout(()=>playChord([523,659,784,988,1047],.6,'sine',.18),500);},
-  // Dice  
-  diceRoll:()=>{for(let i=0;i<4;i++)playTone(150+Math.random()*150,.04,'square',.08,i*.04);},
-  portentRoll:()=>{playTone(880,.1,'sine',.1);playTone(1320,.15,'sine',.12,.1);playTone(1760,.2,'sine',.1,.2);setTimeout(()=>playChord([440,554,659],.4,'sine',.08),350);},
+  marketWin:()=>{playMelody([392,494,587,784],.3,'sine',.11,.1);},
+  marketResolve:()=>{playTone(440,.1,'square',.07);playTone(880,.15,'sine',.08,.12);},
+  // Gacha — 4 notes, not 10+
+  gacha:()=>{playMelody([300,400,500,700],.1,'sine',.08,.08);},
+  gachaSSR:()=>{playMelody([523,784,1047,1568],.3,'sine',.14,.1);},
+  // Dice
+  diceRoll:()=>{playTone(180,.04,'square',.08);playTone(220,.04,'square',.07,.05);},
+  portentRoll:()=>{playTone(880,.1,'sine',.1);playTone(1320,.15,'sine',.1,.12);playMelody([440,554,659],.3,'sine',.09,.12);},
   // UI
-  tab:()=>{playTone(880,.04,'sine',.06);},
-  error:()=>{playTone(220,.2,'sawtooth',.1);playTone(165,.2,'sawtooth',.08,.1);},
-  achievement:()=>{[523,659,784,988].forEach((f,i)=>playTone(f,.2,'sine',.12,i*.06));playTone(1976,.35,'sine',.15,.3);},
-  intervention:()=>{playTone(220,.3,'square',.15);playTone(165,.4,'sawtooth',.12,.25);},
-  oracle:()=>{playTone(220,.6,'sine',.15);playTone(330,.5,'sine',.1,.4);playTone(440,.4,'sine',.08,.7);},
+  tab:()=>{playTone(880,.04,'sine',.05);},
+  error:()=>{playTone(220,.15,'sawtooth',.09);playTone(165,.15,'sawtooth',.07,.1);},
+  achievement:()=>{playMelody([523,659,784,988],.2,'sine',.11,.07);},
+  intervention:()=>{playTone(220,.25,'square',.1);playTone(165,.3,'sawtooth',.08,.2);},
+  oracle:()=>{playTone(220,.5,'sine',.12);playTone(330,.4,'sine',.09,.4);playTone(440,.3,'sine',.07,.7);},
 };
 
 // Hook audio into key events
