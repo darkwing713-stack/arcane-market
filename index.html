@@ -443,13 +443,10 @@ body.dm-mode .nt.player-only{opacity:.6;}
 <div id="nav">
   <button class="nt player-only active" onclick="sw('markets')">MARKETS</button>
   <button class="nt player-only" onclick="sw('costs')">COSTS</button>
-  <button class="nt player-only" onclick="sw('shop')">SCROLL SHOP</button>
-  <button class="nt player-only" onclick="sw('scrollinv')">MY SCROLLS</button>
+  <button class="nt player-only" onclick="sw('scrollinv')">SCROLLS</button>
   <button class="nt player-only" onclick="sw('sponsor')">SPONSORSHIPS</button>
   <button class="nt player-only" onclick="sw('avatar')">AVATAR</button>
-  <button class="nt player-only" onclick="sw('titles')">TITLES</button>
   <button class="nt player-only" onclick="sw('frags')">SOUL FRAGMENTS</button>
-  <button class="nt player-only" onclick="sw('gacha')">GACHA</button>
   <button class="nt player-only" onclick="sw('inventory')">INVENTORY</button>
   <button class="nt player-only" onclick="sw('casino')">CASINO</button>
   <button class="nt player-only" onclick="sw('dice')">DICE ROLLER</button>
@@ -539,25 +536,34 @@ body.dm-mode .nt.player-only{opacity:.6;}
 </div>
 
 <!-- SCROLL SHOP -->
-<div class="pnl" id="pnl-shop">
-  <div class="sh">SCROLL SHOP</div>
-  <div style="font-size:8px;color:var(--dim);margin-bottom:.4rem;">Prices refresh daily. <span style="color:#884400;">⚠ Orange border = non-wizard spell</span> — you can buy it but can't cast it.</div>
-  <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem;align-items:center;">
-    <input class="shop-search" type="text" id="shopSearch" placeholder="Search scrolls..." oninput="renderShop()">
-    <select class="dmi sort-sel" id="shopLvlFilter" onchange="renderShop()" style="background:#05000f;color:var(--w);">
-      <option value="all">All Levels</option>
-    </select>
-    <span style="font-size:7px;color:var(--dim);font-family:var(--fh);" id="shopCount"></span>
-    <span style="font-size:7px;color:var(--gold);font-family:var(--fh);">Max level: <span id="shop-max-level">3</span></span>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.6rem;" id="shopgrid"></div>
-</div>
+<div class="pnl" id="pnl-shop" style="display:none;"></div>
 
-<!-- MY SCROLLS -->
+<!-- SCROLLS (shop + inventory combined) -->
 <div class="pnl" id="pnl-scrollinv">
-  <div class="sh">MY SCROLLS</div>
-  <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Scrolls you have purchased. <span style="color:#884400;">⚠ Orange = non-wizard, cannot cast.</span></div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.6rem;" id="scrollinvgrid"></div>
+  <div class="sh">SCROLLS</div>
+  <!-- Sub-tab nav -->
+  <div style="display:flex;gap:.3rem;margin-bottom:.65rem;border-bottom:1px solid var(--border);padding-bottom:.4rem;">
+    <button class="ftog active" id="scroll-tab-shop" onclick="scrollSubTab('shop',this)">SCROLL SHOP</button>
+    <button class="ftog" id="scroll-tab-inv" onclick="scrollSubTab('inv',this)">MY SCROLLS</button>
+  </div>
+  <!-- SHOP section -->
+  <div id="scroll-section-shop">
+    <div style="font-size:8px;color:var(--dim);margin-bottom:.4rem;">Prices refresh daily. <span style="color:#884400;">⚠ Orange border = non-wizard spell</span> — you can buy it but can't cast it.</div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem;align-items:center;">
+      <input class="shop-search" type="text" id="shopSearch" placeholder="Search scrolls..." oninput="renderShop()">
+      <select class="dmi sort-sel" id="shopLvlFilter" onchange="renderShop()" style="background:#05000f;color:var(--w);">
+        <option value="all">All Levels</option>
+      </select>
+      <span style="font-size:7px;color:var(--dim);font-family:var(--fh);" id="shopCount"></span>
+      <span style="font-size:7px;color:var(--gold);font-family:var(--fh);">Max level: <span id="shop-max-level">3</span></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.6rem;" id="shopgrid"></div>
+  </div>
+  <!-- MY SCROLLS section -->
+  <div id="scroll-section-inv" style="display:none;">
+    <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Scrolls you have purchased. <span style="color:#884400;">⚠ Orange = non-wizard, cannot cast.</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.6rem;" id="scrollinvgrid"></div>
+  </div>
 </div>
 
 <!-- SPONSORSHIPS -->
@@ -569,7 +575,14 @@ body.dm-mode .nt.player-only{opacity:.6;}
 
 <!-- AVATAR -->
 <div class="pnl" id="pnl-avatar">
-  <div class="sh">MY AVATAR</div>
+  <!-- Sub-tab nav -->
+  <div style="display:flex;gap:.3rem;margin-bottom:.65rem;border-bottom:1px solid var(--border);padding-bottom:.4rem;">
+    <button class="ftog active" id="avatar-tab-avatar" onclick="avatarSubTab('avatar',this)">MY AVATAR</button>
+    <button class="ftog" id="avatar-tab-titles" onclick="avatarSubTab('titles',this)">TITLES</button>
+  </div>
+
+  <!-- AVATAR SECTION -->
+  <div id="avatar-section-avatar">
   <div id="avwrap">
     <div id="avstage">
       <canvas id="wc" width="120" height="160"></canvas>
@@ -600,14 +613,16 @@ body.dm-mode .nt.player-only{opacity:.6;}
       <div class="card"><div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">PREPARED SPELLS</div><div id="prepared-display" style="font-size:8px;color:var(--dim);line-height:1.6;max-height:110px;overflow-y:auto;scrollbar-width:thin;"></div></div>
     </div>
   </div>
+  </div><!-- end avatar-section-avatar -->
+
+  <!-- TITLES SECTION -->
+  <div id="avatar-section-titles" style="display:none;">
+    <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Titles grant daily mana gem interest. Purchase then click to equip. <span style="color:#ff00ff;">★ = Gacha-only drop.</span></div>
+    <div id="tlist"></div>
+  </div>
 </div>
 
-<!-- TITLES -->
-<div class="pnl" id="pnl-titles">
-  <div class="sh">TITLE SHOP</div>
-  <div style="font-size:8px;color:var(--dim);margin-bottom:.55rem;">Titles grant daily mana gem interest. Purchase then click to equip. <span style="color:#ff00ff;">★ = Gacha-only drop.</span></div>
-  <div id="tlist"></div>
-</div>
+<!-- TITLES (merged into avatar panel below) -->
 
 <!-- SOUL FRAGMENT MARKET -->
 <div class="pnl" id="pnl-frags">
@@ -645,23 +660,7 @@ body.dm-mode .nt.player-only{opacity:.6;}
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:.5rem;" id="fragmktg"></div>
 </div>
 
-<!-- GACHA -->
-<div class="pnl" id="pnl-gacha">
-  <div id="banner"></div>
-  <div id="bannerrates" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem;font-size:7px;font-family:var(--fh);"></div>
-  <div id="pityw">
-    <div class="pityl"><span>SOFT PITY (SSR+)</span><span id="pitynum">0 / 90</span></div>
-    <div class="pbar"><div class="pbarf" id="pityfill" style="width:0%"></div></div>
-    <div class="pityl" style="margin-top:3px;"><span style="color:var(--gold)">HARD PITY (BANNER ITEM)</span><span id="hardpitynum" style="color:var(--gold)">0 / 180</span></div>
-    <div class="pbar"><div class="pbarf2" id="hardpityfill" style="width:0%"></div></div>
-  </div>
-  <div class="gbtns">
-    <button class="gbtn gbtn1" id="gacha-btn-1" onclick="doPull(1)">SINGLE PULL — 50◈</button>
-    <button class="gbtn gbtn10" id="gacha-btn-10" onclick="doPull(10)">10-PULL — 450◈</button>
-  </div>
-  <div id="pstage"><span class="pidle">AWAITING FATE...</span></div>
-  <div id="psumm" style="font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;margin-top:.3rem;min-height:.8rem;"></div>
-</div>
+<!-- GACHA (merged into casino panel below) -->
 
 <!-- INVENTORY -->
 <div class="pnl" id="pnl-inventory">
@@ -699,7 +698,14 @@ body.dm-mode .nt.player-only{opacity:.6;}
 
 <!-- CASINO -->
 <div class="pnl" id="pnl-casino">
-  <div class="sh">THE ARCANE CASINO</div>
+  <!-- Sub-tab nav -->
+  <div style="display:flex;gap:.3rem;margin-bottom:.65rem;border-bottom:1px solid var(--border);padding-bottom:.4rem;">
+    <button class="ftog active" id="casino-tab-games" onclick="casinoSubTab('games',this)">CASINO GAMES</button>
+    <button class="ftog" id="casino-tab-gacha" onclick="casinoSubTab('gacha',this)" style="border-color:#ffd700;color:#ffd700;">GACHA</button>
+  </div>
+
+  <!-- CASINO GAMES SECTION -->
+  <div id="casino-section-games">
   <div style="font-size:8px;color:var(--dim);margin-bottom:.7rem;">Win anything and the <span style="color:var(--gold)">REIGNBET ENGINE</span> will tempt you. It can multiply — or reduce — your winnings.</div>
   <div id="casino-wrap">
     <!-- ROULETTE -->
@@ -808,7 +814,28 @@ body.dm-mode .nt.player-only{opacity:.6;}
       </div>
     </div>
   </div>
-</div>
+</div><!-- end casino-section-games -->
+
+  <!-- GACHA SECTION -->
+  <div id="casino-section-gacha" style="display:none;">
+    <div id="pnl-gacha" style="display:block;">
+      <div id="banner"></div>
+      <div id="bannerrates" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem;font-size:7px;font-family:var(--fh);"></div>
+      <div id="pityw">
+        <div class="pityl"><span>SOFT PITY (SSR+)</span><span id="pitynum">0 / 90</span></div>
+        <div class="pbar"><div class="pbarf" id="pityfill" style="width:0%"></div></div>
+        <div class="pityl" style="margin-top:3px;"><span style="color:var(--gold)">HARD PITY (BANNER ITEM)</span><span id="hardpitynum" style="color:var(--gold)">0 / 180</span></div>
+        <div class="pbar"><div class="pbarf2" id="hardpityfill" style="width:0%"></div></div>
+      </div>
+      <div class="gbtns">
+        <button class="gbtn gbtn1" id="gacha-btn-1" onclick="doPull(1)">SINGLE PULL — 50◈</button>
+        <button class="gbtn gbtn10" id="gacha-btn-10" onclick="doPull(10)">10-PULL — 450◈</button>
+      </div>
+      <div id="pstage"><span class="pidle">AWAITING FATE...</span></div>
+      <div id="psumm" style="font-size:7px;color:var(--dim);font-family:var(--fh);letter-spacing:1px;margin-top:.3rem;min-height:.8rem;"></div>
+    </div>
+  </div>
+</div><!-- end pnl-casino -->
 
 <!-- DICE ROLLER -->
 <div class="pnl" id="pnl-dice">
@@ -1414,13 +1441,27 @@ function sw(name){
   document.querySelectorAll('.nt').forEach(t=>{if(t.getAttribute('onclick')?.includes("'"+name+"'"))t.classList.add('active');});
   if(name==='markets')renderMarkets();
   if(name==='costs')renderCosts();
-  if(name==='shop')renderShop();
-  if(name==='scrollinv')renderScrollInv();
+  if(name==='scrollinv'){renderShop();}
   if(name==='sponsor')renderSponsors();
   if(name==='avatar'){drawWizard();renderCharSheet();}
-  if(name==='titles')renderTitles();
+  if(name==='titles'){
+    // redirect: show avatar panel on titles sub-tab
+    document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+    document.getElementById('pnl-avatar')?.classList.add('active');
+    document.querySelectorAll('.nt').forEach(t=>{if(t.getAttribute('onclick')?.includes("'avatar'"))t.classList.add('active');});
+    avatarSubTab('titles', document.getElementById('avatar-tab-titles'));
+    return;
+  }
   if(name==='frags')renderFragMkt();
-  if(name==='gacha'){if(!S.currentBanner)rotateBanner();renderBanner();}
+  if(name==='gacha'){
+    document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+    document.getElementById('pnl-casino')?.classList.add('active');
+    document.querySelectorAll('.nt').forEach(t=>{if(t.getAttribute('onclick')?.includes("'casino'"))t.classList.add('active');});
+    casinoSubTab('gacha', document.getElementById('casino-tab-gacha'));
+    return;
+  }
   if(name==='inventory')renderInventory();
   if(name==='casino')initCasino();
   if(name==='dice'){initDiceRoller();renderDicePool();}
@@ -1659,22 +1700,32 @@ function dmResolve(result){
 }
 
 function tickTimers(){
+  // Only do DOM work if markets tab is active
+  const mktsActive=document.getElementById('pnl-markets')?.classList.contains('active');
   let anyExpired=false;
+  const now=Date.now();
   S.markets.forEach(m=>{
     if(m.resolved)return;
     if(m.type==='timed'&&m.timerEnd){
-      const rem=Math.max(0,Math.floor((m.timerEnd-Date.now())/1000));
-      const el=document.getElementById('tmr-'+m.id);
-      if(el){el.textContent=`⏱ ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`;if(rem===0)el.style.color='var(--red)';}
+      const rem=Math.max(0,Math.floor((m.timerEnd-now)/1000));
+      if(mktsActive){
+        const el=document.getElementById('tmr-'+m.id);
+        if(el){
+          el.textContent=`⏱ ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`;
+          if(rem===0)el.style.color='var(--red)';
+        }
+      }
       if(rem===0&&m.proc){m.resolved='expired';anyExpired=true;}
     }
     if(m.type==='day'&&m.dayTarget&&S.day>=m.dayTarget&&!m.resolved&&m.proc){
-      const roll=Math.random()*100;
-      autoResolveProcMarket(m,roll<m.prob?'yes':'no');
+      autoResolveProcMarket(m,Math.random()*100<m.prob?'yes':'no');
       anyExpired=true;
     }
   });
-  if(anyExpired){refreshProcMarkets();if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();}
+  if(anyExpired){
+    refreshProcMarkets();
+    if(mktsActive)renderMarkets();
+  }
 }
 // ══ COSTS ════════════════════════════════════════════════════
 function renderCosts(){
@@ -3095,7 +3146,8 @@ function drawRoulette(cv,angle){
 }
 
 function spinRoulette(){
-  if(roulSpinning)return;const amt=parseInt(document.getElementById('roul-amt').value)||50;
+  if(roulSpinning)return;
+  SFX.rouletteRoll();const amt=parseInt(document.getElementById('roul-amt').value)||50;
   const type=document.getElementById('roul-type').value;const singleNum=parseInt(document.getElementById('roul-num').value)||0;
   if(S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}
   upWallet(-amt,`ROULETTE BET: -${amt}◈`,'spend');roulSpinning=true;
@@ -3152,7 +3204,8 @@ function updateReelDisplay(r){
 }
 
 function spinSlots(){
-  if(slotsSpinning)return;const lineAmt=parseInt(document.getElementById('slots-amt').value)||25;
+  if(slotsSpinning)return;
+  SFX.slotSpin();const lineAmt=parseInt(document.getElementById('slots-amt').value)||25;
   const lines=parseInt(document.getElementById('slots-lines').value)||1;
   const totalCost=lineAmt*lines;
   if(S.wallet<totalCost){toast('INSUFFICIENT GEMS','var(--red)');return;}
@@ -3175,7 +3228,7 @@ function slotResult(finals,lineAmt,lines,totalCost){
   winLines.forEach(k=>{for(let r=0;r<3;r++){const el=document.getElementById(`r${r}-${k}`);if(el)el.classList.add('win-line');}});
   const el=document.getElementById('slots-result');
   if(totalWin>0){
-    upWallet(totalWin,`SLOTS WIN: +${totalWin}◈`,'win');
+    upWallet(totalWin,`SLOTS WIN: +${totalWin}◈`,'win');if(totalWin>lineAmt*10)SFX.bigWin();else SFX.slotWin();
     el.style.color='var(--gold)';el.textContent=`WON +${totalWin.toLocaleString()}◈ on ${winLines.length} line${winLines.length>1?'s':''}!`;
     toast(`SLOTS WIN: +${totalWin.toLocaleString()}◈`,'var(--gold)');spawnTwitchChat(true,totalWin,'slots');updateHotStreak(true);
     setTimeout(()=>queueReignbet(totalWin,null,'slots'),400);
@@ -3193,6 +3246,7 @@ function drawBones(vals){
 }
 function getDots(v,ox,oy,sz){const c=sz/2,q=sz/4,p=ox,pp=oy;switch(v){case 1:return[[p+c,pp+c]];case 2:return[[p+q,pp+q*3],[p+q*3,pp+q]];case 3:return[[p+q,pp+q*3],[p+c,pp+c],[p+q*3,pp+q]];case 4:return[[p+q,pp+q],[p+q*3,pp+q],[p+q,pp+q*3],[p+q*3,pp+q*3]];case 5:return[[p+q,pp+q],[p+q*3,pp+q],[p+c,pp+c],[p+q,pp+q*3],[p+q*3,pp+q*3]];case 6:return[[p+q,pp+q],[p+q*3,pp+q],[p+q,pp+c],[p+q*3,pp+c],[p+q,pp+q*3],[p+q*3,pp+q*3]];default:return[];}}
 function rollBones(){
+  SFX.bonesRoll();
   const amt=parseInt(document.getElementById('bones-amt').value)||30;const type=document.getElementById('bones-type').value;
   if(S.wallet<amt){toast('INSUFFICIENT GEMS','var(--red)');return;}upWallet(-amt,`BONES BET: -${amt}◈`,'spend');
   document.getElementById('bones-btn').disabled=true;document.getElementById('bones-result').textContent='...';
@@ -3337,6 +3391,7 @@ function drawDONWheel(angle){
 }
 
 function showDON(amount){
+  SFX.donOpen();
   donPending={active:true,amount};
   donWheelAngle=0;donWheelSpinning=false;
   drawDONWheel(0);
@@ -3387,6 +3442,7 @@ function spinDONWheel(){
 }
 
 function resolveDON(won){
+  if(won)SFX.donWin();else SFX.donLose();
   const{amount}=donPending;
   const rt=document.getElementById('don-result-text');
   if(won){
@@ -3441,6 +3497,7 @@ function closeDON(){
 
 function confirmReignbet(){
   if(!RB_QUEUE.length)return;
+  SFX.reignbetWin();
   const{finalAmt:_final,callback,baseWin,_finalAmt}=RB_QUEUE[0];
   const finalAmt=_finalAmt!==undefined?_finalAmt:baseWin;
   // Pay gems NOW
@@ -3704,6 +3761,7 @@ let shownAchievements=new Set();
 
 function showAchievement(id,title,desc,icon){
   if(shownAchievements.has(id))return;
+  SFX.achievement();
   shownAchievements.add(id);
   if(!S.achievements)S.achievements=[];
   if(!S.achievements.includes(id)){S.achievements.push(id);fbPush();}
@@ -3751,6 +3809,7 @@ function dmFireOracle(){
 }
 
 function showOracleBanner(text){
+  SFX.oracle();
   const banner=document.getElementById('oracle-banner');const el=document.getElementById('oracle-text');
   if(!banner||!el)return;el.textContent=text;banner.style.display='block';
   // Auto-hide after 30s
@@ -3767,6 +3826,7 @@ const INTERVENTION_MSGS=[
 ];
 
 function fireIntervention(){
+  SFX.intervention();
   const msg=pk(INTERVENTION_MSGS);
   const from=typeof msg.from==='function'?msg.from():msg.from;
   const body=msg.body;
@@ -3817,9 +3877,9 @@ function advanceDay(){
   document.getElementById('dayinfo').textContent=`DAY ${S.day} — Interest +${interest.toLocaleString()}◈ | FRAG PRICES DRIFTED INDEPENDENTLY`;
   document.getElementById('avearn').textContent=`~${Math.floor(S.wallet*ti.interest).toLocaleString()}g/day`;
   genShop();rotateBanner();
-  if(document.getElementById('pnl-gacha').classList.contains('active'))renderBanner();
+  if(document.getElementById('casino-section-gacha')?.style.display!=='none'&&document.getElementById('pnl-casino')?.classList.contains('active'))renderBanner();
   if(document.getElementById('pnl-frags').classList.contains('active'))renderFragMkt();
-  if(document.getElementById('pnl-shop').classList.contains('active'))renderShop();
+  if(document.getElementById('pnl-scrollinv')?.classList.contains('active'))renderShop();
   if(document.getElementById('pnl-sponsor').classList.contains('active'))renderSponsors();
   if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();
   if(document.getElementById('pnl-inventory').classList.contains('active'))renderInventory();
@@ -3842,7 +3902,7 @@ function rollbackDay(){
   toast('DAY ROLLED BACK','var(--orange)');logEntry('DAY ROLLED BACK','spend');equipTitle(S.equippedTitle);renderSlots();drawWizard();
   if(document.getElementById('pnl-markets').classList.contains('active'))renderMarkets();
   if(document.getElementById('pnl-frags').classList.contains('active'))renderFragMkt();
-  if(document.getElementById('pnl-shop').classList.contains('active'))renderShop();
+  if(document.getElementById('pnl-scrollinv')?.classList.contains('active'))renderShop();
   fbPush();
 }
 
@@ -4362,28 +4422,8 @@ const SFX={
 };
 
 // Hook audio into key events
-const _origConfirmReignbet=confirmReignbet;
-function confirmReignbet(){SFX.reignbetWin();_origConfirmReignbet();}
-const _origShowDON=showDON;
-function showDON(amt){SFX.donOpen();_origShowDON(amt);}
-const _origResolveDON=resolveDON;
-function resolveDON(won){won?SFX.donWin():SFX.donLose();_origResolveDON(won);}
-const _origSpinRoulette=spinRoulette;
-function spinRoulette(){SFX.rouletteRoll();_origSpinRoulette();}
-const _origSpinSlots=spinSlots;
-function spinSlots(){SFX.slotSpin();_origSpinSlots();}
-const _origRollBones=rollBones;
-function rollBones(){SFX.bonesRoll();_origRollBones();}
-const _origShowAch=showAchievement;
-function showAchievement(id,t,d,ic){SFX.achievement();_origShowAch(id,t,d,ic);}
-const _origFireIntervention=fireIntervention;
-function fireIntervention(){SFX.intervention();_origFireIntervention();}
-const _origShowOracleBanner=showOracleBanner;
-function showOracleBanner(text){SFX.oracle();_origShowOracleBanner(text);}
-// Hook market win
 function playSFXMarketWin(){SFX.marketWin();}
 // Hook gacha
-const _origDoPullInner=doPullOne;
 
 // ══ BLACKJACK ══════════════════════════════════════════════════
 const BJ_SUITS=['♠','♣','♥','♦'];
@@ -4596,8 +4636,7 @@ function useExpertDivination(){
 }
 
 // Hook portent reroll on day advance
-const _origAdvanceDay2=advanceDay;
-function advanceDay(){_origAdvanceDay2();if(S.charSheet.portentDice?.length)rollPortent();}
+
 
 // ══ CLASS FEATURES (Divination Wizard auto-load) ════════════════
 const DIV_WIZARD_FEATURES={
@@ -4649,6 +4688,35 @@ function updateDivWizardFeatures(){
       el.appendChild(card);
     });
   });
+}
+
+
+// ══ SUB-TAB CONTROLLERS ══════════════════════════════════════
+function scrollSubTab(tab, btn){
+  document.getElementById('scroll-section-shop').style.display = tab==='shop' ? 'block' : 'none';
+  document.getElementById('scroll-section-inv').style.display  = tab==='inv'  ? 'block' : 'none';
+  document.querySelectorAll('#scroll-tab-shop, #scroll-tab-inv').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='shop')renderShop();
+  if(tab==='inv')renderScrollInv();
+}
+
+function avatarSubTab(tab, btn){
+  document.getElementById('avatar-section-avatar').style.display = tab==='avatar' ? 'block' : 'none';
+  document.getElementById('avatar-section-titles').style.display  = tab==='titles' ? 'block' : 'none';
+  document.querySelectorAll('#avatar-tab-avatar, #avatar-tab-titles').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='avatar'){drawWizard();renderCharSheet();}
+  if(tab==='titles')renderTitles();
+}
+
+function casinoSubTab(tab, btn){
+  document.getElementById('casino-section-games').style.display = tab==='games' ? 'block' : 'none';
+  document.getElementById('casino-section-gacha').style.display  = tab==='gacha' ? 'block' : 'none';
+  document.querySelectorAll('#casino-tab-games, #casino-tab-gacha').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='games')initCasino();
+  if(tab==='gacha'){if(!S.currentBanner)rotateBanner();renderBanner();}
 }
 
 document.addEventListener('DOMContentLoaded',init);
