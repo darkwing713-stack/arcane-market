@@ -452,6 +452,7 @@ body.dm-mode .nt.player-only{opacity:.6;}
   <button class="nt player-only" onclick="sw('gacha')">GACHA</button>
   <button class="nt player-only" onclick="sw('inventory')">INVENTORY</button>
   <button class="nt player-only" onclick="sw('casino')">CASINO</button>
+  <button class="nt player-only" onclick="sw('dice')">DICE ROLLER</button>
   <button class="nt player-only" onclick="sw('spellbook')">CHARACTER SHEET</button>
   <button class="nt player-only" onclick="sw('stats')">STATS</button>
   <button class="nt dmt" onclick="sw('dm')">DM PANEL</button>
@@ -781,6 +782,66 @@ body.dm-mode .nt.player-only{opacity:.6;}
       <button class="slots-spin-btn" onclick="rollBones()" id="bones-btn">CAST THE BONES</button>
       <div class="casino-result" id="bones-result"></div>
     </div>
+    <!-- BLACKJACK -->
+    <div class="casino-game" style="grid-column:span 2;">
+      <div class="casino-title">ARCANE BLACKJACK</div>
+      <div class="casino-sub">Hit 21 or get closer than the Dealer. Blackjack pays 3:2. Dealer stands on 17.</div>
+      <div id="bj-table" style="width:100%;background:#05000a;border:1px solid var(--border);border-radius:9px;padding:.7rem;min-height:160px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:.3rem;">
+          <div>
+            <div style="font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">DEALER <span id="bj-dealer-count" style="color:var(--red);"></span></div>
+            <div id="bj-dealer-cards" style="display:flex;gap:4px;flex-wrap:wrap;min-height:60px;align-items:flex-start;"></div>
+          </div>
+          <div>
+            <div style="font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:3px;">YOU <span id="bj-player-count" style="color:var(--green);"></span></div>
+            <div id="bj-player-cards" style="display:flex;gap:4px;flex-wrap:wrap;min-height:60px;align-items:flex-start;"></div>
+          </div>
+        </div>
+        <div class="casino-result" id="bj-result" style="min-height:1.2rem;margin-bottom:.4rem;"></div>
+      </div>
+      <div class="casino-inp-row" style="flex-wrap:wrap;gap:.3rem;">
+        <input class="casi" type="number" id="bj-amt" value="50" min="1" style="width:70px;">
+        <button class="slots-spin-btn" onclick="bjDeal()" id="bj-deal-btn" style="flex:1;min-width:70px;">DEAL</button>
+        <button class="slots-spin-btn" onclick="bjHit()" id="bj-hit-btn" style="display:none;flex:1;min-width:60px;background:#001a00;border-color:var(--green);color:var(--green);">HIT</button>
+        <button class="slots-spin-btn" onclick="bjStand()" id="bj-stand-btn" style="display:none;flex:1;min-width:60px;background:#1a0000;border-color:var(--red);color:var(--red);">STAND</button>
+        <button class="slots-spin-btn" onclick="bjDouble()" id="bj-double-btn" style="display:none;flex:1;min-width:70px;background:#1a1000;border-color:var(--gold);color:var(--gold);">DOUBLE DOWN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DICE ROLLER -->
+<div class="pnl" id="pnl-dice">
+  <div class="sh">DICE ROLLER</div>
+  <div style="font-size:8px;color:var(--dim);margin-bottom:.7rem;">Roll up to 20 dice of any size. Click a die to add it, or type the count.</div>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;" id="dice-quick-btns"></div>
+  <div class="card" style="margin-bottom:.6rem;">
+    <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.5rem;">CUSTOM ROLL</div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-bottom:.4rem;" id="dice-pool-display"></div>
+    <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
+      <input type="number" id="dice-count" value="1" min="1" max="20" class="casi" style="width:55px;">
+      <select id="dice-sides" class="dmi" style="background:#05000f;color:var(--w);font-family:var(--fh);font-size:8px;">
+        <option value="4">d4</option><option value="6">d6</option><option value="8">d8</option>
+        <option value="10">d10</option><option value="12">d12</option><option value="20">d20</option>
+        <option value="100">d100</option><option value="2">d2 (coin)</option>
+      </select>
+      <button onclick="diceAddPool()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:8px;padding:4px 10px;border-radius:4px;cursor:pointer;">ADD TO POOL</button>
+      <button onclick="diceClear()" style="background:transparent;border:1px solid #440044;color:#884488;font-family:var(--fh);font-size:7px;padding:4px 8px;border-radius:4px;cursor:pointer;">CLEAR</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap;">
+    <input type="number" id="dice-modifier" value="0" class="casi" style="width:60px;" placeholder="±MOD">
+    <span style="font-size:8px;color:var(--dim);font-family:var(--fh);align-self:center;">modifier</span>
+    <button class="slots-spin-btn" onclick="rollDicePool()" id="dice-roll-btn" style="flex:1;max-width:200px;font-size:1rem;letter-spacing:3px;">ROLL</button>
+  </div>
+  <div id="dice-result-area" style="background:#05000a;border:1px solid var(--border);border-radius:8px;padding:.7rem;min-height:80px;">
+    <div style="font-size:9px;color:var(--dim);font-family:var(--fh);" id="dice-result-label">Roll the dice to see results...</div>
+    <div id="dice-individual" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:.4rem;"></div>
+    <div id="dice-total" style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);text-shadow:0 0 15px var(--gold);margin-top:.2rem;line-height:1;"></div>
+  </div>
+  <div style="margin-top:.6rem;">
+    <div style="font-family:var(--fh);font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:.3rem;">ROLL HISTORY</div>
+    <div id="dice-history" style="max-height:120px;overflow-y:auto;scrollbar-width:thin;font-size:8px;color:var(--dim);font-family:var(--fh);"></div>
   </div>
 </div>
 
@@ -793,6 +854,8 @@ body.dm-mode .nt.player-only{opacity:.6;}
     <button class="ftog" onclick="csTab('slots',this)">SPELL SLOTS</button>
     <button class="ftog" onclick="csTab('spellbook',this)">SPELLBOOK</button>
     <button class="ftog" onclick="csTab('prepared',this)">PREPARED</button>
+    <button class="ftog" onclick="csTab('features',this)">CLASS FEATURES</button>
+    <button class="ftog" onclick="csTab('portent',this)" style="border-color:#00f5ff;color:#00f5ff;">🔮 PORTENT</button>
     <button class="ftog" onclick="csTab('feats',this)">FEATS</button>
     <button class="ftog" onclick="csTab('profs',this)">PROFICIENCIES</button>
     <button class="ftog" onclick="csTab('notes',this)">NOTES</button>
@@ -877,6 +940,44 @@ body.dm-mode .nt.player-only{opacity:.6;}
   <div id="cs-prepared" class="cs-section" style="display:none;">
     <div style="font-size:7px;color:var(--dim);font-family:var(--fh);margin-bottom:.4rem;">Spells prepared today. Click ← to move back to Spellbook. Cantrips are always prepared.</div>
     <div id="sb-prepared-list" style="display:flex;flex-direction:column;gap:.25rem;max-height:550px;overflow-y:auto;scrollbar-width:thin;"></div>
+  </div>
+
+  <!-- CLASS FEATURES -->
+  <div id="cs-features" class="cs-section" style="display:none;">
+    <div style="display:flex;gap:.5rem;align-items:flex-end;margin-bottom:.5rem;flex-wrap:wrap;">
+      <div><label class="dml">CLASS</label><input type="text" id="cf-class" class="sb-inp" value="Wizard" style="width:110px;"></div>
+      <div><label class="dml">SUBCLASS</label><input type="text" id="cf-subclass" class="sb-inp" value="School of Divination" style="width:150px;"></div>
+      <div><label class="dml">LEVEL</label><input type="number" id="cf-level" class="sb-inp" value="5" min="1" max="20" style="width:55px;" oninput="S.charSheet.level=parseInt(this.value)||1;renderSBDerived();updateDivWizardFeatures();"></div>
+      <button onclick="updateDivWizardFeatures()" style="background:#1a0035;border:1px solid var(--purple);color:var(--purple);font-family:var(--fh);font-size:7px;padding:4px 10px;border-radius:3px;cursor:pointer;">REFRESH FEATURES</button>
+    </div>
+    <div id="cf-features-list" style="display:flex;flex-direction:column;gap:.4rem;max-height:500px;overflow-y:auto;scrollbar-width:thin;"></div>
+  </div>
+
+  <!-- PORTENT DICE -->
+  <div id="cs-portent" class="cs-section" style="display:none;">
+    <div style="font-size:8px;color:var(--dim);margin-bottom:.5rem;font-family:var(--fh);letter-spacing:.5px;">
+      At the start of each day, roll your portent dice. You may replace any attack roll, saving throw, or ability check with one of these results — before or after the roll, before any effects.
+    </div>
+    <div class="card" style="margin-bottom:.5rem;">
+      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">PORTENT DICE — LVL 2 (2 dice) / LVL 14 (3 dice)</div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.5rem;">
+        <button onclick="rollPortent()" style="background:linear-gradient(135deg,#001a2a,#002a3a);border:2px solid var(--cyan);color:var(--cyan);font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;padding:.4rem 1.2rem;border-radius:7px;cursor:pointer;box-shadow:0 0 12px rgba(0,245,255,.3);">🔮 ROLL PORTENT</button>
+        <span style="font-size:7px;color:var(--dim);font-family:var(--fh);">Rerolls at dawn (Advance Day)</span>
+      </div>
+      <div id="portent-dice-display" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem;"></div>
+    </div>
+    <div class="card">
+      <div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">EXPERT DIVINATION — SLOT RECOVERY</div>
+      <div style="font-size:8px;color:var(--dim);line-height:1.6;">When you cast a divination spell of 2nd level or higher using a spell slot, you regain one expended spell slot of a level lower than the spell cast (max 5th level). Track below:</div>
+      <div style="display:flex;gap:.4rem;align-items:center;margin-top:.4rem;flex-wrap:wrap;">
+        <span style="font-size:8px;color:var(--dim);font-family:var(--fh);">Cast divination spell (slot level):</span>
+        <select id="expert-div-level" class="dmi" style="background:#05000f;color:var(--w);">
+          <option value="2">Lv2</option><option value="3">Lv3</option><option value="4">Lv4</option><option value="5">Lv5</option><option value="6">Lv6</option><option value="7">Lv7</option><option value="8">Lv8</option><option value="9">Lv9</option>
+        </select>
+        <button onclick="useExpertDivination()" style="background:#001a2a;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--fh);font-size:7px;padding:3px 9px;border-radius:3px;cursor:pointer;">RECOVER SLOT</button>
+        <div id="expert-div-result" style="font-size:8px;color:var(--green);font-family:var(--fh);"></div>
+      </div>
+    </div>
   </div>
 
   <!-- FEATS -->
@@ -1322,6 +1423,7 @@ function sw(name){
   if(name==='gacha'){if(!S.currentBanner)rotateBanner();renderBanner();}
   if(name==='inventory')renderInventory();
   if(name==='casino')initCasino();
+  if(name==='dice'){initDiceRoller();renderDicePool();}
   if(name==='spellbook')renderSpellbook();
   if(name==='stats')renderStats();
   if(name==='dm')buildDMPanel();
@@ -1546,7 +1648,7 @@ function dmResolve(result){
       upWallet(payout,`MARKET WIN PAID OUT (DM confirmed): +${payout}◈`,'win');
     }else{
       upWallet(payout,`MARKET RESOLVED ${result.toUpperCase()}: +${payout}◈`,'win');
-      toast(`RESOLVED ${result.toUpperCase()}! +${payout.toLocaleString()}◈ — REIGNBET?`,'var(--green)');updateHotStreak(true);if(!S.achievements?.includes('first_win'))showAchievement('first_win','FIRST BLOOD','Won your first prediction market.','💰');
+      toast(`RESOLVED ${result.toUpperCase()}! +${payout.toLocaleString()}◈ — REIGNBET?`,'var(--green)');SFX.marketWin();updateHotStreak(true);if(!S.achievements?.includes('first_win'))showAchievement('first_win','FIRST BLOOD','Won your first prediction market.','💰');
       queueReignbet(payout,null,'market');
     }
   }else{
@@ -2682,6 +2784,8 @@ function csTab(tab,btn){
   if(tab==='prepared')renderSBPreparedList();
   if(tab==='feats')renderSBFeatsList();
   if(tab==='profs'){renderSBProfList();renderSkillsList();}
+  if(tab==='features'){updateDivWizardFeatures();}
+  if(tab==='portent'){renderPortentDice();}
   if(tab==='stats'){renderSBAbilityInputs();renderSBDerived();}
   if(tab==='slots')renderSBSlots();
 }
@@ -2927,6 +3031,7 @@ function updateGachaBtnLabels(){
 }
 
 function doPull(count){
+  SFX.gacha();
   if(typeof logDMEvent==='function')logDMEvent(`Player pulled gacha ×${count} (${count===1?(S.pull1Cost||50):(S.pull10Cost||450)}◈)`,'dfe-pull');
   const cost=count===1?(S.pull1Cost||50):(S.pull10Cost||450);
   if(S.wallet<cost){toast('INSUFFICIENT GEMS','var(--red)');return;}
@@ -2949,7 +3054,7 @@ function doPull(count){
   // Check for gacha-only title
   const gachaTitle=results.find(f=>f._gachaTitle);
   if(gachaTitle&&!S.ownedTitles.includes(9)){S.ownedTitles.push(9);equipTitle(9);showNotif('OMNISCIENT VOID SOVEREIGN OBTAINED FROM GACHA!',6000);}
-  const ssrCount=results.filter(f=>(RC[f.rarity]?.tier||0)>=5).length;
+  const ssrCount=results.filter(f=>(RC[f.rarity]?.tier||0)>=5).length;if(ssrCount>0)SFX.gachaSSR();
   document.getElementById('psumm').textContent=ssrCount>0?`★ GOT ${ssrCount} SSR+ PULL${ssrCount>1?'S':''}!`:`${count} pull${count>1?'s':''} — try again...`;
   renderBanner();fbPush();
 }
@@ -3106,7 +3211,7 @@ function bonesResult(vals,type,amt){
     setTimeout(()=>queueReignbet(baseWin,null,'bones'),400);
   }else{el.style.color='var(--red)';el.textContent=`${d1}+${d2}=${total}. LOST.`;spawnTwitchChat(false,amt,'bones');updateHotStreak(false);}
 }
-function initCasino(){initRoulette();initSlots();initBones();}
+function initCasino(){initRoulette();initSlots();initBones();bjBuildDeck();}
 // ══ REIGNBET QUEUE ════════════════════════════════════════════
 const RB_QUEUE=[];
 let rbActive=false;
@@ -3172,7 +3277,7 @@ function rollReignbet(){
       const diff=final-base;const diffStr=diff>=0?`+${diff.toLocaleString()}◈`:`${diff.toLocaleString()}◈`;
       document.getElementById('rb-final-display').textContent=`${final.toLocaleString()} gems  (${diffStr})`;
       document.getElementById('rb-final-display').style.color=col;
-      if(mult===4){
+      if(mult===4){SFX.reignbetX4();
         // ×4 MAXIMUM — offer Double or Nothing after a moment
         const btn=document.getElementById('rb-confirm-btn');btn.style.display='block';
         btn.textContent=`COLLECT ${final.toLocaleString()}◈ — or spin the wheel...`;
@@ -4076,7 +4181,7 @@ function afterStateLoad(){
   // Restore DM mode from localStorage
   const storedDM=localStorage.getItem('arcane_dm_mode');if(storedDM==='1'){S.isDM=true;document.body.classList.add('dm-mode');}
   equipTitle(S.equippedTitle);renderSlots();drawWizard();renderCharSheet();
-  renderMarkets();renderCosts();updateGachaBtnLabels();buildNewsTicker();updateTaxDisplay();renderRestWell();renderStreakPill();if(S.dailyOracle&&S.dailyOracle.day===S.day)showOracleBanner(S.dailyOracle.text);
+  renderMarkets();renderCosts();updateGachaBtnLabels();buildNewsTicker();updateTaxDisplay();renderRestWell();renderStreakPill();if(S.charSheet?.portentDice?.length)renderPortentDice();if(S.dailyOracle&&S.dailyOracle.day===S.day)showOracleBanner(S.dailyOracle.text);
   const activeId=document.querySelector('.pnl.active')?.id?.replace('pnl-','');
   if(activeId==='shop')renderShop();else if(activeId==='scrollinv')renderScrollInv();
   else if(activeId==='sponsor')renderSponsors();else if(activeId==='frags')renderFragMkt();
@@ -4192,6 +4297,358 @@ function renderSkillsList(){
     el.appendChild(row);
   });
   const hint=document.createElement('div');hint.style.cssText='font-size:7px;color:#440066;font-family:var(--fh);margin-top:4px;';hint.textContent='Click: none → proficient (green) → expertise (gold pip) → none';el.appendChild(hint);
+}
+
+// ══ AUDIO ENGINE ══════════════════════════════════════════════
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let _actx=null;
+function getACtx(){if(!_actx)try{_actx=new AudioCtx();}catch(e){}return _actx;}
+
+function playTone(freq,dur,type='sine',vol=.18,delay=0){
+  const ctx=getACtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);
+  g.gain.setValueAtTime(0,ctx.currentTime+delay);
+  g.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+.01);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+dur);
+  o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+.05);
+}
+
+function playChord(freqs,dur,type='sine',vol=.12){freqs.forEach((f,i)=>playTone(f,dur,type,vol,i*.04));}
+
+const SFX={
+  // Casino & gambling
+  spin:()=>{for(let i=0;i<8;i++)playTone(200+i*40,.06,'square',.08,i*.055);},
+  cardFlip:()=>{playTone(800,.04,'square',.06);playTone(600,.05,'square',.04,.05);},
+  chipStack:()=>{playTone(440,.08,'triangle',.12);playTone(880,.06,'triangle',.08,.09);},
+  slotSpin:()=>{for(let i=0;i<5;i++)playTone(150+Math.random()*100,.04,'sawtooth',.05,i*.08);},
+  slotWin:()=>{const notes=[523,659,784,1047];notes.forEach((f,i)=>playTone(f,.2,'sine',.15,i*.12));},
+  rouletteRoll:()=>{let t=0;for(let i=0;i<20;i++){playTone(300+Math.random()*200,.03,'square',.04,t);t+=.05+i*.006;}},
+  bonesRoll:()=>{for(let i=0;i<3;i++){playTone(150+Math.random()*100,.05,'square',.08,i*.06);}},
+  bjCard:()=>{playTone(660,.05,'triangle',.1);playTone(990,.04,'triangle',.07,.06);},
+  bjBust:()=>{for(let i=0;i<3;i++)playTone(300-i*60,.15,'sawtooth',.1,i*.1);},
+  bjBlackjack:()=>{[523,659,784,1047,1319].forEach((f,i)=>playTone(f,.25,'sine',.15,i*.08));},
+  // Wins
+  smallWin:()=>{playChord([523,659,784],.3,'sine',.12);playTone(1047,.4,'sine',.15,.2);},
+  bigWin:()=>{[523,659,784,988,1047,1319,1568].forEach((f,i)=>playTone(f,.3,'sine',.14,i*.07));},
+  reignbet:()=>{// Ominous rising tone
+    playTone(110,.8,'sine',.2);playTone(165,.6,'sine',.15,.3);playTone(220,.5,'sine',.12,.6);
+    playTone(880,.1,'square',.08,1.0);playTone(440,.2,'sine',.1,1.0);},
+  reignbetWin:()=>{playChord([440,554,659,880],.5,'sine',.15);playTone(1760,.3,'sine',.1,.4);},
+  reignbetBust:()=>{playTone(220,.5,'sawtooth',.2);playTone(110,.8,'sine',.15,.3);},
+  reignbetX4:()=>{// Dramatic swell
+    for(let i=0;i<6;i++)playTone(440+i*110,.15+i*.05,'sine',.1+i*.02,i*.1);
+    playTone(1760,.4,'sine',.2,.7);},
+  // DON
+  donOpen:()=>{playTone(55,1.5,'sine',.3);playTone(110,.8,'sawtooth',.2,.3);playTone(220,.5,'square',.15,.8);},
+  donWin:()=>{[261,329,392,523,659,784,1047,1568].forEach((f,i)=>playTone(f,.4,'sine',.16,i*.06));},
+  donLose:()=>{for(let i=0;i<4;i++)playTone(220-i*30,.3,'sawtooth',.15,i*.12);},
+  // Market
+  marketWin:()=>{playChord([392,494,587],.4,'sine',.12);playTone(1174,.3,'sine',.1,.35);},
+  marketResolve:()=>{playTone(440,.1,'square',.08);playTone(880,.2,'sine',.1,.15);},
+  // Gacha
+  gacha:()=>{for(let i=0;i<10;i++)playTone(200+i*80,.07,'sine',.08,i*.07);},
+  gachaSSR:()=>{[261,329,392,494,587,740,880,1174,1568].forEach((f,i)=>playTone(f,.3,'sine',.15,i*.05));setTimeout(()=>playChord([523,659,784,988,1047],.6,'sine',.18),500);},
+  // Dice  
+  diceRoll:()=>{for(let i=0;i<4;i++)playTone(150+Math.random()*150,.04,'square',.08,i*.04);},
+  portentRoll:()=>{playTone(880,.1,'sine',.1);playTone(1320,.15,'sine',.12,.1);playTone(1760,.2,'sine',.1,.2);setTimeout(()=>playChord([440,554,659],.4,'sine',.08),350);},
+  // UI
+  tab:()=>{playTone(880,.04,'sine',.06);},
+  error:()=>{playTone(220,.2,'sawtooth',.1);playTone(165,.2,'sawtooth',.08,.1);},
+  achievement:()=>{[523,659,784,988].forEach((f,i)=>playTone(f,.2,'sine',.12,i*.06));playTone(1976,.35,'sine',.15,.3);},
+  intervention:()=>{playTone(220,.3,'square',.15);playTone(165,.4,'sawtooth',.12,.25);},
+  oracle:()=>{playTone(220,.6,'sine',.15);playTone(330,.5,'sine',.1,.4);playTone(440,.4,'sine',.08,.7);},
+};
+
+// Hook audio into key events
+const _origConfirmReignbet=confirmReignbet;
+function confirmReignbet(){SFX.reignbetWin();_origConfirmReignbet();}
+const _origShowDON=showDON;
+function showDON(amt){SFX.donOpen();_origShowDON(amt);}
+const _origResolveDON=resolveDON;
+function resolveDON(won){won?SFX.donWin():SFX.donLose();_origResolveDON(won);}
+const _origSpinRoulette=spinRoulette;
+function spinRoulette(){SFX.rouletteRoll();_origSpinRoulette();}
+const _origSpinSlots=spinSlots;
+function spinSlots(){SFX.slotSpin();_origSpinSlots();}
+const _origRollBones=rollBones;
+function rollBones(){SFX.bonesRoll();_origRollBones();}
+const _origShowAch=showAchievement;
+function showAchievement(id,t,d,ic){SFX.achievement();_origShowAch(id,t,d,ic);}
+const _origFireIntervention=fireIntervention;
+function fireIntervention(){SFX.intervention();_origFireIntervention();}
+const _origShowOracleBanner=showOracleBanner;
+function showOracleBanner(text){SFX.oracle();_origShowOracleBanner(text);}
+// Hook market win
+function playSFXMarketWin(){SFX.marketWin();}
+// Hook gacha
+const _origDoPullInner=doPullOne;
+
+// ══ BLACKJACK ══════════════════════════════════════════════════
+const BJ_SUITS=['♠','♣','♥','♦'];
+const BJ_RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+let bjDeck=[],bjPlayer=[],bjDealer=[],bjBet=0,bjActive=false,bjDoubled=false;
+
+function bjBuildDeck(){
+  bjDeck=[];
+  for(let d=0;d<6;d++)for(const s of BJ_SUITS)for(const r of BJ_RANKS)bjDeck.push({s,r});
+  for(let i=bjDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bjDeck[i],bjDeck[j]]=[bjDeck[j],bjDeck[i]];}
+}
+function bjCardVal(r){if(['J','Q','K'].includes(r))return 10;if(r==='A')return 11;return parseInt(r);}
+function bjHandVal(hand){let v=0,aces=0;for(const c of hand){v+=bjCardVal(c.r);if(c.r==='A')aces++;}while(v>21&&aces>0){v-=10;aces--;}return v;}
+function bjCardHTML(c,hidden=false){
+  const red=c.s==='♥'||c.s==='♦';
+  const style=`display:inline-flex;flex-direction:column;justify-content:space-between;width:32px;height:46px;border-radius:4px;padding:2px 3px;font-family:'Bebas Neue',sans-serif;font-size:10px;line-height:1;cursor:default;border:1px solid;`;
+  if(hidden)return`<div style="${style}background:#0a0018;border-color:#440066;color:#440066;">▓<br>▓▓<br>▓</div>`;
+  return`<div style="${style}background:${red?'#1a0008':'#08000f'};border-color:${red?'#cc2244':'#4466aa'};color:${red?'#ff4466':'#88aaff'};">${c.r}<br><span style="font-size:14px;">${c.s}</span><br>${c.r}</div>`;
+}
+function bjRender(hideDealer=true){
+  const dc=document.getElementById('bj-dealer-cards');const pc=document.getElementById('bj-player-cards');
+  const dv=document.getElementById('bj-dealer-count');const pv=document.getElementById('bj-player-count');
+  if(!dc||!pc)return;
+  dc.innerHTML=bjDealer.map((c,i)=>bjCardHTML(c,hideDealer&&i===1)).join('');
+  pc.innerHTML=bjPlayer.map(c=>bjCardHTML(c,false)).join('');
+  const pval=bjHandVal(bjPlayer);
+  pv.textContent=pval+(pval>21?' BUST!':'');
+  if(hideDealer){dv.textContent='?';}
+  else{const dval=bjHandVal(bjDealer);dv.textContent=dval+(dval>21?' BUST!':'');}
+}
+function bjDeal(){
+  if(bjDeck.length<15)bjBuildDeck();
+  bjBet=parseInt(document.getElementById('bj-amt').value)||50;
+  if(S.wallet<bjBet){toast('INSUFFICIENT GEMS','var(--red)');SFX.error();return;}
+  upWallet(-bjBet,`BLACKJACK BET: -${bjBet}◈`,'spend');
+  bjPlayer=[bjDeck.pop(),bjDeck.pop()];bjDealer=[bjDeck.pop(),bjDeck.pop()];
+  bjActive=true;bjDoubled=false;
+  SFX.bjCard();setTimeout(SFX.bjCard,150);setTimeout(SFX.bjCard,300);setTimeout(SFX.bjCard,450);
+  document.getElementById('bj-result').textContent='';
+  bjRender(true);
+  document.getElementById('bj-deal-btn').style.display='none';
+  document.getElementById('bj-hit-btn').style.display='block';
+  document.getElementById('bj-stand-btn').style.display='block';
+  // Show double down only on initial deal and if can afford
+  document.getElementById('bj-double-btn').style.display=S.wallet>=bjBet?'block':'none';
+  // Check player blackjack
+  if(bjHandVal(bjPlayer)===21){bjStand();}
+}
+function bjHit(){
+  if(!bjActive)return;SFX.bjCard();
+  bjPlayer.push(bjDeck.pop());bjRender(true);
+  document.getElementById('bj-double-btn').style.display='none';
+  if(bjHandVal(bjPlayer)>21){bjEnd('bust');}
+}
+function bjDouble(){
+  if(!bjActive||S.wallet<bjBet)return;
+  upWallet(-bjBet,`BLACKJACK DOUBLE: -${bjBet}◈`,'spend');bjBet*=2;bjDoubled=true;
+  SFX.bjCard();bjPlayer.push(bjDeck.pop());bjRender(true);
+  document.getElementById('bj-double-btn').style.display='none';
+  if(bjHandVal(bjPlayer)>21){bjEnd('bust');}else{bjStand();}
+}
+function bjStand(){
+  if(!bjActive)return;bjActive=false;
+  document.getElementById('bj-hit-btn').style.display='none';
+  document.getElementById('bj-stand-btn').style.display='none';
+  document.getElementById('bj-double-btn').style.display='none';
+  // Dealer draws to 17
+  const iv=setInterval(()=>{
+    const dv=bjHandVal(bjDealer);
+    if(dv<17){bjDealer.push(bjDeck.pop());SFX.bjCard();bjRender(false);}
+    else{clearInterval(iv);bjRender(false);const pv=bjHandVal(bjPlayer);const dv2=bjHandVal(bjDealer);bjEnd(pv>21?'bust':dv2>21?'dealer_bust':pv>dv2?'win':pv<dv2?'lose':'push');}
+  },600);
+}
+function bjEnd(result){
+  bjActive=false;bjRender(false);
+  document.getElementById('bj-hit-btn').style.display='none';
+  document.getElementById('bj-stand-btn').style.display='none';
+  document.getElementById('bj-double-btn').style.display='none';
+  document.getElementById('bj-deal-btn').style.display='block';
+  const el=document.getElementById('bj-result');
+  const pv=bjHandVal(bjPlayer);const isNaturalBJ=bjPlayer.length===2&&pv===21;
+  if(result==='bust'){el.style.color='var(--red)';el.textContent='BUST! You lose.';SFX.bjBust();updateHotStreak(false);}
+  else if(result==='dealer_bust'){
+    const win=Math.floor(bjBet*(isNaturalBJ?1.5:1));upWallet(bjBet+win,`BLACKJACK WIN: +${win}◈`,'win');
+    el.style.color='var(--green)';el.textContent=isNaturalBJ?`BLACKJACK! +${win}◈`:`DEALER BUST! +${win}◈`;
+    if(isNaturalBJ)SFX.bjBlackjack();else SFX.smallWin();updateHotStreak(true);queueReignbet(win,null,'blackjack');
+  }else if(result==='win'){
+    const win=Math.floor(bjBet*(isNaturalBJ?1.5:1));upWallet(bjBet+win,`BLACKJACK WIN: +${win}◈`,'win');
+    el.style.color='var(--green)';el.textContent=isNaturalBJ?`BLACKJACK! +${win}◈`:`WIN! +${win}◈`;
+    if(isNaturalBJ)SFX.bjBlackjack();else SFX.smallWin();updateHotStreak(true);queueReignbet(win,null,'blackjack');
+  }else if(result==='lose'){el.style.color='var(--red)';el.textContent='DEALER WINS.';SFX.bjBust();updateHotStreak(false);}
+  else{upWallet(bjBet,`BLACKJACK PUSH`,'win');el.style.color='var(--dim)';el.textContent='PUSH — BET RETURNED.';}
+  spawnTwitchChat(!['bust','lose'].includes(result),bjBet,'blackjack');
+  fbPush();
+}
+
+// ══ DICE ROLLER ════════════════════════════════════════════════
+let dicePool=[];
+const DICE_TYPES=[4,6,8,10,12,20,100];
+const DICE_COLORS={4:'#ff4400',6:'#4488ff',8:'#44ff88',10:'#ff44cc',12:'#ffd700',20:'#c800ff',100:'#00f5ff'};
+
+function initDiceRoller(){
+  const btns=document.getElementById('dice-quick-btns');if(!btns||btns.children.length>0)return;
+  DICE_TYPES.forEach(d=>{
+    const btn=document.createElement('button');
+    const col=DICE_COLORS[d]||'var(--purple)';
+    btn.style.cssText=`font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;background:#05000a;border:2px solid ${col};color:${col};padding:.3rem .8rem;border-radius:6px;cursor:pointer;box-shadow:0 0 8px ${col}44;transition:all .2s;`;
+    btn.textContent=`d${d}`;
+    btn.onmouseenter=()=>{btn.style.background=col+'22';btn.style.boxShadow=`0 0 16px ${col}88`;};
+    btn.onmouseleave=()=>{btn.style.background='#05000a';btn.style.boxShadow=`0 0 8px ${col}44`;};
+    btn.onclick=()=>{dicePool.push(d);renderDicePool();SFX.tab();};
+    btns.appendChild(btn);
+  });
+}
+
+function renderDicePool(){
+  const el=document.getElementById('dice-pool-display');if(!el)return;el.innerHTML='';
+  if(!dicePool.length){el.innerHTML='<span style="font-size:8px;color:var(--dim);font-family:var(--fh);">Click dice above or add to pool...</span>';return;}
+  // Group counts
+  const counts={};dicePool.forEach(d=>{counts[d]=(counts[d]||0)+1;});
+  Object.entries(counts).forEach(([d,n])=>{
+    const col=DICE_COLORS[d]||'var(--purple)';
+    const chip=document.createElement('div');
+    chip.style.cssText=`display:flex;align-items:center;gap:4px;background:#05000a;border:2px solid ${col};border-radius:6px;padding:3px 8px;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:${col};cursor:pointer;`;
+    chip.innerHTML=`${n}d${d} <span style="font-size:10px;color:${col}88;margin-left:2px;">✕</span>`;
+    chip.onclick=()=>{// Remove all of this type
+      dicePool=dicePool.filter(x=>x!==parseInt(d));renderDicePool();};
+    el.appendChild(chip);
+  });
+}
+
+function diceAddPool(){
+  const count=Math.min(20,parseInt(document.getElementById('dice-count')?.value)||1);
+  const sides=parseInt(document.getElementById('dice-sides')?.value)||6;
+  for(let i=0;i<count;i++){if(dicePool.length<20)dicePool.push(sides);}
+  renderDicePool();SFX.chipStack();
+}
+
+function diceClear(){dicePool=[];renderDicePool();document.getElementById('dice-result-area').querySelector('#dice-result-label').textContent='Roll the dice to see results...';document.getElementById('dice-individual').innerHTML='';document.getElementById('dice-total').textContent='';}
+
+function rollDicePool(){
+  if(!dicePool.length){toast('Add dice to the pool first','var(--orange)');SFX.error();return;}
+  SFX.diceRoll();
+  const mod=parseInt(document.getElementById('dice-modifier')?.value)||0;
+  const results=dicePool.map(d=>({d,r:rnd(1,d)}));
+  const sum=results.reduce((a,b)=>a+b.r,0)+mod;
+  // Render individual dice
+  const ind=document.getElementById('dice-individual');ind.innerHTML='';
+  results.forEach(({d,r})=>{
+    const col=DICE_COLORS[d]||'var(--purple)';const isMax=r===d;const isMin=r===1;
+    const die=document.createElement('div');
+    die.style.cssText=`display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:6px;border:2px solid ${isMax?'var(--gold)':isMin?'var(--red)':col};background:${isMax?'rgba(255,215,0,.1)':isMin?'rgba(255,0,0,.1)':'#05000a'};font-family:'Bebas Neue',sans-serif;font-size:1rem;color:${isMax?'var(--gold)':isMin?'var(--red)':col};box-shadow:${isMax?`0 0 10px var(--gold)`:isMin?'0 0 6px var(--red)':'none'};`;
+    die.textContent=r;die.title=`d${d}`;
+    ind.appendChild(die);
+  });
+  if(mod!==0){const ms=document.createElement('span');ms.style.cssText='font-family:var(--fh);font-size:9px;color:var(--dim);align-self:center;';ms.textContent=(mod>0?'+ ':'- ')+Math.abs(mod);ind.appendChild(ms);}
+  document.getElementById('dice-total').textContent=sum;
+  document.getElementById('dice-result-label').textContent=`${dicePool.map(d=>'d'+d).join('+')}${mod?((mod>0?'+':'')+mod):''} = ${sum}`;
+  // History
+  const hist=document.getElementById('dice-history');const entry=document.createElement('div');entry.style.cssText='padding:2px 0;border-bottom:1px solid #110022;';entry.textContent=`${results.map(({d,r})=>`d${d}:${r}`).join(', ')}${mod?((mod>0?'+':'')+mod):''} = ${sum}`;hist.prepend(entry);while(hist.children.length>20)hist.removeChild(hist.lastChild);
+  // Big wins get audio flourish
+  if(results.length>1&&results.every(({d,r})=>r===d))SFX.bigWin();
+}
+
+// ══ PORTENT DICE ═══════════════════════════════════════════════
+function getPortentCount(){const lv=S.charSheet.level||5;return lv>=14?3:2;}
+
+function rollPortent(){
+  SFX.portentRoll();
+  const count=getPortentCount();
+  const rolls=Array.from({length:count},()=>rnd(1,20));
+  S.charSheet.portentDice=rolls.map(r=>({value:r,used:false}));
+  renderPortentDice();fbPush();
+  toast(`PORTENT ROLLED: ${rolls.join(', ')}`,'var(--cyan)');
+  logDMEvent(`Player rolled portent: ${rolls.join(', ')}`,'dfe-equip');
+}
+
+function renderPortentDice(){
+  const el=document.getElementById('portent-dice-display');if(!el)return;el.innerHTML='';
+  const dice=S.charSheet.portentDice||[];
+  if(!dice.length){el.innerHTML='<div style="font-size:8px;color:var(--dim);font-family:var(--fh);">No portent dice rolled today. Click ROLL PORTENT above.</div>';return;}
+  dice.forEach((pd,i)=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText=`display:flex;flex-direction:column;align-items:center;gap:4px;`;
+    const die=document.createElement('div');
+    const col=pd.value<=5?'var(--red)':pd.value>=16?'var(--gold)':'var(--cyan)';
+    die.style.cssText=`width:64px;height:64px;border-radius:10px;border:3px solid ${pd.used?'#333':col};background:${pd.used?'#050008':col+'11'};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:${pd.used?'#333':col};box-shadow:${pd.used?'none':`0 0 16px ${col}66`};cursor:${pd.used?'default':'pointer'};transition:all .3s;`;
+    die.textContent=pd.value;
+    die.title=pd.used?'Used':'Click to mark as used';
+    if(!pd.used)die.onclick=()=>{pd.used=true;renderPortentDice();fbPush();SFX.tab();};
+    const lbl=document.createElement('div');
+    lbl.style.cssText=`font-family:var(--fh);font-size:7px;color:${pd.used?'#333':'var(--dim)'};letter-spacing:1px;`;
+    lbl.textContent=pd.used?'USED':(pd.value<=5?'LOW':pd.value>=16?'HIGH':'MID');
+    wrap.appendChild(die);wrap.appendChild(lbl);el.appendChild(wrap);
+  });
+}
+
+function useExpertDivination(){
+  const castLevel=parseInt(document.getElementById('expert-div-level')?.value)||2;
+  const recoverable=Math.min(castLevel-1,5);
+  // Find lowest empty slot that's recoverable
+  let recovered=false;
+  for(let l=recoverable;l>=1;l--){
+    const cur=S.charSheet.spellSlots?.[l-1]||0;const max=S.charSheet.spellSlotsMax?.[l-1]||0;
+    if(cur<max){S.charSheet.spellSlots[l-1]=cur+1;recovered=true;
+      document.getElementById('expert-div-result').textContent=`Recovered 1 Lv${l} slot!`;
+      toast(`Expert Divination: +1 Lv${l} spell slot`,'var(--cyan)');SFX.portentRoll();fbPush();break;}
+  }
+  if(!recovered){document.getElementById('expert-div-result').textContent='All eligible slots full.';SFX.error();}
+}
+
+// Hook portent reroll on day advance
+const _origAdvanceDay2=advanceDay;
+function advanceDay(){_origAdvanceDay2();if(S.charSheet.portentDice?.length)rollPortent();}
+
+// ══ CLASS FEATURES (Divination Wizard auto-load) ════════════════
+const DIV_WIZARD_FEATURES={
+  2:[{name:'Divination Savant',desc:'The gold and time you must spend to copy a divination spell into your spellbook is halved.'},
+     {name:'Portent',desc:'Starting at 2nd level, glimpses of the future begin to press in on your perception. When you finish a long rest, roll two d20s and record the numbers rolled. You can replace any attack roll, saving throw, or ability check made by you or a creature that you can see with one of these foretelling rolls. You must choose to do so before the roll, and you can replace a roll in this way only once per turn. Each foretelling roll can be used only once. When you finish a long rest, you lose any unused foretelling rolls.'}],
+  6:[{name:'Expert Divination',desc:'Beginning at 6th level, casting divination spells comes so easily to you that it expends only a fraction of your spellcasting efforts. When you cast a divination spell of 2nd level or higher using a spell slot, you regain one expended spell slot. The slot you regain must be of a level lower than the spell you cast and can\'t be higher than 5th level.'}],
+  10:[{name:'The Third Eye',desc:'Starting at 10th level, you can use your action to increase your powers of perception. When you do so, choose one of the following benefits, which lasts until you are incapacitated or you take a short or long rest: Darkvision (60ft), Ethereal Sight, Greater Comprehension (read any language), or See Invisibility.'}],
+  14:[{name:'Greater Portent',desc:'Starting at 14th level, the visions in your dreams intensify and paint a more accurate picture in your mind of what is to come. You roll three dice for your Portent feature, rather than two.'}],
+};
+const BASE_WIZARD_FEATURES={
+  1:[{name:'Spellcasting',desc:'You can cast wizard spells. Your spellcasting ability is Intelligence. You know three cantrips from the wizard spell list. Your spell save DC = 8 + proficiency bonus + INT modifier. Spell attack modifier = proficiency bonus + INT modifier.'},
+     {name:'Arcane Recovery',desc:'Once per day when you finish a short rest, you can choose expended spell slots to recover. Total levels of slots recovered can\'t exceed half your wizard level (rounded up), and none of the slots can be 6th level or higher.'}],
+  2:[{name:'Arcane Tradition',desc:'You choose an arcane tradition from the list of available traditions. Your choice grants you features at 2nd level and again at 6th, 10th, and 14th level.'}],
+  4:[{name:'Ability Score Improvement',desc:'You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. You can\'t increase an ability score above 20 using this feature. (Level 4, 8, 12, 16, 19)'}],
+  18:[{name:'Spell Mastery',desc:'You have achieved such mastery over certain spells that you can cast them at will. Choose a 1st-level and a 2nd-level wizard spell in your spellbook. You can cast those spells at their lowest level without expending a spell slot when you have them prepared.'}],
+  20:[{name:'Signature Spells',desc:'You gain mastery over two powerful spells and can cast them with little effort. Choose two 3rd-level wizard spells in your spellbook as your signature spells. You always have these spells prepared, they don\'t count against the number of spells you have prepared, and you can cast each of them once at 3rd level without expending a spell slot. When you do so, you can\'t do so again until you finish a short or long rest.'}],
+};
+
+function updateDivWizardFeatures(){
+  const levelEl=document.getElementById('cf-level');const classEl=document.getElementById('cf-class');const subEl=document.getElementById('cf-subclass');
+  if(levelEl)S.charSheet.level=parseInt(levelEl.value)||5;
+  if(classEl)S.charSheet.className=classEl.value||'Wizard';
+  if(subEl)S.charSheet.subclass=subEl.value||'School of Divination';
+  const lv=S.charSheet.level||5;
+  const el=document.getElementById('cf-features-list');if(!el)return;el.innerHTML='';
+  const profBonus=Math.ceil(lv/4)+1;
+  // Summary card
+  const sumCard=document.createElement('div');sumCard.className='card';
+  sumCard.innerHTML=`<div style="font-family:var(--fh);font-size:7px;color:var(--cyan);letter-spacing:2px;margin-bottom:.4rem;">CHARACTER SUMMARY</div>
+    <div style="font-size:9px;color:var(--dim);line-height:2;font-family:var(--fh);">
+      <span style="color:var(--w);">${S.charSheet.className||'Wizard'} ${lv}</span> — ${S.charSheet.subclass||'School of Divination'}<br>
+      Proficiency Bonus: <span style="color:var(--green);">+${profBonus}</span> &nbsp;
+      Spell Save DC: <span style="color:var(--purple);">${8+profBonus+(abilityMod(S.charSheet.int||18))}</span> &nbsp;
+      Spell Attack: <span style="color:var(--purple);">+${profBonus+(abilityMod(S.charSheet.int||18))}</span><br>
+      Portent Dice: <span style="color:var(--cyan);">${getPortentCount()} d20s per long rest</span>
+    </div>`;
+  el.appendChild(sumCard);
+  // Render features by level
+  const allFeatures={};
+  Object.entries(BASE_WIZARD_FEATURES).forEach(([fl,feats])=>{if(parseInt(fl)<=lv)feats.forEach(f=>{ if(!allFeatures[fl])allFeatures[fl]=[];allFeatures[fl].push({...f,source:'Wizard'});});});
+  Object.entries(DIV_WIZARD_FEATURES).forEach(([fl,feats])=>{if(parseInt(fl)<=lv)feats.forEach(f=>{ if(!allFeatures[fl])allFeatures[fl]=[];allFeatures[fl].push({...f,source:'Divination'});});});
+  Object.keys(allFeatures).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(fl=>{
+    const header=document.createElement('div');header.style.cssText='font-family:var(--fh);font-size:7px;color:var(--gold);letter-spacing:2px;padding:3px 0;border-bottom:1px solid #2a0050;margin-top:4px;margin-bottom:3px;';header.textContent=`LEVEL ${fl}`;el.appendChild(header);
+    allFeatures[fl].forEach(f=>{
+      const card=document.createElement('div');card.className='card';card.style.cssText='margin-bottom:3px;cursor:pointer;';
+      const src=f.source==='Divination'?'<span style="font-size:6px;color:var(--cyan);font-family:var(--fh);border:1px solid var(--cyan);border-radius:2px;padding:0 3px;margin-left:4px;">DIV</span>':'';
+      card.innerHTML=`<div style="font-family:var(--fh);font-size:8px;color:var(--gold);margin-bottom:2px;">${f.name}${src}</div><div id="ff-desc-${fl}-${f.name.replace(/\s/g,'')}" style="font-size:8px;color:var(--dim);line-height:1.5;display:none;">${f.desc}</div>`;
+      card.onclick=()=>{const d=document.getElementById('ff-desc-'+fl+'-'+f.name.replace(/\s/g,''));if(d)d.style.display=d.style.display==='none'?'block':'none';};
+      el.appendChild(card);
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded',init);
